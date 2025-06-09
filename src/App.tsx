@@ -17,6 +17,7 @@ import OutsourcedMattersSpend from "./pages/OutsourcedMattersSpend";
 import NotFound from "./pages/NotFound";
 import RiskDashboard from "./pages/RiskDashboard";
 import TaskManagement from "./pages/TaskManagement";
+import UserAccessManagement from "./pages/UserAccessManagement";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
           <Route path="/risk-dashboard" element={<RiskDashboard />} />
           <Route path="/task-management" element={<TaskManagement />} />
+          <Route path="/user-access-management" element={<UserAccessManagement />} />
           {/* Redirect from old paths to new paths */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
           <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />

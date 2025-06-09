@@ -11,7 +11,8 @@ import {
   BarChart3,
   Home,
   Settings,
-  CheckSquare
+  CheckSquare,
+  Users
 } from "lucide-react";
 import {
   Sidebar as SidebarPrimitive,
@@ -86,6 +87,11 @@ const modules = [
     title: "Task Management",
     url: "/task-management",
     icon: CheckSquare,
+  },
+  {
+    title: "User & Access Management",
+    url: "/user-access-management",
+    icon: Users,
   },
 ];
 
