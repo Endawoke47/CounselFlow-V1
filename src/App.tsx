@@ -29,6 +29,8 @@ const App = () => (
           <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
           {/* Redirect from old path to new path */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
+          {/* Redirect from /licensing to /licensing-regulatory */}
+          <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
