@@ -54,8 +54,8 @@ export function PolicyLibraryDashboard() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [entityFilter, setEntityFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [entityFilter, setEntityFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const handleViewPolicy = (policy: any) => {
     setSelectedPolicy(policy);
@@ -153,7 +153,7 @@ export function PolicyLibraryDashboard() {
                 <SelectValue placeholder="Filter by Entity" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Entities</SelectItem>
+                <SelectItem value="all">All Entities</SelectItem>
                 <SelectItem value="uk">TechCorp UK Ltd</SelectItem>
                 <SelectItem value="de">TechCorp GmbH</SelectItem>
                 <SelectItem value="us">TechCorp Inc</SelectItem>
@@ -164,7 +164,7 @@ export function PolicyLibraryDashboard() {
                 <SelectValue placeholder="Filter by Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Draft">Draft</SelectItem>
                 <SelectItem value="In Review">In Review</SelectItem>

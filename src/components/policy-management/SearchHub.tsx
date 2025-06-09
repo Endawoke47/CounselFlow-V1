@@ -42,8 +42,8 @@ const mockSearchResults = [
 
 export function SearchHub() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [entityFilter, setEntityFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
+  const [entityFilter, setEntityFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   return (
@@ -78,7 +78,7 @@ export function SearchHub() {
                   <SelectValue placeholder="Filter by Entity" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Entities</SelectItem>
+                  <SelectItem value="all">All Entities</SelectItem>
                   <SelectItem value="uk">TechCorp UK Ltd</SelectItem>
                   <SelectItem value="de">TechCorp GmbH</SelectItem>
                   <SelectItem value="us">TechCorp Inc</SelectItem>
@@ -90,7 +90,7 @@ export function SearchHub() {
                   <SelectValue placeholder="Policy Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="data-privacy">Data Privacy</SelectItem>
                   <SelectItem value="ethics">Ethics & Compliance</SelectItem>
                   <SelectItem value="financial">Financial Compliance</SelectItem>
