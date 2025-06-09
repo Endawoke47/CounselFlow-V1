@@ -1,0 +1,400 @@
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Building2, 
+  Users, 
+  FileText, 
+  Calendar, 
+  AlertTriangle,
+  Plus,
+  Search,
+  Filter,
+  MoreHorizontal,
+  MapPin,
+  Briefcase
+} from "lucide-react";
+
+export function CompanySecretarialDashboard() {
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Company Secretarial & Corporate Governance</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage entity records, statutory registers, and compliance across your organization
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Entity
+          </Button>
+          <Button variant="outline">
+            <Calendar className="h-4 w-4 mr-2" />
+            Schedule Meeting
+          </Button>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Entities</CardTitle>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">247</div>
+            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+              <span>Active: 231</span>
+              <span>Dormant: 16</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Filings</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">23</div>
+            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+              <span className="text-red-600">Overdue: 3</span>
+              <span className="text-orange-600">Due: 5</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Board Meetings</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">12</div>
+            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+              <span>This Month: 4</span>
+              <span>Upcoming: 8</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Compliance Alerts</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8</div>
+            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+              <span className="text-red-600">High: 3</span>
+              <span className="text-orange-600">Medium: 5</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="entities" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="entities">Entity Directory</TabsTrigger>
+          <TabsTrigger value="registers">Statutory Registers</TabsTrigger>
+          <TabsTrigger value="filings">Regulatory Filings</TabsTrigger>
+          <TabsTrigger value="meetings">Meetings & Resolutions</TabsTrigger>
+          <TabsTrigger value="structure">Group Structure</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="entities" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Entity Directory</CardTitle>
+                  <CardDescription>Manage and monitor all entities across jurisdictions</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Search className="h-4 w-4 mr-2" />
+                    Search
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Sample Entity Rows */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Building2 className="h-8 w-8 text-primary" />
+                      <div>
+                        <h3 className="font-semibold">Acme Corporation Ltd</h3>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            United Kingdom
+                          </span>
+                          <span>Company Number: 12345678</span>
+                          <Badge variant="secondary">Active</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">3 Pending Filings</Badge>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Building2 className="h-8 w-8 text-primary" />
+                      <div>
+                        <h3 className="font-semibold">Global Tech Solutions Pte Ltd</h3>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            Singapore
+                          </span>
+                          <span>UEN: 201912345G</span>
+                          <Badge variant="secondary">Active</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive">Overdue Filing</Badge>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Building2 className="h-8 w-8 text-muted-foreground" />
+                      <div>
+                        <h3 className="font-semibold">Innovation Holdings Inc</h3>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            Delaware, USA
+                          </span>
+                          <span>File Number: 7891234</span>
+                          <Badge variant="outline">Dormant</Badge>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">No Pending Actions</Badge>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="registers" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Statutory Registers</CardTitle>
+              <CardDescription>Maintain directors, members, and other statutory records</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Directors Register</CardTitle>
+                    <CardDescription>Track director appointments and resignations</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold mb-2">156</div>
+                    <div className="text-sm text-muted-foreground">Active appointments</div>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      <Users className="h-4 w-4 mr-2" />
+                      View Register
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Members Register</CardTitle>
+                    <CardDescription>Manage shareholder records and transfers</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold mb-2">89</div>
+                    <div className="text-sm text-muted-foreground">Registered members</div>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      <Briefcase className="h-4 w-4 mr-2" />
+                      View Register
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Charges Register</CardTitle>
+                    <CardDescription>Monitor security interests and charges</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold mb-2">23</div>
+                    <div className="text-sm text-muted-foreground">Active charges</div>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Register
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="filings" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Regulatory Filings & Compliance Calendar</CardTitle>
+              <CardDescription>Track filing deadlines and compliance requirements</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="border rounded-lg p-4 border-red-200 bg-red-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <AlertTriangle className="h-5 w-5 text-red-600" />
+                      <div>
+                        <h3 className="font-semibold text-red-900">Annual Return - Overdue</h3>
+                        <p className="text-sm text-red-700">Global Tech Solutions Pte Ltd</p>
+                        <p className="text-xs text-red-600">Due: 3 days ago</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="destructive">
+                      File Now
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-4 border-orange-200 bg-orange-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <Calendar className="h-5 w-5 text-orange-600" />
+                      <div>
+                        <h3 className="font-semibold text-orange-900">Confirmation Statement</h3>
+                        <p className="text-sm text-orange-700">Acme Corporation Ltd</p>
+                        <p className="text-xs text-orange-600">Due: In 5 days</p>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline">
+                      Prepare Filing
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <div>
+                        <h3 className="font-semibold">Annual Accounts</h3>
+                        <p className="text-sm text-muted-foreground">Innovation Holdings Inc</p>
+                        <p className="text-xs text-muted-foreground">Due: In 2 months</p>
+                      </div>
+                    </div>
+                    <Badge variant="outline">Scheduled</Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="meetings" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Board Meetings & Resolutions</CardTitle>
+              <CardDescription>Manage meeting schedules, agendas, and resolutions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Upcoming Meetings</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="border-l-4 border-primary pl-4">
+                        <h4 className="font-semibold">Board Meeting - Q4 Review</h4>
+                        <p className="text-sm text-muted-foreground">Acme Corporation Ltd</p>
+                        <p className="text-xs text-muted-foreground">Dec 15, 2024 at 2:00 PM</p>
+                      </div>
+                      <div className="border-l-4 border-primary pl-4">
+                        <h4 className="font-semibold">AGM 2024</h4>
+                        <p className="text-sm text-muted-foreground">Global Tech Solutions Pte Ltd</p>
+                        <p className="text-xs text-muted-foreground">Dec 20, 2024 at 10:00 AM</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Recent Resolutions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="border rounded p-3">
+                        <h4 className="font-semibold">Resolution #2024-015</h4>
+                        <p className="text-sm text-muted-foreground">Approval of new banking facilities</p>
+                        <Badge variant="secondary" className="mt-2">Approved</Badge>
+                      </div>
+                      <div className="border rounded p-3">
+                        <h4 className="font-semibold">Resolution #2024-014</h4>
+                        <p className="text-sm text-muted-foreground">Director appointment</p>
+                        <Badge variant="secondary" className="mt-2">Approved</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="structure" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Group Structure Visualization</CardTitle>
+              <CardDescription>Interactive organizational chart and ownership structure</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12 text-muted-foreground">
+                <Building2 className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-medium mb-2">Organization Chart</h3>
+                <p className="text-sm">Interactive group structure visualization will be displayed here</p>
+                <Button variant="outline" className="mt-4">
+                  View Full Structure
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
