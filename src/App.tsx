@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import CompanySecretarial from "./pages/CompanySecretarial";
 import Contracts from "./pages/Contracts";
 import DisputeResolution from "./pages/DisputeResolution";
+import MatterManagement from "./pages/MatterManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/company-secretarial" element={<CompanySecretarial />} />
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/dispute-resolution" element={<DisputeResolution />} />
+          <Route path="/matters" element={<MatterManagement />} />
           {/* Redirect from old path to new path */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

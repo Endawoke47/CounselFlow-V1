@@ -1,0 +1,163 @@
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Search, Filter, AlertTriangle, Clock, User } from "lucide-react";
+
+interface MattersListProps {
+  onMatterSelect: (matter: any) => void;
+}
+
+export function MattersList({ onMatterSelect }: MattersListProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const matters = [
+    {
+      id: "MAT-2024-001",
+      title: "Contract Review - Vendor Agreement",
+      businessUnit: "Procurement",
+      owner: "Sarah Chen",
+      status: "In Progress",
+      priority: "High",
+      slaStatus: "On Track",
+      riskLevel: "Medium",
+      createdDate: "2024-01-15",
+      dueDate: "2024-01-25",
+      type: "Contract Review"
+    },
+    {
+      id: "MAT-2024-002", 
+      title: "Employment Law Advice - Remote Work Policy",
+      businessUnit: "HR",
+      owner: "David Park",
+      status: "Pending Review",
+      priority: "Medium",
+      slaStatus: "At Risk",
+      riskLevel: "Low",
+      createdDate: "2024-01-18",
+      dueDate: "2024-01-28",
+      type: "Legal Advice"
+    },
+    {
+      id: "MAT-2024-003",
+      title: "Regulatory Compliance - Data Privacy Assessment",
+      businessUnit: "IT",
+      owner: "Emily Rodriguez",
+      status: "Complete",
+      priority: "High",
+      slaStatus: "Completed",
+      riskLevel: "High",
+      createdDate: "2024-01-10",
+      dueDate: "2024-01-20",
+      type: "Compliance"
+    }
+  ];
+
+  const getStatusBadge = (status: string) => {
+    const colors = {
+      "In Progress": "bg-blue-100 text-blue-800",
+      "Pending Review": "bg-yellow-100 text-yellow-800",
+      "Complete": "bg-green-100 text-green-800",
+      "On Hold": "bg-gray-100 text-gray-800"
+    };
+    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  };
+
+  const getPriorityBadge = (priority: string) => {
+    const colors = {
+      "High": "bg-red-100 text-red-800",
+      "Medium": "bg-orange-100 text-orange-800", 
+      "Low": "bg-green-100 text-green-800"
+    };
+    return colors[priority as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  };
+
+  const getSLAIcon = (slaStatus: string) => {
+    if (slaStatus === "At Risk") return <AlertTriangle className="h-4 w-4 text-red-500" />;
+    if (slaStatus === "On Track") return <Clock className="h-4 w-4 text-green-500" />;
+    return <Clock className="h-4 w-4 text-gray-500" />;
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            All Matters
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search matters..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 w-64"
+              />
+            </div>
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Filter
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Matter ID</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Business Unit</TableHead>
+              <TableHead>Owner</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>SLA</TableHead>
+              <TableHead>Due Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {matters.map((matter) => (
+              <TableRow 
+                key={matter.id} 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => onMatterSelect(matter)}
+              >
+                <TableCell className="font-medium">{matter.id}</TableCell>
+                <TableCell>
+                  <div>
+                    <div className="font-medium">{matter.title}</div>
+                    <div className="text-sm text-muted-foreground">{matter.type}</div>
+                  </div>
+                </TableCell>
+                <TableCell>{matter.businessUnit}</TableCell>
+                <TableCell>{matter.owner}</TableCell>
+                <TableCell>
+                  <Badge className={getStatusBadge(matter.status)}>
+                    {matter.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge className={getPriorityBadge(matter.priority)}>
+                    {matter.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    {getSLAIcon(matter.slaStatus)}
+                    <span className="text-sm">{matter.slaStatus}</span>
+                  </div>
+                </TableCell>
+                <TableCell>{matter.dueDate}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
