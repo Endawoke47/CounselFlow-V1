@@ -10,6 +10,7 @@ import Contracts from "./pages/Contracts";
 import DisputeResolution from "./pages/DisputeResolution";
 import MatterManagement from "./pages/MatterManagement";
 import LicensingRegulatory from "./pages/LicensingRegulatory";
+import PolicyManagement from "./pages/PolicyManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/dispute-resolution" element={<DisputeResolution />} />
           <Route path="/matters" element={<MatterManagement />} />
           <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
+          <Route path="/policy-management" element={<PolicyManagement />} />
           {/* Redirect from old path to new path */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
           {/* Redirect from /licensing to /licensing-regulatory */}
