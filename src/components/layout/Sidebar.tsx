@@ -10,7 +10,8 @@ import {
   CreditCard, 
   BarChart3,
   Home,
-  Settings
+  Settings,
+  CheckSquare
 } from "lucide-react";
 import {
   Sidebar as SidebarPrimitive,
@@ -80,6 +81,11 @@ const modules = [
     title: "Risk Dashboard",
     url: "/risk",
     icon: BarChart3,
+  },
+  {
+    title: "Task Management",
+    url: "/task-management",
+    icon: CheckSquare,
   },
 ];
 
