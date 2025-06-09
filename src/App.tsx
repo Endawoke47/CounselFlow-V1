@@ -29,10 +29,10 @@ const App = () => (
           <Route path="/matters" element={<MatterManagement />} />
           <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
           <Route path="/policy-management" element={<PolicyManagement />} />
-          {/* Redirect from old path to new path */}
+          {/* Redirect from old paths to new paths */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
-          {/* Redirect from /licensing to /licensing-regulatory */}
           <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
+          <Route path="/policies" element={<Navigate to="/policy-management" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
