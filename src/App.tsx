@@ -13,6 +13,7 @@ import LicensingRegulatory from "./pages/LicensingRegulatory";
 import PolicyManagement from "./pages/PolicyManagement";
 import KnowledgeManagement from "./pages/KnowledgeManagement";
 import IPManagement from "./pages/IPManagement";
+import OutsourcedMattersSpend from "./pages/OutsourcedMattersSpend";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,12 +34,14 @@ const App = () => (
           <Route path="/policy-management" element={<PolicyManagement />} />
           <Route path="/knowledge-management" element={<KnowledgeManagement />} />
           <Route path="/ip-management" element={<IPManagement />} />
+          <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
           {/* Redirect from old paths to new paths */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
           <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
           <Route path="/policies" element={<Navigate to="/policy-management" replace />} />
           <Route path="/knowledge" element={<Navigate to="/knowledge-management" replace />} />
           <Route path="/ip" element={<Navigate to="/ip-management" replace />} />
+          <Route path="/legal-spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
