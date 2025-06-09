@@ -9,6 +9,7 @@ import CompanySecretarial from "./pages/CompanySecretarial";
 import Contracts from "./pages/Contracts";
 import DisputeResolution from "./pages/DisputeResolution";
 import MatterManagement from "./pages/MatterManagement";
+import LicensingRegulatory from "./pages/LicensingRegulatory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/contracts" element={<Contracts />} />
           <Route path="/dispute-resolution" element={<DisputeResolution />} />
           <Route path="/matters" element={<MatterManagement />} />
+          <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
           {/* Redirect from old path to new path */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
