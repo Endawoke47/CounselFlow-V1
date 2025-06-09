@@ -6,47 +6,48 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Bell, Eye, FileText, Scale, Gavel } from "lucide-react";
+import { Search, Bell, Filter, Eye, AlertTriangle, Calendar, MapPin } from "lucide-react";
 import { RegulatoryUpdateModal } from "./RegulatoryUpdateModal";
 
 export function RegulatoryWatchlist() {
   const [selectedUpdate, setSelectedUpdate] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
   const [jurisdictionFilter, setJurisdictionFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const stats = [
     {
       title: "Active Alerts",
-      value: "24",
+      value: "18",
       change: "+3 this week",
       icon: Bell,
       color: "text-blue-600",
       bgColor: "bg-blue-50"
     },
     {
-      title: "New Regulations",
-      value: "8",
-      change: "This month",
-      icon: FileText,
-      color: "text-green-600",
-      bgColor: "bg-green-50"
+      title: "High Risk Updates",
+      value: "5",
+      change: "Immediate review",
+      icon: AlertTriangle,
+      color: "text-red-600",
+      bgColor: "bg-red-50"
     },
     {
-      title: "Case Law Updates",
+      title: "Pending Review",
       value: "12",
-      change: "Under review",
-      icon: Gavel,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
-    },
-    {
-      title: "Pending Actions",
-      value: "16",
-      change: "Requiring review",
+      change: "Awaiting assignment",
       icon: Eye,
       color: "text-orange-600",
       bgColor: "bg-orange-50"
+    },
+    {
+      title: "This Month",
+      value: "34",
+      change: "Total updates",
+      icon: Calendar,
+      color: "text-green-600",
+      bgColor: "bg-green-50"
     }
   ];
 
@@ -54,38 +55,38 @@ export function RegulatoryWatchlist() {
     {
       id: 1,
       title: "EU AI Act Implementation Guidelines",
-      type: "Regulation",
       jurisdiction: "European Union",
+      type: "Regulation",
       status: "Active",
       effectiveDate: "2024-08-01",
       riskLevel: "High",
       assignedReviewer: "Sarah Johnson",
-      summary: "New guidelines for AI system compliance and risk assessment requirements",
-      source: "European Commission"
+      source: "Official Journal EU",
+      summary: "New implementation guidelines for the EU AI Act requiring enhanced documentation and compliance procedures for AI systems."
     },
     {
       id: 2,
       title: "Data Protection Amendment Act 2024",
-      type: "Proposed Regulation",
       jurisdiction: "United Kingdom",
+      type: "Proposed Regulation",
       status: "Proposed",
-      effectiveDate: "2025-01-01",
+      effectiveDate: "2024-09-15",
       riskLevel: "Medium",
       assignedReviewer: "Michael Chen",
-      summary: "Proposed amendments to UK GDPR implementation",
-      source: "UK Parliament"
+      source: "UK Parliament",
+      summary: "Proposed amendments to strengthen data protection requirements for multinational corporations."
     },
     {
       id: 3,
       title: "Thompson v. TechCorp Data Breach Ruling",
-      type: "Case Law",
       jurisdiction: "United States",
+      type: "Case Law",
       status: "Final",
       effectiveDate: "2024-06-15",
       riskLevel: "High",
       assignedReviewer: "Emma Wilson",
-      summary: "Landmark ruling on corporate liability in data breach incidents",
-      source: "Supreme Court"
+      source: "Federal Court",
+      summary: "Supreme Court ruling establishing new liability standards for corporate data breaches affecting consumer rights."
     }
   ];
 
@@ -137,15 +138,21 @@ export function RegulatoryWatchlist() {
         ))}
       </div>
 
-      {/* Watchlist */}
+      {/* Regulatory Updates */}
       <Card>
         <CardHeader>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <CardTitle>Regulatory Watchlist</CardTitle>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Alert
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline">
+                <Bell className="h-4 w-4 mr-2" />
+                Manage Alerts
+              </Button>
+              <Button variant="outline">
+                <Filter className="h-4 w-4 mr-2" />
+                Saved Views
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -159,17 +166,6 @@ export function RegulatoryWatchlist() {
                 className="pl-10"
               />
             </div>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="regulation">Regulation</SelectItem>
-                <SelectItem value="proposed">Proposed</SelectItem>
-                <SelectItem value="case-law">Case Law</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter by jurisdiction" />
@@ -179,7 +175,28 @@ export function RegulatoryWatchlist() {
                 <SelectItem value="eu">European Union</SelectItem>
                 <SelectItem value="uk">United Kingdom</SelectItem>
                 <SelectItem value="us">United States</SelectItem>
-                <SelectItem value="sg">Singapore</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="regulation">Regulation</SelectItem>
+                <SelectItem value="proposed">Proposed Regulation</SelectItem>
+                <SelectItem value="case-law">Case Law</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="proposed">Proposed</SelectItem>
+                <SelectItem value="final">Final</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -188,7 +205,7 @@ export function RegulatoryWatchlist() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
+                <TableHead>Update Title</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Jurisdiction</TableHead>
                 <TableHead>Effective Date</TableHead>
@@ -206,7 +223,12 @@ export function RegulatoryWatchlist() {
                 >
                   <TableCell className="font-medium">{update.title}</TableCell>
                   <TableCell>{getTypeBadge(update.type)}</TableCell>
-                  <TableCell>{update.jurisdiction}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      {update.jurisdiction}
+                    </div>
+                  </TableCell>
                   <TableCell>{update.effectiveDate}</TableCell>
                   <TableCell>{getRiskBadge(update.riskLevel)}</TableCell>
                   <TableCell>{update.assignedReviewer}</TableCell>
@@ -220,7 +242,10 @@ export function RegulatoryWatchlist() {
         </CardContent>
       </Card>
 
-      <RegulatoryUpdateModal update={selectedUpdate} onOpenChange={setSelectedUpdate} />
+      <RegulatoryUpdateModal 
+        update={selectedUpdate} 
+        onOpenChange={setSelectedUpdate} 
+      />
     </div>
   );
 }

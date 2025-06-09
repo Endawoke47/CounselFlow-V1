@@ -10,7 +10,12 @@ export function LicensingRegulatoryDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">Licensing & Regulatory</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Licensing & Regulatory</h1>
+          <p className="text-muted-foreground">
+            Manage licenses, monitor regulatory changes, and track compliance actions
+          </p>
+        </div>
       </div>
 
       <Tabs defaultValue="licenses" className="space-y-6">
