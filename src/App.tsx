@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,7 @@ import IPManagement from "./pages/IPManagement";
 import OutsourcedMattersSpend from "./pages/OutsourcedMattersSpend";
 import NotFound from "./pages/NotFound";
 import RiskDashboard from "./pages/RiskDashboard";
+import TaskManagement from "./pages/TaskManagement";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,7 @@ const App = () => (
           <Route path="/ip-management" element={<IPManagement />} />
           <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
           <Route path="/risk-dashboard" element={<RiskDashboard />} />
+          <Route path="/task-management" element={<TaskManagement />} />
           {/* Redirect from old paths to new paths */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
           <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
@@ -45,6 +48,7 @@ const App = () => (
           <Route path="/legal-spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
           <Route path="/spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
           <Route path="/risk" element={<Navigate to="/risk-dashboard" replace />} />
+          <Route path="/tasks" element={<Navigate to="/task-management" replace />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
