@@ -192,7 +192,7 @@ export function PolicyAnalytics() {
                 <span className="text-sm text-muted-foreground">78%</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Policies Pending > 7 days</span>
+                <span className="text-sm font-medium">Policies Pending {">"}7 days</span>
                 <span className="text-sm text-muted-foreground">3</span>
               </div>
               <div className="flex items-center justify-between">
