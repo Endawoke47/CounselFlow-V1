@@ -1,9 +1,10 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, FileText, User, MapPin, AlertTriangle, Link, Plus } from "lucide-react";
+import { Calendar, MapPin, User, AlertTriangle, FileText, Plus } from "lucide-react";
 
 interface RegulatoryUpdateModalProps {
   update: any;
@@ -72,7 +73,7 @@ export function RegulatoryUpdateModal({ update, onOpenChange }: RegulatoryUpdate
             <div className="flex items-center space-x-2">
               <User className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-sm text-muted-foreground">Reviewer</p>
+                <p className="text-sm text-muted-foreground">Assigned Reviewer</p>
                 <p className="font-medium">{update.assignedReviewer}</p>
               </div>
             </div>
@@ -89,8 +90,8 @@ export function RegulatoryUpdateModal({ update, onOpenChange }: RegulatoryUpdate
             <TabsList>
               <TabsTrigger value="summary">Summary</TabsTrigger>
               <TabsTrigger value="impact">Impact Assessment</TabsTrigger>
-              <TabsTrigger value="actions">Compliance Actions</TabsTrigger>
-              <TabsTrigger value="links">Linked Records</TabsTrigger>
+              <TabsTrigger value="actions">Actions</TabsTrigger>
+              <TabsTrigger value="documents">Documents</TabsTrigger>
             </TabsList>
 
             <TabsContent value="summary">
@@ -100,50 +101,17 @@ export function RegulatoryUpdateModal({ update, onOpenChange }: RegulatoryUpdate
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Summary</label>
+                    <label className="text-sm font-medium text-muted-foreground">Description</label>
                     <p className="mt-1">{update.summary}</p>
                   </div>
-                  
-                  {update.type === "Case Law" && (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">Court</label>
-                          <p className="mt-1">Supreme Court</p>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">Citation</label>
-                          <p className="mt-1">Thompson v. TechCorp, 2024 SC 123</p>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Holding Summary</label>
-                        <p className="mt-1">The court held that corporations have enhanced liability for data breaches involving personal information, establishing new standards for data protection compliance.</p>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Legal Area</label>
-                        <div className="mt-1 flex gap-2">
-                          <Badge variant="outline">Data Protection</Badge>
-                          <Badge variant="outline">Corporate Liability</Badge>
-                          <Badge variant="outline">Privacy</Badge>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {update.type === "Proposed Regulation" && (
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Forecasted Impact</label>
-                      <p className="mt-1">This amendment will require enhanced data processing documentation and may impact our current data handling procedures across UK operations.</p>
+                      <label className="text-sm font-medium text-muted-foreground">Status</label>
+                      <p className="mt-1">{update.status}</p>
                     </div>
-                  )}
-
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Tags</label>
-                    <div className="mt-1 flex gap-2">
-                      <Badge variant="outline">Data Protection</Badge>
-                      <Badge variant="outline">Compliance</Badge>
-                      <Badge variant="outline">High Priority</Badge>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Risk Level</label>
+                      <p className="mt-1">{update.riskLevel}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -153,51 +121,28 @@ export function RegulatoryUpdateModal({ update, onOpenChange }: RegulatoryUpdate
             <TabsContent value="impact">
               <Card>
                 <CardHeader>
-                  <CardTitle>Business Impact Assessment</CardTitle>
+                  <CardTitle>Impact Assessment</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Affected Entities</label>
-                      <div className="mt-1 space-y-2">
-                        <div className="flex items-center justify-between p-2 border rounded">
-                          <span>TechCorp UK Ltd</span>
-                          <Badge className="bg-red-100 text-red-800">High Impact</Badge>
-                        </div>
-                        <div className="flex items-center justify-between p-2 border rounded">
-                          <span>TechCorp Services UK</span>
-                          <Badge className="bg-yellow-100 text-yellow-800">Medium Impact</Badge>
-                        </div>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertTriangle className="h-4 w-4 text-orange-600" />
+                        <span className="font-medium">Business Functions Affected</span>
                       </div>
+                      <ul className="list-disc list-inside text-sm space-y-1">
+                        <li>Legal Department - Policy updates required</li>
+                        <li>Compliance - Process review needed</li>
+                        <li>Data Processing - New documentation standards</li>
+                      </ul>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Business Functions</label>
-                      <div className="mt-1 space-y-2">
-                        <div className="flex items-center justify-between p-2 border rounded">
-                          <span>Data Processing</span>
-                          <Badge className="bg-red-100 text-red-800">Critical</Badge>
-                        </div>
-                        <div className="flex items-center justify-between p-2 border rounded">
-                          <span>Customer Services</span>
-                          <Badge className="bg-yellow-100 text-yellow-800">Moderate</Badge>
-                        </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="h-4 w-4 text-blue-600" />
+                        <span className="font-medium">Timeline</span>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Risk Assessment</label>
-                    <div className="mt-1 p-4 border rounded-md bg-red-50">
-                      <div className="flex items-start gap-2">
-                        <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
-                        <div>
-                          <p className="font-medium text-red-800">High Risk - Immediate Action Required</p>
-                          <p className="text-sm text-red-700 mt-1">
-                            Non-compliance could result in significant regulatory penalties and reputational damage. 
-                            Existing data processing agreements may need immediate review and updates.
-                          </p>
-                        </div>
-                      </div>
+                      <p className="text-sm">Implementation deadline: {update.effectiveDate}</p>
+                      <p className="text-sm text-muted-foreground">90 days to complete all required actions</p>
                     </div>
                   </div>
                 </CardContent>
@@ -207,83 +152,61 @@ export function RegulatoryUpdateModal({ update, onOpenChange }: RegulatoryUpdate
             <TabsContent value="actions">
               <Card>
                 <CardHeader>
-                  <CardTitle>Compliance Actions</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Required Actions</CardTitle>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Action
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-3 border rounded-md">
                       <div>
-                        <p className="font-medium">Review and update data processing agreements</p>
-                        <p className="text-sm text-muted-foreground">Due: 2024-07-15 • Assigned: Legal Team</p>
+                        <p className="font-medium">Update data processing agreements</p>
+                        <p className="text-sm text-muted-foreground">Due: 2024-07-15 • Assigned to: Sarah Johnson</p>
                       </div>
-                      <Badge className="bg-orange-100 text-orange-800">In Progress</Badge>
+                      <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-md">
                       <div>
-                        <p className="font-medium">Conduct privacy impact assessment</p>
-                        <p className="text-sm text-muted-foreground">Due: 2024-07-30 • Assigned: Compliance Team</p>
-                      </div>
-                      <Badge variant="outline">Pending</Badge>
-                    </div>
-                    <div className="flex items-center justify-between p-3 border rounded-md">
-                      <div>
-                        <p className="font-medium">Update privacy policies and notices</p>
-                        <p className="text-sm text-muted-foreground">Due: 2024-08-15 • Assigned: Legal Team</p>
+                        <p className="font-medium">Conduct compliance training</p>
+                        <p className="text-sm text-muted-foreground">Due: 2024-07-30 • Assigned to: Michael Chen</p>
                       </div>
                       <Badge variant="outline">Not Started</Badge>
                     </div>
                   </div>
-                  <Button className="w-full mt-4">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Compliance Action
-                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="links">
+            <TabsContent value="documents">
               <Card>
                 <CardHeader>
-                  <CardTitle>Linked Records</CardTitle>
+                  <CardTitle>Related Documents</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Related Licenses</label>
-                      <div className="mt-1 space-y-2">
-                        <div className="flex items-center gap-3 p-2 border rounded">
-                          <Link className="h-4 w-4" />
-                          <span>Data Protection Registration - UK</span>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4" />
+                        <div>
+                          <p className="font-medium">Official Regulation Text</p>
+                          <p className="text-sm text-muted-foreground">EU-AI-Act-2024.pdf</p>
                         </div>
                       </div>
+                      <Button variant="outline" size="sm">Download</Button>
                     </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Related Contracts</label>
-                      <div className="mt-1 space-y-2">
-                        <div className="flex items-center gap-3 p-2 border rounded">
-                          <Link className="h-4 w-4" />
-                          <span>Master Services Agreement - Customer Data</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-2 border rounded">
-                          <Link className="h-4 w-4" />
-                          <span>Data Processing Agreement Template</span>
+                    <div className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4" />
+                        <div>
+                          <p className="font-medium">Implementation Guidelines</p>
+                          <p className="text-sm text-muted-foreground">AI-Act-Guidelines.pdf</p>
                         </div>
                       </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Related Policies</label>
-                      <div className="mt-1 space-y-2">
-                        <div className="flex items-center gap-3 p-2 border rounded">
-                          <Link className="h-4 w-4" />
-                          <span>Privacy Policy v2.1</span>
-                        </div>
-                        <div className="flex items-center gap-3 p-2 border rounded">
-                          <Link className="h-4 w-4" />
-                          <span>Data Retention Policy</span>
-                        </div>
-                      </div>
+                      <Button variant="outline" size="sm">Download</Button>
                     </div>
                   </div>
                 </CardContent>
