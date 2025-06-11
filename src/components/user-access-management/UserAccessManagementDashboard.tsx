@@ -16,51 +16,53 @@ export function UserAccessManagementDashboard() {
   const [showAddUserModal, setShowAddUserModal] = useState(false);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">User & Access Management</h1>
-          <p className="text-muted-foreground">
-            Manage user access, roles, and permissions across all legal modules
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="h-4 w-4 mr-2" />
-            Filters
-          </Button>
-          <Button onClick={() => setShowAddUserModal(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add User
-          </Button>
+    <div className="space-y-8">
+      <div className="section-header">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="section-title">User & Access Management</h1>
+            <p className="section-description">
+              Manage user access, roles, and permissions across all legal modules
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" size="sm" className="h-9 rounded-lg border-border/50 hover:bg-accent/50">
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+            <Button onClick={() => setShowAddUserModal(true)} className="h-9 rounded-lg">
+              <Plus className="h-4 w-4 mr-2" />
+              Add User
+            </Button>
+          </div>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="users" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-6 bg-muted/30 p-1 rounded-xl border border-border/30">
+          <TabsTrigger value="users" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Users className="h-4 w-4" />
-            Users
+            <span className="hidden sm:inline">Users</span>
           </TabsTrigger>
-          <TabsTrigger value="roles" className="flex items-center gap-2">
+          <TabsTrigger value="roles" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Shield className="h-4 w-4" />
-            Roles
+            <span className="hidden sm:inline">Roles</span>
           </TabsTrigger>
-          <TabsTrigger value="access-requests" className="flex items-center gap-2">
+          <TabsTrigger value="access-requests" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <CheckSquare className="h-4 w-4" />
-            Access Requests
+            <span className="hidden sm:inline">Requests</span>
           </TabsTrigger>
-          <TabsTrigger value="entities" className="flex items-center gap-2">
+          <TabsTrigger value="entities" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Globe className="h-4 w-4" />
-            Entity Access
+            <span className="hidden sm:inline">Entities</span>
           </TabsTrigger>
-          <TabsTrigger value="external" className="flex items-center gap-2">
+          <TabsTrigger value="external" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Eye className="h-4 w-4" />
-            External Users
+            <span className="hidden sm:inline">External</span>
           </TabsTrigger>
-          <TabsTrigger value="audit" className="flex items-center gap-2">
+          <TabsTrigger value="audit" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Activity className="h-4 w-4" />
-            Audit Logs
+            <span className="hidden sm:inline">Audit</span>
           </TabsTrigger>
         </TabsList>
 

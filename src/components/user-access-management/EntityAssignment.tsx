@@ -43,69 +43,75 @@ const mockEntityAssignments = [
 export function EntityAssignment() {
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
+      <Card className="modern-card">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
+              <Globe className="h-4 w-4 text-primary" />
+            </div>
             Entity & Geography Access
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm text-muted-foreground leading-relaxed">
             Manage user access to specific entities, regions, and business units
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Entity Access</TableHead>
-                <TableHead>Regional Scope</TableHead>
-                <TableHead>Access Restrictions</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockEntityAssignments.map((assignment) => (
-                <TableRow key={assignment.id}>
-                  <TableCell>
-                    <div className="font-medium">{assignment.user}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{assignment.role}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {assignment.entities.map((entity, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          <Building className="h-3 w-3 mr-1" />
-                          {entity}
-                        </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {assignment.regions.map((region, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          {region}
-                        </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell className="max-w-xs">
-                    <div className="text-sm">{assignment.restrictions}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm">
-                      Edit Access
-                    </Button>
-                  </TableCell>
+        <CardContent className="p-0">
+          <div className="overflow-hidden rounded-lg border border-border/50">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="font-semibold text-foreground">User</TableHead>
+                  <TableHead className="font-semibold text-foreground">Role</TableHead>
+                  <TableHead className="font-semibold text-foreground">Entity Access</TableHead>
+                  <TableHead className="font-semibold text-foreground">Regional Scope</TableHead>
+                  <TableHead className="font-semibold text-foreground">Access Restrictions</TableHead>
+                  <TableHead className="font-semibold text-foreground">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {mockEntityAssignments.map((assignment) => (
+                  <TableRow key={assignment.id} className="hover:bg-accent/30 transition-colors">
+                    <TableCell className="py-4">
+                      <div className="font-medium text-foreground">{assignment.user}</div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <Badge variant="outline" className="rounded-lg border-border/50 bg-muted/30">
+                        {assignment.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex flex-wrap gap-1.5">
+                        {assignment.entities.map((entity, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs rounded-lg bg-accent/50 border border-border/30">
+                            <Building className="h-3 w-3 mr-1.5" />
+                            {entity}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex flex-wrap gap-1.5">
+                        {assignment.regions.map((region, index) => (
+                          <Badge key={index} variant="outline" className="text-xs rounded-lg border-border/50">
+                            <MapPin className="h-3 w-3 mr-1.5" />
+                            {region}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell className="max-w-xs py-4">
+                      <div className="text-sm text-muted-foreground">{assignment.restrictions}</div>
+                    </TableCell>
+                    <TableCell className="py-4">
+                      <Button variant="outline" size="sm" className="h-8 rounded-lg border-border/50 hover:bg-accent/50">
+                        Edit Access
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
