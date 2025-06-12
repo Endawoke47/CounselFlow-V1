@@ -97,32 +97,28 @@ const modules = [
 
 export function Sidebar() {
   return (
-    <SidebarPrimitive className="border-r border-border/50 bg-sidebar-background/95 backdrop-blur supports-[backdrop-filter]:bg-sidebar-background/60">
-      <SidebarHeader className="border-b border-sidebar-border/30 p-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20">
-            <Scale className="h-5 w-5 text-primary" />
-          </div>
+    <SidebarPrimitive className="border-r border-border bg-sidebar-background">
+      <SidebarHeader className="border-b border-sidebar-border p-4">
+        <div className="flex items-center gap-2">
+          <Scale className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-lg font-semibold text-sidebar-foreground">CounselFlow</h1>
-            <p className="text-xs text-sidebar-foreground/60 font-medium">Legal Operations Platform</p>
+            <h1 className="text-lg font-bold text-sidebar-foreground">CounselFlow</h1>
+            <p className="text-xs text-sidebar-foreground/60">Legal Operations Platform</p>
           </div>
         </div>
       </SidebarHeader>
       
-      <SidebarContent className="px-3 py-4">
+      <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/70 uppercase tracking-wider">
-            Modules
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Modules</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {modules.map((module) => (
                 <SidebarMenuItem key={module.title}>
-                  <SidebarMenuButton asChild className="h-10 rounded-lg hover:bg-sidebar-accent/50 transition-colors">
-                    <a href={module.url} className="flex items-center gap-3 px-3 py-2 text-sm font-medium">
-                      <module.icon className="h-4 w-4 text-sidebar-foreground/70" />
-                      <span className="text-sidebar-foreground">{module.title}</span>
+                  <SidebarMenuButton asChild>
+                    <a href={module.url} className="flex items-center gap-3 px-3 py-2 text-sm">
+                      <module.icon className="h-4 w-4" />
+                      <span>{module.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -132,13 +128,13 @@ export function Sidebar() {
         </SidebarGroup>
       </SidebarContent>
       
-      <SidebarFooter className="border-t border-sidebar-border/30 p-3">
+      <SidebarFooter className="border-t border-sidebar-border p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="h-10 rounded-lg hover:bg-sidebar-accent/50 transition-colors">
-              <a href="/settings" className="flex items-center gap-3 px-3 py-2 text-sm font-medium">
-                <Settings className="h-4 w-4 text-sidebar-foreground/70" />
-                <span className="text-sidebar-foreground">Settings</span>
+            <SidebarMenuButton asChild>
+              <a href="/settings" className="flex items-center gap-3 px-3 py-2 text-sm">
+                <Settings className="h-4 w-4" />
+                <span>Settings</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
