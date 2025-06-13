@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,7 @@ import NotFound from "./pages/NotFound";
 import RiskDashboard from "./pages/RiskDashboard";
 import TaskManagement from "./pages/TaskManagement";
 import UserAccessManagement from "./pages/UserAccessManagement";
+import Dealflow from "./pages/Dealflow";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +41,7 @@ const App = () => (
           <Route path="/risk-dashboard" element={<RiskDashboard />} />
           <Route path="/task-management" element={<TaskManagement />} />
           <Route path="/user-access-management" element={<UserAccessManagement />} />
+          <Route path="/dealflow" element={<Dealflow />} />
           {/* Redirect from old paths to new paths */}
           <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
           <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />

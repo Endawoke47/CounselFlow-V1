@@ -1,4 +1,3 @@
-
 import { 
   Building2, 
   FileText, 
@@ -12,7 +11,8 @@ import {
   Home,
   Settings,
   CheckSquare,
-  Users
+  Users,
+  TrendingUp
 } from "lucide-react";
 import {
   Sidebar as SidebarPrimitive,
@@ -92,6 +92,11 @@ const modules = [
     title: "User & Access Management",
     url: "/user-access-management",
     icon: Users,
+  },
+  {
+    title: "Dealflow",
+    url: "/dealflow",
+    icon: TrendingUp,
   },
 ];
 
