@@ -1,97 +1,111 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, AlertTriangle, Clock, FileText, Brain, Users } from "lucide-react";
+import { CheckCircle, AlertTriangle, Clock, FileText, Brain, Users, ChevronRight } from "lucide-react";
+import { ProjectDueDiligenceDetail } from "./ProjectDueDiligenceDetail";
 
-const mockDiligenceItems = [
+const mockProjects = [
   {
     id: "1",
-    category: "Legal & Compliance",
-    document: "Corporate Structure & Governance",
-    status: "Completed",
-    aiRisks: 2,
-    humanReviewed: true,
-    assignee: "Sarah Johnson",
-    priority: "High",
-    dueDate: "2024-01-20"
+    name: "TechCorp Acquisition",
+    sector: "Technology",
+    dealSize: "$50M",
+    status: "Due Diligence",
+    overallProgress: 65,
+    documentsReviewed: 12,
+    totalDocuments: 18,
+    aiRisks: 8,
+    highRisks: 3,
+    mediumRisks: 4,
+    lowRisks: 1,
+    teamMembers: 4,
+    lastActivity: "2 hours ago"
   },
   {
     id: "2",
-    category: "IP & Technology",
-    document: "Patent Portfolio Analysis",
-    status: "In Review",
-    aiRisks: 5,
-    humanReviewed: false,
-    assignee: "Michael Chen",
-    priority: "High",
-    dueDate: "2024-01-22"
+    name: "Healthcare Holdings",
+    sector: "Healthcare", 
+    dealSize: "$125M",
+    status: "Due Diligence",
+    overallProgress: 35,
+    documentsReviewed: 6,
+    totalDocuments: 22,
+    aiRisks: 12,
+    highRisks: 2,
+    mediumRisks: 7,
+    lowRisks: 3,
+    teamMembers: 6,
+    lastActivity: "1 day ago"
   },
   {
     id: "3",
-    category: "Employment",
-    document: "Employment Agreements & Benefits",
-    status: "Pending",
-    aiRisks: 1,
-    humanReviewed: false,
-    assignee: "Emily Rodriguez",
-    priority: "Medium",
-    dueDate: "2024-01-25"
-  },
-  {
-    id: "4",
-    category: "Financial",
-    document: "Audited Financial Statements",
-    status: "In Review",
-    aiRisks: 3,
-    humanReviewed: true,
-    assignee: "David Kim",
-    priority: "High",
-    dueDate: "2024-01-21"
+    name: "Manufacturing Co",
+    sector: "Manufacturing",
+    dealSize: "$80M", 
+    status: "Due Diligence",
+    overallProgress: 85,
+    documentsReviewed: 20,
+    totalDocuments: 24,
+    aiRisks: 5,
+    highRisks: 1,
+    mediumRisks: 2,
+    lowRisks: 2,
+    teamMembers: 5,
+    lastActivity: "30 minutes ago"
   }
 ];
 
-const categories = [
-  { name: "Legal & Compliance", completed: 3, total: 5, progress: 60 },
-  { name: "Financial", completed: 2, total: 4, progress: 50 },
-  { name: "IP & Technology", completed: 1, total: 3, progress: 33 },
-  { name: "Employment", completed: 0, total: 2, progress: 0 },
-  { name: "Commercial", completed: 2, total: 3, progress: 67 }
-];
-
 export function DueDiligenceWorkflow() {
-  const getStatusColor = (status: string) => {
-    const colors = {
-      "Completed": "bg-green-100 text-green-800",
-      "In Review": "bg-yellow-100 text-yellow-800",
-      "Pending": "bg-gray-100 text-gray-800"
-    };
-    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
-  };
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Completed":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "In Review":
-        return <Clock className="h-4 w-4 text-yellow-600" />;
-      default:
-        return <AlertTriangle className="h-4 w-4 text-gray-600" />;
+  if (selectedProject) {
+    const project = mockProjects.find(p => p.id === selectedProject);
+    if (project) {
+      return (
+        <ProjectDueDiligenceDetail 
+          project={project} 
+          onBack={() => setSelectedProject(null)} 
+        />
+      );
     }
+  }
+
+  const totalDocuments = mockProjects.reduce((sum, project) => sum + project.totalDocuments, 0);
+  const totalReviewed = mockProjects.reduce((sum, project) => sum + project.documentsReviewed, 0);
+  const totalAIRisks = mockProjects.reduce((sum, project) => sum + project.aiRisks, 0);
+  const totalTeamMembers = mockProjects.reduce((sum, project) => sum + project.teamMembers, 0);
+
+  const getRiskColor = (highRisks: number) => {
+    if (highRisks >= 3) return "text-red-600";
+    if (highRisks >= 1) return "text-yellow-600";
+    return "text-green-600";
   };
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Documents Reviewed</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8/17</div>
-            <p className="text-xs text-muted-foreground">47% complete</p>
+            <div className="text-2xl font-bold">{mockProjects.length}</div>
+            <p className="text-xs text-muted-foreground">In due diligence</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Documents Reviewed</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalReviewed}/{totalDocuments}</div>
+            <p className="text-xs text-muted-foreground">{Math.round((totalReviewed/totalDocuments)*100)}% complete</p>
           </CardContent>
         </Card>
         
@@ -101,8 +115,8 @@ export function DueDiligenceWorkflow() {
             <Brain className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">11</div>
-            <p className="text-xs text-muted-foreground">Requiring review</p>
+            <div className="text-2xl font-bold">{totalAIRisks}</div>
+            <p className="text-xs text-muted-foreground">Across all projects</p>
           </CardContent>
         </Card>
         
@@ -112,7 +126,7 @@ export function DueDiligenceWorkflow() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">6</div>
+            <div className="text-2xl font-bold">{totalTeamMembers}</div>
             <p className="text-xs text-muted-foreground">Active reviewers</p>
           </CardContent>
         </Card>
@@ -120,82 +134,65 @@ export function DueDiligenceWorkflow() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Category Progress</CardTitle>
+          <CardTitle>Project Due Diligence Overview</CardTitle>
           <CardDescription>
-            Due diligence progress by review category
+            Click on any project to view detailed due diligence workflow and documents
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {categories.map((category) => (
-              <div key={category.name} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">{category.name}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {category.completed}/{category.total} complete
-                  </span>
-                </div>
-                <Progress value={category.progress} className="h-2" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Document Review Queue</CardTitle>
-          <CardDescription>
-            Active due diligence items with AI-assisted risk flagging
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {mockDiligenceItems.map((item) => (
-              <div key={item.id} className="p-4 border rounded-lg">
+            {mockProjects.map((project) => (
+              <div 
+                key={project.id} 
+                className="p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                onClick={() => setSelectedProject(project.id)}
+              >
                 <div className="flex items-start justify-between">
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-3 flex-1">
                     <div className="flex items-center gap-3">
-                      {getStatusIcon(item.status)}
-                      <h4 className="font-semibold">{item.document}</h4>
-                      <Badge className={getStatusColor(item.status)}>
-                        {item.status}
-                      </Badge>
-                      {item.priority === "High" && (
-                        <Badge variant="destructive">High Priority</Badge>
-                      )}
+                      <h4 className="font-semibold">{project.name}</h4>
+                      <Badge variant="outline">{project.sector}</Badge>
+                      <Badge variant="secondary">{project.dealSize}</Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Overall Progress</span>
+                          <span>{project.overallProgress}%</span>
+                        </div>
+                        <Progress value={project.overallProgress} className="h-2" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Documents</span>
+                          <span>{project.documentsReviewed}/{project.totalDocuments}</span>
+                        </div>
+                        <Progress value={(project.documentsReviewed/project.totalDocuments)*100} className="h-2" />
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1">
+                          <Brain className="h-4 w-4 text-blue-600" />
+                          <span>{project.aiRisks} AI risks</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <AlertTriangle className={`h-4 w-4 ${getRiskColor(project.highRisks)}`} />
+                          <span className={getRiskColor(project.highRisks)}>
+                            {project.highRisks} high risks
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <span>Category: {item.category}</span>
-                      <span>Assignee: {item.assignee}</span>
-                      <span>Due: {item.dueDate}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <Brain className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm">
-                          {item.aiRisks} AI-flagged risks
-                        </span>
-                      </div>
-                      {item.humanReviewed && (
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
-                          <span className="text-sm text-green-600">Human reviewed</span>
-                        </div>
-                      )}
+                      <span>{project.teamMembers} team members</span>
+                      <span>Last activity: {project.lastActivity}</span>
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      View Document
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Review Risks
-                    </Button>
-                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
             ))}

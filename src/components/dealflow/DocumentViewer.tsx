@@ -1,107 +1,108 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Eye, Brain, AlertTriangle, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Upload, Search, Filter, ChevronRight, FolderOpen } from "lucide-react";
+import { ProjectDocumentViewer } from "./ProjectDocumentViewer";
 
-const mockDocuments = [
+const mockProjects = [
   {
     id: "1",
-    name: "Financial Statements 2023.pdf",
-    category: "Financial",
-    size: "2.4 MB",
-    uploadDate: "2024-01-15",
-    status: "Reviewed",
-    aiFlags: 3,
-    reviewer: "Sarah Johnson",
-    riskLevel: "Medium"
+    name: "TechCorp Acquisition",
+    sector: "Technology",
+    dealSize: "$50M",
+    totalDocuments: 18,
+    categorizedDocuments: {
+      "Legal & Compliance": 6,
+      "Financial": 4,
+      "IP & Technology": 3,
+      "Employment": 2,
+      "Commercial": 3
+    },
+    lastUpload: "2 hours ago",
+    totalSize: "45.2 MB"
   },
   {
     id: "2",
-    name: "Patent Portfolio Summary.xlsx",
-    category: "IP & Technology",
-    size: "1.8 MB",
-    uploadDate: "2024-01-14",
-    status: "In Review",
-    aiFlags: 7,
-    reviewer: "Michael Chen",
-    riskLevel: "High"
+    name: "Healthcare Holdings",
+    sector: "Healthcare",
+    dealSize: "$125M", 
+    totalDocuments: 22,
+    categorizedDocuments: {
+      "Legal & Compliance": 8,
+      "Financial": 5,
+      "IP & Technology": 4,
+      "Employment": 3,
+      "Commercial": 2
+    },
+    lastUpload: "1 day ago",
+    totalSize: "67.8 MB"
   },
   {
     id: "3",
-    name: "Employment Contracts Bundle.zip",
-    category: "Employment",
-    size: "15.2 MB",
-    uploadDate: "2024-01-13",
-    status: "Pending",
-    aiFlags: 2,
-    reviewer: "Emily Rodriguez",
-    riskLevel: "Low"
-  },
-  {
-    id: "4",
-    name: "Corporate Governance Charter.docx",
-    category: "Legal & Compliance",
-    size: "850 KB",
-    uploadDate: "2024-01-12",
-    status: "Reviewed",
-    aiFlags: 1,
-    reviewer: "David Kim",
-    riskLevel: "Low"
-  },
-  {
-    id: "5",
-    name: "Customer Contracts Sample.pdf",
-    category: "Commercial",
-    size: "4.1 MB",
-    uploadDate: "2024-01-11",
-    status: "In Review",
-    aiFlags: 5,
-    reviewer: "Sarah Johnson",
-    riskLevel: "Medium"
+    name: "Manufacturing Co",
+    sector: "Manufacturing",
+    dealSize: "$80M",
+    totalDocuments: 24,
+    categorizedDocuments: {
+      "Legal & Compliance": 7,
+      "Financial": 6,
+      "IP & Technology": 5,
+      "Employment": 3,
+      "Commercial": 3
+    },
+    lastUpload: "30 minutes ago", 
+    totalSize: "52.1 MB"
   }
 ];
 
-const categories = [
-  { name: "Financial", count: 8, reviewed: 6 },
-  { name: "Legal & Compliance", count: 12, reviewed: 10 },
-  { name: "IP & Technology", count: 5, reviewed: 2 },
-  { name: "Employment", count: 7, reviewed: 4 },
-  { name: "Commercial", count: 9, reviewed: 7 }
-];
-
 export function DocumentViewer() {
-  const getStatusColor = (status: string) => {
-    const colors = {
-      "Reviewed": "bg-green-100 text-green-800",
-      "In Review": "bg-yellow-100 text-yellow-800",
-      "Pending": "bg-gray-100 text-gray-800"
-    };
-    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
-  };
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterSector, setFilterSector] = useState("all");
 
-  const getRiskColor = (risk: string) => {
-    const colors = {
-      "High": "text-red-600",
-      "Medium": "text-yellow-600",
-      "Low": "text-green-600"
-    };
-    return colors[risk as keyof typeof colors] || "text-gray-600";
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "Reviewed":
-        return <Eye className="h-4 w-4 text-green-600" />;
-      case "In Review":
-        return <Clock className="h-4 w-4 text-yellow-600" />;
-      default:
-        return <FileText className="h-4 w-4 text-gray-600" />;
+  if (selectedProject) {
+    const project = mockProjects.find(p => p.id === selectedProject);
+    if (project) {
+      return (
+        <ProjectDocumentViewer 
+          project={project} 
+          onBack={() => setSelectedProject(null)} 
+        />
+      );
     }
-  };
+  }
+
+  const totalDocuments = mockProjects.reduce((sum, project) => sum + project.totalDocuments, 0);
+  const totalSize = mockProjects.reduce((sum, project) => {
+    const sizeNumber = parseFloat(project.totalSize.split(' ')[0]);
+    return sum + sizeNumber;
+  }, 0);
+
+  const filteredProjects = mockProjects.filter(project => {
+    const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSector = filterSector === "all" || project.sector.toLowerCase() === filterSector.toLowerCase();
+    return matchesSearch && matchesSector;
+  });
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Document Management</h2>
+          <p className="text-muted-foreground">
+            Manage documents across all due diligence projects
+          </p>
+        </div>
+        <Button>
+          <Upload className="h-4 w-4 mr-2" />
+          Upload Documents
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -109,133 +110,134 @@ export function DocumentViewer() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">41</div>
-            <p className="text-xs text-muted-foreground">Across all categories</p>
+            <div className="text-2xl font-bold">{totalDocuments}</div>
+            <p className="text-xs text-muted-foreground">Across all projects</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">AI-Flagged Items</CardTitle>
-            <Brain className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
-            <p className="text-xs text-muted-foreground">Requiring attention</p>
+            <div className="text-2xl font-bold">{mockProjects.length}</div>
+            <p className="text-xs text-muted-foreground">With documents</p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Review Progress</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Storage Used</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">71%</div>
-            <p className="text-xs text-muted-foreground">29/41 reviewed</p>
+            <div className="text-2xl font-bold">{totalSize.toFixed(1)} MB</div>
+            <p className="text-xs text-muted-foreground">Total storage</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Document Categories</CardTitle>
+          <CardTitle>Document Search & Filters</CardTitle>
           <CardDescription>
-            Review progress by document category
+            Search across all project documents or filter by project criteria
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category) => (
-              <div key={category.name} className="p-4 border rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-medium">{category.name}</h4>
-                  <Badge variant="outline">
-                    {category.reviewed}/{category.count}
-                  </Badge>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {Math.round((category.reviewed / category.count) * 100)}% complete
-                </div>
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search projects..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-            ))}
+            </div>
+            <Select value={filterSector} onValueChange={setFilterSector}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by sector" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sectors</SelectItem>
+                <SelectItem value="technology">Technology</SelectItem>
+                <SelectItem value="healthcare">Healthcare</SelectItem>
+                <SelectItem value="manufacturing">Manufacturing</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline">
+              <Filter className="h-4 w-4 mr-2" />
+              More Filters
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Document Library</CardTitle>
+          <CardTitle>Project Document Repositories</CardTitle>
           <CardDescription>
-            All uploaded documents with AI-assisted analysis
+            Click on any project to view and manage its document repository
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockDocuments.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-4 flex-1">
-                  {getStatusIcon(doc.status)}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h4 className="font-medium">{doc.name}</h4>
-                      <Badge className={getStatusColor(doc.status)}>
-                        {doc.status}
-                      </Badge>
+            {filteredProjects.map((project) => (
+              <div 
+                key={project.id}
+                className="p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                onClick={() => setSelectedProject(project.id)}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="space-y-3 flex-1">
+                    <div className="flex items-center gap-3">
+                      <FolderOpen className="h-5 w-5 text-blue-600" />
+                      <h4 className="font-semibold">{project.name}</h4>
+                      <Badge variant="outline">{project.sector}</Badge>
+                      <Badge variant="secondary">{project.dealSize}</Badge>
                     </div>
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <span>Category: {doc.category}</span>
-                      <span>Size: {doc.size}</span>
-                      <span>Uploaded: {doc.uploadDate}</span>
-                      <span>Reviewer: {doc.reviewer}</span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-2">
-                      <div className="flex items-center gap-1">
-                        <Brain className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm">{doc.aiFlags} AI flags</span>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm font-medium mb-2">Document Categories</div>
+                        <div className="space-y-1">
+                          {Object.entries(project.categorizedDocuments).map(([category, count]) => (
+                            <div key={category} className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">{category}</span>
+                              <span>{count} docs</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <AlertTriangle className={`h-4 w-4 ${getRiskColor(doc.riskLevel)}`} />
-                        <span className={`text-sm ${getRiskColor(doc.riskLevel)}`}>
-                          {doc.riskLevel} risk
-                        </span>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Total Documents:</span>
+                          <span className="font-medium">{project.totalDocuments}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Storage Used:</span>
+                          <span className="font-medium">{project.totalSize}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Last Upload:</span>
+                          <span className="text-muted-foreground">{project.lastUpload}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Brain className="h-4 w-4 mr-1" />
-                    AI Analysis
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
+                  
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
-
-      <div className="flex gap-4">
-        <Button>
-          <FileText className="h-4 w-4 mr-2" />
-          Upload Documents
-        </Button>
-        <Button variant="outline">
-          Connect to VDR
-        </Button>
-        <Button variant="outline">
-          Bulk Analysis
-        </Button>
-      </div>
     </div>
   );
 }
