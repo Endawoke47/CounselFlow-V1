@@ -1,244 +1,208 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Shield, TrendingDown, FileText, MessageSquare } from "lucide-react";
+import { AlertTriangle, Shield, TrendingDown, FileText, MessageSquare, ChevronRight } from "lucide-react";
+import { ProjectRiskDetail } from "./ProjectRiskDetail";
 
-const mockRisks = [
+const mockProjects = [
   {
     id: "1",
-    category: "IP & Technology",
-    title: "Patent Expiration Risk",
-    description: "Key patent expires in 18 months with no renewal strategy",
-    severity: "High",
-    probability: "Medium",
-    impact: "Revenue loss of $5-10M annually",
-    mitigation: "Negotiate extended licensing agreement",
-    status: "Under Review",
-    assignee: "Sarah Johnson",
-    comments: 3
+    name: "TechCorp Acquisition",
+    sector: "Technology",
+    dealSize: "$50M",
+    status: "Due Diligence",
+    totalRisks: 14,
+    highRisks: 3,
+    mediumRisks: 7,
+    lowRisks: 4,
+    resolvedRisks: 2,
+    overallRiskScore: 6.2,
+    riskTrend: "stable",
+    lastRiskUpdate: "2 hours ago",
+    mitigationProgress: 57
   },
   {
     id: "2",
-    category: "Legal & Compliance",
-    title: "Regulatory Compliance Gap",
-    description: "Missing GDPR compliance documentation for EU operations",
-    severity: "Medium",
-    probability: "High",
-    impact: "Potential fines up to €2M",
-    mitigation: "Implement compliance program pre-closing",
-    status: "Acknowledged",
-    assignee: "Michael Chen",
-    comments: 1
+    name: "Healthcare Holdings",
+    sector: "Healthcare",
+    dealSize: "$125M",
+    status: "Due Diligence",
+    totalRisks: 18,
+    highRisks: 5,
+    mediumRisks: 8,
+    lowRisks: 3,
+    resolvedRisks: 4,
+    overallRiskScore: 7.8,
+    riskTrend: "increasing",
+    lastRiskUpdate: "1 day ago",
+    mitigationProgress: 33
   },
   {
     id: "3",
-    category: "Employment",
-    title: "Key Person Dependency",
-    description: "75% of revenue tied to relationships of departing CEO",
-    severity: "High",
-    probability: "Medium",
-    impact: "Customer retention risk",
-    mitigation: "Negotiate retention package and transition plan",
-    status: "Resolved",
-    assignee: "Emily Rodriguez",
-    comments: 5
-  },
-  {
-    id: "4",
-    category: "Financial",
-    title: "Working Capital Variance",
-    description: "Significant seasonal working capital requirements",
-    severity: "Low",
-    probability: "High",
-    impact: "Additional $3M financing needs",
-    mitigation: "Adjust purchase price for working capital",
-    status: "Under Review",
-    assignee: "David Kim",
-    comments: 2
+    name: "Manufacturing Co",
+    sector: "Manufacturing",
+    dealSize: "$80M",
+    status: "Due Diligence",
+    totalRisks: 10,
+    highRisks: 2,
+    mediumRisks: 4,
+    lowRisks: 2,
+    resolvedRisks: 6,
+    overallRiskScore: 4.1,
+    riskTrend: "decreasing",
+    lastRiskUpdate: "30 minutes ago",
+    mitigationProgress: 80
   }
 ];
 
-const riskMetrics = [
-  { category: "High Risk", count: 3, color: "text-red-600" },
-  { category: "Medium Risk", count: 5, color: "text-yellow-600" },
-  { category: "Low Risk", count: 2, color: "text-green-600" },
-  { category: "Resolved", count: 4, color: "text-gray-600" }
-];
-
 export function RiskConsolidation() {
-  const getSeverityColor = (severity: string) => {
-    const colors = {
-      "High": "bg-red-100 text-red-800",
-      "Medium": "bg-yellow-100 text-yellow-800",
-      "Low": "bg-green-100 text-green-800"
-    };
-    return colors[severity as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+
+  if (selectedProject) {
+    const project = mockProjects.find(p => p.id === selectedProject);
+    if (project) {
+      return (
+        <ProjectRiskDetail 
+          project={project} 
+          onBack={() => setSelectedProject(null)} 
+        />
+      );
+    }
+  }
+
+  const totalRisks = mockProjects.reduce((sum, project) => sum + project.totalRisks, 0);
+  const totalHighRisks = mockProjects.reduce((sum, project) => sum + project.highRisks, 0);
+  const totalMediumRisks = mockProjects.reduce((sum, project) => sum + project.mediumRisks, 0);
+  const totalLowRisks = mockProjects.reduce((sum, project) => sum + project.lowRisks, 0);
+
+  const getRiskScoreColor = (score: number) => {
+    if (score >= 7) return "text-red-600";
+    if (score >= 5) return "text-yellow-600";
+    return "text-green-600";
   };
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      "Under Review": "bg-blue-100 text-blue-800",
-      "Acknowledged": "bg-yellow-100 text-yellow-800",
-      "Resolved": "bg-green-100 text-green-800"
-    };
-    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  const getTrendIcon = (trend: string) => {
+    if (trend === "increasing") return "↗️";
+    if (trend === "decreasing") return "↘️";
+    return "→";
   };
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {riskMetrics.map((metric) => (
-          <Card key={metric.category}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{metric.category}</CardTitle>
-              <AlertTriangle className={`h-4 w-4 ${metric.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${metric.color}`}>{metric.count}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Risk Score Summary
-            </CardTitle>
-            <CardDescription>
-              Overall risk assessment for this deal
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Risks</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span>Overall Risk Score</span>
-                <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                  Medium (6.2/10)
-                </Badge>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Legal & Compliance</span>
-                  <span className="text-yellow-600">5.5/10</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Financial</span>
-                  <span className="text-green-600">3.2/10</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>IP & Technology</span>
-                  <span className="text-red-600">8.1/10</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Employment</span>
-                  <span className="text-yellow-600">6.8/10</span>
-                </div>
-              </div>
-            </div>
+            <div className="text-2xl font-bold">{totalRisks}</div>
+            <p className="text-xs text-muted-foreground">Across all projects</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingDown className="h-5 w-5" />
-              Risk Mitigation Progress
-            </CardTitle>
-            <CardDescription>
-              Status of identified risk mitigation actions
-            </CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">High Risk</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span>Mitigation Actions</span>
-                <span className="text-sm text-muted-foreground">8/14 complete</span>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Completed</span>
-                  <span className="text-green-600">8</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>In Progress</span>
-                  <span className="text-yellow-600">4</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Not Started</span>
-                  <span className="text-gray-600">2</span>
-                </div>
-              </div>
-            </div>
+            <div className="text-2xl font-bold text-red-600">{totalHighRisks}</div>
+            <p className="text-xs text-muted-foreground">Require immediate attention</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Medium Risk</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-yellow-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">{totalMediumRisks}</div>
+            <p className="text-xs text-muted-foreground">Monitor closely</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Low Risk</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{totalLowRisks}</div>
+            <p className="text-xs text-muted-foreground">Standard monitoring</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Risk Register</CardTitle>
+          <CardTitle>Project Risk Analysis Overview</CardTitle>
           <CardDescription>
-            Detailed view of all identified risks and mitigation strategies
+            Click on any project to view detailed risk analysis and mitigation strategies
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockRisks.map((risk) => (
-              <div key={risk.id} className="p-4 border rounded-lg">
+            {mockProjects.map((project) => (
+              <div 
+                key={project.id}
+                className="p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                onClick={() => setSelectedProject(project.id)}
+              >
                 <div className="flex items-start justify-between">
-                  <div className="space-y-2 flex-1">
+                  <div className="space-y-3 flex-1">
                     <div className="flex items-center gap-3">
-                      <h4 className="font-semibold">{risk.title}</h4>
-                      <Badge className={getSeverityColor(risk.severity)}>
-                        {risk.severity} Risk
-                      </Badge>
-                      <Badge className={getStatusColor(risk.status)}>
-                        {risk.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="text-sm text-muted-foreground">
-                      <span className="font-medium">Category:</span> {risk.category}
-                    </div>
-                    
-                    <div className="text-sm">
-                      {risk.description}
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium">Impact:</span> {risk.impact}
-                      </div>
-                      <div>
-                        <span className="font-medium">Probability:</span> {risk.probability}
+                      <h4 className="font-semibold">{project.name}</h4>
+                      <Badge variant="outline">{project.sector}</Badge>
+                      <Badge variant="secondary">{project.dealSize}</Badge>
+                      <div className="flex items-center gap-1 text-sm">
+                        <span>{getTrendIcon(project.riskTrend)}</span>
+                        <span className="capitalize">{project.riskTrend}</span>
                       </div>
                     </div>
                     
-                    <div className="text-sm">
-                      <span className="font-medium">Mitigation:</span> {risk.mitigation}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Risk Score</div>
+                        <div className={`text-2xl font-bold ${getRiskScoreColor(project.overallRiskScore)}`}>
+                          {project.overallRiskScore}/10
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Risk Breakdown</div>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="text-red-600">{project.highRisks} High</span>
+                          <span className="text-yellow-600">{project.mediumRisks} Medium</span>
+                          <span className="text-green-600">{project.lowRisks} Low</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Mitigation Progress</div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full" 
+                              style={{ width: `${project.mitigationProgress}%` }}
+                            />
+                          </div>
+                          <span className="text-sm">{project.mitigationProgress}%</span>
+                        </div>
+                      </div>
                     </div>
                     
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>Assignee: {risk.assignee}</span>
-                      <div className="flex items-center gap-1">
-                        <MessageSquare className="h-4 w-4" />
-                        {risk.comments} comments
-                      </div>
+                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                      <span>Total Risks: {project.totalRisks}</span>
+                      <span>Resolved: {project.resolvedRisks}</span>
+                      <span>Last Update: {project.lastRiskUpdate}</span>
                     </div>
                   </div>
                   
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      <MessageSquare className="h-4 w-4 mr-1" />
-                      Comment
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Update Status
-                    </Button>
-                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
             ))}
@@ -249,10 +213,10 @@ export function RiskConsolidation() {
       <div className="flex gap-4">
         <Button>
           <FileText className="h-4 w-4 mr-2" />
-          Generate Risk Report
+          Generate Portfolio Risk Report
         </Button>
         <Button variant="outline">
-          Export to PDF
+          Export Summary
         </Button>
       </div>
     </div>
