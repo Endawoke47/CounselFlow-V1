@@ -1,143 +1,300 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, TrendingUp, FileText, Plus, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Plus, DollarSign, TrendingUp, Users, FileText, Eye, Edit } from "lucide-react";
 
-const mockLicenses = [
+const mockLicenseAgreements = [
   {
     id: "1",
-    asset: "AI Processing Method",
-    licensee: "MegaCorp Inc",
-    type: "Outbound",
+    licensee: "TechSoft Solutions",
+    ipAsset: "AI Processing Method",
+    type: "Exclusive",
     territory: "North America",
-    exclusivity: "Non-exclusive",
-    term: "5 years",
-    royaltyRate: "3.5%",
-    annualRevenue: "$125,000",
-    status: "Active"
+    startDate: "2024-01-15",
+    endDate: "2027-01-15",
+    royaltyRate: "5%",
+    minimumRoyalty: "$50,000",
+    status: "Active",
+    revenue: "$125,000"
   },
   {
     id: "2",
-    asset: "DataFlow Technology",
-    licensor: "InnovateTech Ltd",
-    type: "Inbound",
-    territory: "Global",
-    exclusivity: "Exclusive",
-    term: "3 years",
-    royaltyRate: "2.0%",
-    annualCost: "$85,000",
-    status: "Active"
+    licensee: "Global Innovations Inc",
+    ipAsset: "TechBrand Logo",
+    type: "Non-Exclusive",
+    territory: "Worldwide",
+    startDate: "2023-06-01",
+    endDate: "2026-06-01",
+    royaltyRate: "3%",
+    minimumRoyalty: "$25,000",
+    status: "Active",
+    revenue: "$75,000"
+  },
+  {
+    id: "3",
+    licensee: "StartupCorp",
+    ipAsset: "DataFlow System",
+    type: "Non-Exclusive",
+    territory: "Europe",
+    startDate: "2023-03-10",
+    endDate: "2025-03-10",
+    royaltyRate: "4%",
+    minimumRoyalty: "$30,000",
+    status: "Pending Renewal",
+    revenue: "$42,000"
   }
 ];
 
-const commercializationMetrics = [
-  { label: "Total License Revenue", value: "$2.4M", change: "+12%", period: "YTD" },
-  { label: "Active Licenses", value: "47", change: "+3", period: "This Quarter" },
-  { label: "License Portfolio Value", value: "$15.8M", change: "+8%", period: "Estimated" },
-  { label: "Average Royalty Rate", value: "2.8%", change: "+0.2%", period: "Weighted" }
-];
-
 export function CommercializationManagement() {
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedType, setSelectedType] = useState("all");
 
-  const getTypeBadge = (type: string) => {
-    return type === "Outbound" 
-      ? <Badge className="bg-green-100 text-green-800">Outbound</Badge>
-      : <Badge className="bg-blue-100 text-blue-800">Inbound</Badge>;
-  };
-
-  const getExclusivityBadge = (exclusivity: string) => {
-    return exclusivity === "Exclusive"
-      ? <Badge className="bg-purple-100 text-purple-800">Exclusive</Badge>
-      : <Badge variant="outline">Non-exclusive</Badge>;
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "Active":
+        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+      case "Pending Renewal":
+        return <Badge className="bg-yellow-100 text-yellow-800">Pending Renewal</Badge>;
+      case "Expired":
+        return <Badge className="bg-red-100 text-red-800">Expired</Badge>;
+      case "Terminated":
+        return <Badge className="bg-gray-100 text-gray-800">Terminated</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">IP Commercialization</h2>
+          <h2 className="text-2xl font-bold">Commercialization Management</h2>
           <p className="text-muted-foreground">
-            Manage licensing agreements and track revenue generation
+            Manage IP licensing agreements and revenue streams
           </p>
         </div>
-        <Button onClick={() => setShowAddModal(true)}>
+        <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Add License Agreement
+          New License Agreement
         </Button>
       </div>
 
-      {/* Revenue Metrics */}
+      {/* Revenue Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {commercializationMetrics.map((metric, index) => (
-          <Card key={index}>
-            <CardContent className="p-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$2.4M</div>
+            <p className="text-xs text-muted-foreground">
+              +15% from last year
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Licenses</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">47</div>
+            <p className="text-xs text-muted-foreground">
+              3 expiring this quarter
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Licensees</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">23</div>
+            <p className="text-xs text-muted-foreground">
+              5 new this year
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Royalty Rate</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">4.2%</div>
+            <p className="text-xs text-muted-foreground">
+              Industry standard: 3.8%
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Revenue by Asset Type */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Revenue by Asset Type</CardTitle>
+            <CardDescription>Breakdown of licensing revenue</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
+                <span className="text-sm">Patents</span>
+                <span className="text-sm font-medium">$1.2M (50%)</span>
+              </div>
+              <Progress value={50} className="h-2" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Trademarks</span>
+                <span className="text-sm font-medium">$720K (30%)</span>
+              </div>
+              <Progress value={30} className="h-2" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Copyrights</span>
+                <span className="text-sm font-medium">$360K (15%)</span>
+              </div>
+              <Progress value={15} className="h-2" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Trade Secrets</span>
+                <span className="text-sm font-medium">$120K (5%)</span>
+              </div>
+              <Progress value={5} className="h-2" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Performing Assets</CardTitle>
+            <CardDescription>Highest revenue generating IP assets</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
-                  <div className="text-2xl font-bold">{metric.value}</div>
-                  <div className="text-sm text-muted-foreground">{metric.label}</div>
-                  <div className="text-xs text-muted-foreground">{metric.period}</div>
+                  <div className="font-medium">AI Processing Method</div>
+                  <div className="text-sm text-muted-foreground">Patent Portfolio</div>
                 </div>
-                <div className="flex items-center gap-1 text-sm text-green-600">
-                  <TrendingUp className="h-4 w-4" />
-                  {metric.change}
+                <div className="text-right">
+                  <div className="font-bold">$450K</div>
+                  <div className="text-xs text-muted-foreground">12 licenses</div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <div className="font-medium">TechBrand Suite</div>
+                  <div className="text-sm text-muted-foreground">Trademark Family</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold">$320K</div>
+                  <div className="text-xs text-muted-foreground">8 licenses</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <div className="font-medium">DataFlow Architecture</div>
+                  <div className="text-sm text-muted-foreground">Trade Secret</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold">$280K</div>
+                  <div className="text-xs text-muted-foreground">5 licenses</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* License Agreements Table */}
       <Card>
         <CardHeader>
-          <CardTitle>License Agreements</CardTitle>
-          <CardDescription>Active licensing agreements and revenue streams</CardDescription>
+          <div className="flex items-center justify-between">
+            <CardTitle>License Agreements</CardTitle>
+            <div className="flex gap-4">
+              <Input
+                placeholder="Search agreements..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-64"
+              />
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="pending">Pending Renewal</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="exclusive">Exclusive</SelectItem>
+                  <SelectItem value="non-exclusive">Non-Exclusive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Licensee</TableHead>
                 <TableHead>IP Asset</TableHead>
-                <TableHead>Partner</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Territory</TableHead>
-                <TableHead>Exclusivity</TableHead>
                 <TableHead>Term</TableHead>
                 <TableHead>Royalty Rate</TableHead>
-                <TableHead>Annual Value</TableHead>
+                <TableHead>Revenue</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockLicenses.map((license) => (
-                <TableRow key={license.id}>
-                  <TableCell className="font-medium">{license.asset}</TableCell>
+              {mockLicenseAgreements.map((agreement) => (
+                <TableRow key={agreement.id}>
+                  <TableCell className="font-medium">{agreement.licensee}</TableCell>
+                  <TableCell>{agreement.ipAsset}</TableCell>
                   <TableCell>
-                    {license.type === "Outbound" ? license.licensee : license.licensor}
+                    <Badge variant="outline">{agreement.type}</Badge>
                   </TableCell>
-                  <TableCell>{getTypeBadge(license.type)}</TableCell>
-                  <TableCell>{license.territory}</TableCell>
-                  <TableCell>{getExclusivityBadge(license.exclusivity)}</TableCell>
-                  <TableCell>{license.term}</TableCell>
-                  <TableCell>{license.royaltyRate}</TableCell>
-                  <TableCell className="font-medium">
-                    {license.type === "Outbound" ? license.annualRevenue : license.annualCost}
+                  <TableCell>{agreement.territory}</TableCell>
+                  <TableCell className="text-sm">
+                    {agreement.startDate} - {agreement.endDate}
                   </TableCell>
-                  <TableCell>
-                    <Badge className="bg-green-100 text-green-800">{license.status}</Badge>
-                  </TableCell>
+                  <TableCell>{agreement.royaltyRate}</TableCell>
+                  <TableCell className="font-medium">{agreement.revenue}</TableCell>
+                  <TableCell>{getStatusBadge(agreement.status)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="sm">
-                        <FileText className="h-4 w-4" />
+                        <Edit className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -145,113 +302,6 @@ export function CommercializationManagement() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-
-      {/* Revenue Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue by Asset Type</CardTitle>
-            <CardDescription>Licensing revenue breakdown</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Patents</span>
-              <div className="flex items-center gap-2">
-                <div className="w-20 bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: "65%" }}></div>
-                </div>
-                <span className="text-sm font-medium">$1.56M (65%)</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Trademarks</span>
-              <div className="flex items-center gap-2">
-                <div className="w-20 bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{ width: "25%" }}></div>
-                </div>
-                <span className="text-sm font-medium">$0.6M (25%)</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Copyrights</span>
-              <div className="flex items-center gap-2">
-                <div className="w-20 bg-gray-200 rounded-full h-2">
-                  <div className="bg-purple-500 h-2 rounded-full" style={{ width: "10%" }}></div>
-                </div>
-                <span className="text-sm font-medium">$0.24M (10%)</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Geographic Revenue</CardTitle>
-            <CardDescription>Revenue distribution by region</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">North America</span>
-              <div className="flex items-center gap-2">
-                <div className="w-20 bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{ width: "45%" }}></div>
-                </div>
-                <span className="text-sm font-medium">$1.08M (45%)</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Europe</span>
-              <div className="flex items-center gap-2">
-                <div className="w-20 bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-500 h-2 rounded-full" style={{ width: "35%" }}></div>
-                </div>
-                <span className="text-sm font-medium">$0.84M (35%)</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Asia Pacific</span>
-              <div className="flex items-center gap-2">
-                <div className="w-20 bg-gray-200 rounded-full h-2">
-                  <div className="bg-orange-500 h-2 rounded-full" style={{ width: "20%" }}></div>
-                </div>
-                <span className="text-sm font-medium">$0.48M (20%)</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Licensing Opportunities */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Licensing Opportunities</CardTitle>
-          <CardDescription>Underutilized assets with commercialization potential</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 border rounded-lg">
-              <DollarSign className="h-5 w-5 text-green-500" />
-              <div className="flex-1">
-                <div className="font-medium">Machine Learning Framework</div>
-                <div className="text-sm text-muted-foreground">
-                  Granted patent with high commercial interest - 3 licensing inquiries pending
-                </div>
-              </div>
-              <Badge className="bg-green-100 text-green-800">High Potential</Badge>
-            </div>
-            <div className="flex items-center gap-4 p-4 border rounded-lg">
-              <TrendingUp className="h-5 w-5 text-blue-500" />
-              <div className="flex-1">
-                <div className="font-medium">CloudSync Technology</div>
-                <div className="text-sm text-muted-foreground">
-                  Active patent family in 12 jurisdictions - suitable for licensing program
-                </div>
-              </div>
-              <Badge className="bg-blue-100 text-blue-800">Medium Potential</Badge>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
