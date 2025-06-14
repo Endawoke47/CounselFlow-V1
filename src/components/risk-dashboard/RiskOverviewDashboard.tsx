@@ -1,185 +1,132 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, TrendingUp, Clock, CheckCircle, Shield, Building2 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { Progress } from "@/components/ui/progress";
+import { AlertTriangle, Shield, TrendingUp, Clock, BarChart3, Users, Target, Activity } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
+
+const riskTrendData = [
+  { month: "Jan", high: 12, medium: 28, low: 15 },
+  { month: "Feb", high: 15, medium: 25, low: 18 },
+  { month: "Mar", high: 18, medium: 30, low: 20 },
+  { month: "Apr", high: 14, medium: 35, low: 22 },
+  { month: "May", high: 16, medium: 32, low: 25 },
+  { month: "Jun", high: 13, medium: 29, low: 28 }
+];
+
+const riskCategoryData = [
+  { name: "Regulatory", value: 35, color: "#ef4444" },
+  { name: "Operational", value: 28, color: "#f59e0b" },
+  { name: "Financial", value: 20, color: "#eab308" },
+  { name: "Cyber Security", value: 12, color: "#3b82f6" },
+  { name: "Reputational", value: 5, color: "#8b5cf6" }
+];
+
+const mitigationProgressData = [
+  { category: "Critical Risks", completed: 75, total: 100 },
+  { category: "High Risks", completed: 60, total: 100 },
+  { category: "Medium Risks", completed: 45, total: 100 },
+  { category: "Low Risks", completed: 80, total: 100 }
+];
 
 export function RiskOverviewDashboard() {
-  const riskSummary = [
-    {
-      title: "Total Active Risks",
-      value: "142",
-      description: "Across all business units",
-      icon: AlertTriangle,
-      trend: "+8 this month",
-      variant: "default" as const
-    },
-    {
-      title: "Critical Risks",
-      value: "12",
-      description: "Requiring immediate attention",
-      icon: Shield,
-      trend: "-2 from last month",
-      variant: "destructive" as const
-    },
-    {
-      title: "Overdue Mitigations",
-      value: "23",
-      description: "Past target completion",
-      icon: Clock,
-      trend: "+5 this week",
-      variant: "secondary" as const
-    },
-    {
-      title: "Resolved This Quarter",
-      value: "67",
-      description: "Successfully mitigated",
-      icon: CheckCircle,
-      trend: "+23% vs last quarter",
-      variant: "default" as const
-    }
-  ];
-
-  const riskTrends = [
-    { month: "Jan", risks: 45, resolved: 32 },
-    { month: "Feb", risks: 52, resolved: 38 },
-    { month: "Mar", risks: 48, resolved: 41 },
-    { month: "Apr", risks: 56, resolved: 35 },
-    { month: "May", risks: 61, resolved: 43 },
-    { month: "Jun", risks: 58, resolved: 47 }
-  ];
-
-  const riskByType = [
-    { name: "Contractual", value: 35, color: "#8884d8" },
-    { name: "Litigation", value: 28, color: "#82ca9d" },
-    { name: "Compliance", value: 22, color: "#ffc658" },
-    { name: "IP & Licensing", value: 18, color: "#ff7300" },
-    { name: "Cyber & Privacy", value: 15, color: "#0088fe" },
-    { name: "Regulatory", value: 12, color: "#00c49f" },
-    { name: "Operational", value: 8, color: "#ffbb28" },
-    { name: "Reputational", value: 4, color: "#ff8042" }
-  ];
-
-  const topRisks = [
-    {
-      id: 1,
-      title: "Data Privacy Compliance Gap",
-      category: "Compliance",
-      severity: "Critical",
-      likelihood: "High",
-      entity: "EU Operations",
-      owner: "Privacy Officer",
-      dueDate: "2024-11-20"
-    },
-    {
-      id: 2,
-      title: "Major Contract Termination Risk",
-      category: "Contractual",
-      severity: "High",
-      likelihood: "Medium",
-      entity: "Global Holdings",
-      owner: "Commercial Team",
-      dueDate: "2024-11-25"
-    },
-    {
-      id: 3,
-      title: "Patent Opposition Proceedings",
-      category: "IP & Licensing",
-      severity: "High",
-      likelihood: "High",
-      entity: "Technology Division",
-      owner: "IP Counsel",
-      dueDate: "2024-12-01"
-    }
-  ];
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "Critical": return "destructive";
-      case "High": return "secondary";
-      case "Medium": return "outline";
-      default: return "default";
-    }
-  };
-
   return (
     <div className="space-y-6">
-      {/* Entity Switcher */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-4">
-            <Building2 className="h-5 w-5 text-muted-foreground" />
-            <select className="flex-1 bg-transparent border-none text-sm focus:outline-none">
-              <option>All Entities</option>
-              <option>Global Holdings Inc</option>
-              <option>EU Operations Ltd</option>
-              <option>APAC Subsidiary</option>
-              <option>Technology Division</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Risks</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">247</div>
+            <p className="text-xs text-muted-foreground">
+              +12 from last month
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Summary Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {riskSummary.map((stat, index) => (
-          <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.description}</p>
-              <Badge variant={stat.variant} className="mt-2 text-xs">
-                {stat.trend}
-              </Badge>
-            </CardContent>
-          </Card>
-        ))}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Critical & High</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">42</div>
+            <p className="text-xs text-muted-foreground">
+              Require immediate attention
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Mitigation Rate</CardTitle>
+            <Shield className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">68%</div>
+            <p className="text-xs text-muted-foreground">
+              Actions completed
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Risk Score</CardTitle>
+            <Activity className="h-4 w-4 text-yellow-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">7.2</div>
+            <p className="text-xs text-muted-foreground">
+              Portfolio risk rating
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Risk Trends Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Risk Trends</CardTitle>
-            <CardDescription>Monthly risk identification vs resolution</CardDescription>
+            <CardTitle>Risk Trend Analysis</CardTitle>
+            <CardDescription>Risk levels over the past 6 months</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={riskTrends}>
+              <LineChart data={riskTrendData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="risks" fill="#ef4444" name="New Risks" />
-                <Bar dataKey="resolved" fill="#22c55e" name="Resolved" />
-              </BarChart>
+                <Line type="monotone" dataKey="high" stroke="#ef4444" strokeWidth={2} name="High Risk" />
+                <Line type="monotone" dataKey="medium" stroke="#f59e0b" strokeWidth={2} name="Medium Risk" />
+                <Line type="monotone" dataKey="low" stroke="#22c55e" strokeWidth={2} name="Low Risk" />
+              </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Risk Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Risk Distribution by Type</CardTitle>
-            <CardDescription>Current active risks by category</CardDescription>
+            <CardTitle>Risk by Category</CardTitle>
+            <CardDescription>Distribution of risks across categories</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={riskByType}
+                  data={riskCategoryData}
                   cx="50%"
                   cy="50%"
-                  outerRadius={80}
+                  outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}`}
+                  label={({ name, value }) => `${name}: ${value}%`}
                 >
-                  {riskByType.map((entry, index) => (
+                  {riskCategoryData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -190,38 +137,118 @@ export function RiskOverviewDashboard() {
         </Card>
       </div>
 
-      {/* Top Risks Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Priority Risks</CardTitle>
-          <CardDescription>Highest severity risks requiring immediate attention</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {topRisks.map((risk) => (
-              <div key={risk.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50">
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-medium">{risk.title}</h4>
-                    <Badge variant={getSeverityColor(risk.severity) as any}>
-                      {risk.severity}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>{risk.category}</span>
-                    <span>•</span>
-                    <span>{risk.entity}</span>
-                    <span>•</span>
-                    <span>Owner: {risk.owner}</span>
-                    <span>•</span>
-                    <span>Due: {risk.dueDate}</span>
-                  </div>
+      {/* Recent Activity and Top Risks */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Mitigation Progress</CardTitle>
+            <CardDescription>Progress on risk mitigation actions by category</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {mitigationProgressData.map((item, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">{item.category}</span>
+                  <span className="text-sm">{item.completed}%</span>
                 </div>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
+                <Progress value={item.completed} className="h-2" />
               </div>
             ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Critical Risks</CardTitle>
+            <CardDescription>Highest priority risks requiring attention</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 p-3 border rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                <div className="flex-1">
+                  <div className="font-medium">Regulatory Compliance Gap</div>
+                  <div className="text-sm text-muted-foreground">
+                    New GDPR requirements not fully implemented
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className="bg-red-100 text-red-800">Critical</Badge>
+                    <span className="text-xs text-muted-foreground">Due in 15 days</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 border rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                <div className="flex-1">
+                  <div className="font-medium">Cyber Security Vulnerability</div>
+                  <div className="text-sm text-muted-foreground">
+                    Critical security patches pending deployment
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className="bg-red-100 text-red-800">Critical</Badge>
+                    <span className="text-xs text-muted-foreground">Due in 7 days</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 border rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-orange-500 mt-0.5" />
+                <div className="flex-1">
+                  <div className="font-medium">Vendor Risk Assessment</div>
+                  <div className="text-sm text-muted-foreground">
+                    Key vendor contracts up for renewal
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className="bg-orange-100 text-orange-800">High</Badge>
+                    <span className="text-xs text-muted-foreground">Due in 30 days</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Common risk management tasks</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+              <Target className="h-5 w-5 text-blue-600" />
+              <div>
+                <div className="font-medium">Add New Risk</div>
+                <div className="text-sm text-muted-foreground">Register new risk</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+              <Shield className="h-5 w-5 text-green-600" />
+              <div>
+                <div className="font-medium">Update Mitigation</div>
+                <div className="text-sm text-muted-foreground">Track progress</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+              <BarChart3 className="h-5 w-5 text-purple-600" />
+              <div>
+                <div className="font-medium">Generate Report</div>
+                <div className="text-sm text-muted-foreground">Risk analytics</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+              <Users className="h-5 w-5 text-orange-600" />
+              <div>
+                <div className="font-medium">Assign Owner</div>
+                <div className="text-sm text-muted-foreground">Delegate risks</div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

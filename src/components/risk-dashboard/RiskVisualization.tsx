@@ -1,251 +1,304 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Download, Filter } from "lucide-react";
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, BarChart, Bar, PieChart, Pie, Legend, LineChart, Line } from "recharts";
+
+// Mock data for risk heatmap
+const riskHeatmapData = [
+  { probability: 10, impact: 2, name: "Minor Process Risk", category: "Operational", riskScore: 2.0 },
+  { probability: 20, impact: 3, name: "Documentation Gap", category: "Regulatory", riskScore: 3.0 },
+  { probability: 30, impact: 4, name: "Vendor Dependency", category: "Operational", riskScore: 4.5 },
+  { probability: 40, impact: 3, name: "Market Volatility", category: "Financial", riskScore: 4.8 },
+  { probability: 50, impact: 4, name: "Skill Gap", category: "Operational", riskScore: 6.0 },
+  { probability: 60, impact: 4, name: "System Vulnerability", category: "Cyber Security", riskScore: 7.2 },
+  { probability: 70, impact: 3, name: "Vendor Risk", category: "Operational", riskScore: 7.0 },
+  { probability: 80, impact: 4, name: "Compliance Gap", category: "Regulatory", riskScore: 8.0 },
+  { probability: 85, impact: 5, name: "GDPR Violation", category: "Regulatory", riskScore: 8.5 },
+  { probability: 60, impact: 5, name: "Cyber Attack", category: "Cyber Security", riskScore: 9.0 }
+];
+
+// Risk distribution by category
+const categoryDistribution = [
+  { category: "Regulatory", count: 35, percentage: 35 },
+  { category: "Operational", count: 28, percentage: 28 },
+  { category: "Financial", count: 20, percentage: 20 },
+  { category: "Cyber Security", count: 12, percentage: 12 },
+  { category: "Reputational", count: 5, percentage: 5 }
+];
+
+// Risk trend over time
+const riskTrendData = [
+  { month: "Jan", identified: 12, resolved: 8, open: 35 },
+  { month: "Feb", identified: 15, resolved: 10, open: 40 },
+  { month: "Mar", identified: 18, resolved: 12, open: 46 },
+  { month: "Apr", identified: 14, resolved: 16, open: 44 },
+  { month: "May", identified: 16, resolved: 14, open: 46 },
+  { month: "Jun", identified: 13, resolved: 15, open: 44 }
+];
+
+// Risk severity distribution
+const severityData = [
+  { severity: "Critical", count: 8, color: "#ef4444" },
+  { severity: "High", count: 15, color: "#f97316" },
+  { severity: "Medium", count: 32, color: "#eab308" },
+  { severity: "Low", count: 18, color: "#22c55e" }
+];
 
 export function RiskVisualization() {
-  const [filterEntity, setFilterEntity] = useState("all");
-  const [filterCategory, setFilterCategory] = useState("all");
+  const [selectedTimeframe, setSelectedTimeframe] = useState("6months");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // Risk heat map data (Impact vs Likelihood)
-  const heatMapData = [
-    { x: 1, y: 4, name: "GDPR Compliance Gap", severity: "Critical", category: "Compliance" },
-    { x: 2, y: 4, name: "Contract Termination", severity: "High", category: "Contractual" },
-    { x: 4, y: 3, name: "Patent Opposition", severity: "High", category: "IP" },
-    { x: 1, y: 5, name: "Class Action Risk", severity: "Medium", category: "Litigation" },
-    { x: 3, y: 2, name: "Vendor Risk", severity: "Medium", category: "Outsourcing" },
-    { x: 2, y: 2, name: "Regulatory Change", severity: "Low", category: "Regulatory" },
-    { x: 1, y: 1, name: "Minor IP Issue", severity: "Low", category: "IP" },
-    { x: 5, y: 1, name: "Reputation Risk", severity: "Medium", category: "Reputation" }
-  ];
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "Critical": return "#dc2626";
-      case "High": return "#ea580c";
-      case "Medium": return "#d97706";
-      case "Low": return "#65a30d";
-      default: return "#6b7280";
-    }
+  const getRiskColor = (riskScore: number) => {
+    if (riskScore >= 8) return "#ef4444"; // Red for critical
+    if (riskScore >= 6) return "#f97316"; // Orange for high
+    if (riskScore >= 4) return "#eab308"; // Yellow for medium
+    return "#22c55e"; // Green for low
   };
 
-  const riskMatrix = [
-    [
-      { impact: 1, likelihood: 1, count: 2, risks: ["Minor IP Issue", "Low vendor risk"] },
-      { impact: 1, likelihood: 2, count: 1, risks: ["Regulatory change impact"] },
-      { impact: 1, likelihood: 3, count: 0, risks: [] },
-      { impact: 1, likelihood: 4, count: 1, risks: ["GDPR audit finding"] },
-      { impact: 1, likelihood: 5, count: 1, risks: ["Class action exposure"] }
-    ],
-    [
-      { impact: 2, likelihood: 1, count: 0, risks: [] },
-      { impact: 2, likelihood: 2, count: 1, risks: ["Vendor performance"] },
-      { impact: 2, likelihood: 3, count: 0, risks: [] },
-      { impact: 2, likelihood: 4, count: 1, risks: ["Contract termination"] },
-      { impact: 2, likelihood: 5, count: 0, risks: [] }
-    ],
-    [
-      { impact: 3, likelihood: 1, count: 0, risks: [] },
-      { impact: 3, likelihood: 2, count: 0, risks: [] },
-      { impact: 3, likelihood: 3, count: 0, risks: [] },
-      { impact: 3, likelihood: 4, count: 0, risks: [] },
-      { impact: 3, likelihood: 5, count: 0, risks: [] }
-    ],
-    [
-      { impact: 4, likelihood: 1, count: 0, risks: [] },
-      { impact: 4, likelihood: 2, count: 0, risks: [] },
-      { impact: 4, likelihood: 3, count: 1, risks: ["Patent opposition"] },
-      { impact: 4, likelihood: 4, count: 0, risks: [] },
-      { impact: 4, likelihood: 5, count: 0, risks: [] }
-    ],
-    [
-      { impact: 5, likelihood: 1, count: 1, risks: ["Reputation damage"] },
-      { impact: 5, likelihood: 2, count: 0, risks: [] },
-      { impact: 5, likelihood: 3, count: 0, risks: [] },
-      { impact: 5, likelihood: 4, count: 0, risks: [] },
-      { impact: 5, likelihood: 5, count: 0, risks: [] }
-    ]
-  ];
-
-  const getMatrixCellColor = (count: number) => {
-    if (count === 0) return "bg-gray-50";
-    if (count <= 1) return "bg-green-100";
-    if (count <= 2) return "bg-yellow-100";
-    if (count <= 3) return "bg-orange-100";
-    return "bg-red-100";
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-3 border rounded-lg shadow-lg">
+          <p className="font-medium">{data.name}</p>
+          <p className="text-sm text-muted-foreground">Category: {data.category}</p>
+          <p className="text-sm">Probability: {data.probability}%</p>
+          <p className="text-sm">Impact: {data.impact}/5</p>
+          <p className="text-sm font-medium">Risk Score: {data.riskScore}</p>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Risk Analysis & Visualization</h2>
-          <p className="text-muted-foreground">Interactive risk assessment and heat maps</p>
+          <p className="text-muted-foreground">Visual analysis of risk patterns, trends, and distributions</p>
         </div>
-        <div className="flex gap-4">
-          <Select value={filterEntity} onValueChange={setFilterEntity}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Entity" />
+        <div className="flex gap-2">
+          <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Timeframe" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Entities</SelectItem>
-              <SelectItem value="global">Global Holdings</SelectItem>
-              <SelectItem value="eu">EU Operations</SelectItem>
-              <SelectItem value="apac">APAC Subsidiary</SelectItem>
+              <SelectItem value="3months">Last 3 Months</SelectItem>
+              <SelectItem value="6months">Last 6 Months</SelectItem>
+              <SelectItem value="1year">Last Year</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="Contractual">Contractual</SelectItem>
-              <SelectItem value="Compliance">Compliance</SelectItem>
-              <SelectItem value="IP">IP & Licensing</SelectItem>
-              <SelectItem value="Litigation">Litigation</SelectItem>
-            </SelectContent>
-          </Select>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export Charts
+          </Button>
         </div>
       </div>
 
+      {/* Risk Heat Map */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Risk Heat Map</CardTitle>
+          <CardDescription>
+            Risk positioning based on probability and impact assessment
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <ScatterChart
+              margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+              data={riskHeatmapData}
+            >
+              <CartesianGrid />
+              <XAxis 
+                type="number" 
+                dataKey="probability" 
+                name="Probability (%)"
+                domain={[0, 100]}
+                label={{ value: 'Probability (%)', position: 'bottom' }}
+              />
+              <YAxis 
+                type="number" 
+                dataKey="impact" 
+                name="Impact"
+                domain={[0, 5]}
+                label={{ value: 'Impact Level', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Scatter dataKey="riskScore" fill="#8884d8">
+                {riskHeatmapData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getRiskColor(entry.riskScore)} />
+                ))}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+          <div className="mt-4 flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500 rounded"></div>
+              <span>Low Risk (0-4)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+              <span>Medium Risk (4-6)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-orange-500 rounded"></div>
+              <span>High Risk (6-8)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded"></div>
+              <span>Critical Risk (8+)</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Risk Scatter Plot */}
+        {/* Risk Category Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Risk Impact vs Likelihood</CardTitle>
-            <CardDescription>Interactive scatter plot showing risk positioning</CardDescription>
+            <CardTitle>Risk Distribution by Category</CardTitle>
+            <CardDescription>Breakdown of risks across different categories</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                <CartesianGrid />
-                <XAxis 
-                  type="number" 
-                  dataKey="x" 
-                  name="Likelihood" 
-                  domain={[0, 6]}
-                  tickCount={6}
-                />
-                <YAxis 
-                  type="number" 
-                  dataKey="y" 
-                  name="Impact" 
-                  domain={[0, 6]}
-                  tickCount={6}
-                />
-                <Tooltip 
-                  cursor={{ strokeDasharray: '3 3' }}
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-white p-3 border rounded shadow">
-                          <p className="font-medium">{data.name}</p>
-                          <p className="text-sm">Category: {data.category}</p>
-                          <p className="text-sm">Severity: {data.severity}</p>
-                          <p className="text-sm">Likelihood: {data.x}</p>
-                          <p className="text-sm">Impact: {data.y}</p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Scatter data={heatMapData}>
-                  {heatMapData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={getSeverityColor(entry.severity)} />
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={categoryDistribution}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="count"
+                  label={({ category, percentage }) => `${category}: ${percentage}%`}
+                >
+                  {categoryDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={`hsl(${index * 72}, 70%, 50%)`} />
                   ))}
-                </Scatter>
-              </ScatterChart>
+                </Pie>
+                <Tooltip />
+              </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Risk Heat Map Matrix */}
+        {/* Risk Severity Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Risk Heat Map Matrix</CardTitle>
-            <CardDescription>Grid view of risks by impact and likelihood</CardDescription>
+            <CardTitle>Risk Severity Distribution</CardTitle>
+            <CardDescription>Number of risks by severity level</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-muted-foreground mb-4">
-                <span>← Lower Impact</span>
-                <span>Higher Impact →</span>
-              </div>
-              <div className="grid grid-cols-6 gap-1">
-                <div></div>
-                {[1, 2, 3, 4, 5].map(i => (
-                  <div key={i} className="text-center text-xs font-medium p-2">
-                    L{i}
-                  </div>
-                ))}
-                {riskMatrix.map((row, rowIndex) => (
-                  <>
-                    <div key={`impact-${rowIndex}`} className="text-center text-xs font-medium p-2">
-                      I{5 - rowIndex}
-                    </div>
-                    {row.map((cell, colIndex) => (
-                      <div
-                        key={`${rowIndex}-${colIndex}`}
-                        className={`${getMatrixCellColor(cell.count)} border p-2 h-16 flex items-center justify-center text-xs font-medium cursor-pointer hover:opacity-80`}
-                        title={cell.risks.join(', ')}
-                      >
-                        {cell.count > 0 && cell.count}
-                      </div>
-                    ))}
-                  </>
-                ))}
-              </div>
-              <div className="flex justify-center text-sm text-muted-foreground mt-4">
-                <span>↑ Higher Likelihood</span>
-              </div>
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={severityData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="severity" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8884d8">
+                  {severityData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
-      {/* Risk Distribution Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-red-600">3</div>
-            <p className="text-xs text-muted-foreground">Critical Risks</p>
-            <div className="w-full bg-red-100 rounded-full h-2 mt-2">
-              <div className="bg-red-600 h-2 rounded-full" style={{ width: '25%' }}></div>
+      {/* Risk Trend Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Risk Trend Analysis</CardTitle>
+          <CardDescription>Risk identification and resolution trends over time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={riskTrendData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="identified" 
+                stroke="#ef4444" 
+                strokeWidth={2} 
+                name="Risks Identified" 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="resolved" 
+                stroke="#22c55e" 
+                strokeWidth={2} 
+                name="Risks Resolved" 
+              />
+              <Line 
+                type="monotone" 
+                dataKey="open" 
+                stroke="#3b82f6" 
+                strokeWidth={2} 
+                name="Open Risks" 
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Risk Analysis Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Risk Analysis Insights</CardTitle>
+          <CardDescription>Key insights from risk visualization analysis</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-semibold text-red-600">High-Risk Areas</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                Regulatory and Cyber Security categories show the highest concentration of critical risks
+              </p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-orange-600">5</div>
-            <p className="text-xs text-muted-foreground">High Risks</p>
-            <div className="w-full bg-orange-100 rounded-full h-2 mt-2">
-              <div className="bg-orange-600 h-2 rounded-full" style={{ width: '42%' }}></div>
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-semibold text-orange-600">Risk Concentration</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                65% of risks fall into the High-Medium probability and High-Medium impact quadrant
+              </p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">4</div>
-            <p className="text-xs text-muted-foreground">Medium Risks</p>
-            <div className="w-full bg-yellow-100 rounded-full h-2 mt-2">
-              <div className="bg-yellow-600 h-2 rounded-full" style={{ width: '33%' }}></div>
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-semibold text-blue-600">Trend Analysis</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                Risk identification rate is increasing, but resolution rate needs improvement
+              </p>
             </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">2</div>
-            <p className="text-xs text-muted-foreground">Low Risks</p>
-            <div className="w-full bg-green-100 rounded-full h-2 mt-2">
-              <div className="bg-green-600 h-2 rounded-full" style={{ width: '17%' }}></div>
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-semibold text-green-600">Mitigation Success</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                68% average mitigation completion rate across all risk categories
+              </p>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-semibold text-purple-600">Priority Focus</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                23 risks require immediate attention based on current risk scores
+              </p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <h4 className="font-semibold text-yellow-600">Resource Allocation</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                Regulatory compliance requires 40% of current risk management resources
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

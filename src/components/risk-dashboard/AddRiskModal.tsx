@@ -1,11 +1,15 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
 
 interface AddRiskModalProps {
   open: boolean;
@@ -13,186 +17,184 @@ interface AddRiskModalProps {
 }
 
 export function AddRiskModal({ open, onOpenChange }: AddRiskModalProps) {
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [severity, setSeverity] = useState("");
-  const [likelihood, setLikelihood] = useState("");
-  const [impact, setImpact] = useState("");
-  const [entity, setEntity] = useState("");
-  const [jurisdiction, setJurisdiction] = useState("");
-  const [owner, setOwner] = useState("");
-  const [description, setDescription] = useState("");
-  const [source, setSource] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    riskLevel: "",
+    probability: "",
+    impact: "",
+    owner: "",
+    identifiedDate: new Date(),
+    reviewDate: undefined as Date | undefined
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Adding risk:", { 
-      title, category, severity, likelihood, impact, entity, jurisdiction, owner, description, source 
-    });
+    // TODO: Handle form submission
+    console.log("Risk data:", formData);
     onOpenChange(false);
+    // Reset form
+    setFormData({
+      title: "",
+      description: "",
+      category: "",
+      riskLevel: "",
+      probability: "",
+      impact: "",
+      owner: "",
+      identifiedDate: new Date(),
+      reviewDate: undefined
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add New Risk</DialogTitle>
           <DialogDescription>
-            Register a new risk for tracking and mitigation
+            Register a new risk in the risk registry with detailed information.
           </DialogDescription>
         </DialogHeader>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="title">Risk Title *</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter risk title"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Risk Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Brief description of the risk"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
               <Label htmlFor="category">Category *</Label>
-              <Select value={category} onValueChange={setCategory}>
+              <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="contractual">Contractual</SelectItem>
-                  <SelectItem value="litigation">Litigation & Disputes</SelectItem>
-                  <SelectItem value="governance">Governance & Company Secretarial</SelectItem>
-                  <SelectItem value="ip">IP & Licensing</SelectItem>
-                  <SelectItem value="outsourcing">Outsourcing / Third Parties</SelectItem>
-                  <SelectItem value="compliance">Compliance & Regulatory</SelectItem>
-                  <SelectItem value="reputation">Reputation / ESG</SelectItem>
-                  <SelectItem value="privacy">Data Privacy / Cyber</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="source">Source *</Label>
-              <Select value={source} onValueChange={setSource}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select source" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="contract">Contract Review</SelectItem>
-                  <SelectItem value="audit">Internal Audit</SelectItem>
-                  <SelectItem value="regulatory">Regulatory Review</SelectItem>
-                  <SelectItem value="litigation">Litigation Assessment</SelectItem>
-                  <SelectItem value="business">Business Unit Report</SelectItem>
-                  <SelectItem value="vendor">Vendor Assessment</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="regulatory">Regulatory</SelectItem>
+                  <SelectItem value="operational">Operational</SelectItem>
+                  <SelectItem value="financial">Financial</SelectItem>
+                  <SelectItem value="cybersecurity">Cyber Security</SelectItem>
+                  <SelectItem value="reputational">Reputational</SelectItem>
+                  <SelectItem value="legal">Legal</SelectItem>
+                  <SelectItem value="strategic">Strategic</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="severity">Severity *</Label>
-              <Select value={severity} onValueChange={setSeverity}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select severity" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="likelihood">Likelihood *</Label>
-              <Select value={likelihood} onValueChange={setLikelihood}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select likelihood" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rare">Rare</SelectItem>
-                  <SelectItem value="unlikely">Unlikely</SelectItem>
-                  <SelectItem value="possible">Possible</SelectItem>
-                  <SelectItem value="likely">Likely</SelectItem>
-                  <SelectItem value="almost-certain">Almost Certain</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="impact">Impact *</Label>
-              <Select value={impact} onValueChange={setImpact}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select impact" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="minimal">Minimal</SelectItem>
-                  <SelectItem value="minor">Minor</SelectItem>
-                  <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="major">Major</SelectItem>
-                  <SelectItem value="catastrophic">Catastrophic</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="entity">Entity *</Label>
-              <Select value={entity} onValueChange={setEntity}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select entity" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="global">Global Holdings Inc</SelectItem>
-                  <SelectItem value="eu">EU Operations Ltd</SelectItem>
-                  <SelectItem value="apac">APAC Subsidiary</SelectItem>
-                  <SelectItem value="tech">Technology Division</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="jurisdiction">Jurisdiction *</Label>
-              <Input
-                id="jurisdiction"
-                value={jurisdiction}
-                onChange={(e) => setJurisdiction(e.target.value)}
-                placeholder="e.g., US, EU, UK, Global"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="owner">Risk Owner *</Label>
-            <Input
-              id="owner"
-              value={owner}
-              onChange={(e) => setOwner(e.target.value)}
-              placeholder="Enter responsible person/team"
+          <div className="space-y-2">
+            <Label htmlFor="description">Risk Description *</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Detailed description of the risk, its potential causes, and consequences"
+              rows={3}
               required
             />
           </div>
 
-          <div>
-            <Label htmlFor="description">Risk Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Detailed description of the risk, potential impacts, and context"
-              rows={4}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="riskLevel">Risk Level *</Label>
+              <Select value={formData.riskLevel} onValueChange={(value) => setFormData({ ...formData, riskLevel: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="probability">Probability (%) *</Label>
+              <Input
+                id="probability"
+                type="number"
+                min="0"
+                max="100"
+                value={formData.probability}
+                onChange={(e) => setFormData({ ...formData, probability: e.target.value })}
+                placeholder="0-100"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="impact">Impact Level *</Label>
+              <Select value={formData.impact} onValueChange={(value) => setFormData({ ...formData, impact: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select impact" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="flex justify-end space-x-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="owner">Risk Owner *</Label>
+              <Select value={formData.owner} onValueChange={(value) => setFormData({ ...formData, owner: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Assign owner" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="jane.smith">Jane Smith</SelectItem>
+                  <SelectItem value="mike.johnson">Mike Johnson</SelectItem>
+                  <SelectItem value="sarah.davis">Sarah Davis</SelectItem>
+                  <SelectItem value="david.wilson">David Wilson</SelectItem>
+                  <SelectItem value="lisa.chen">Lisa Chen</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Review Date *</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.reviewDate ? format(formData.reviewDate, "PPP") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.reviewDate}
+                    onSelect={(date) => setFormData({ ...formData, reviewDate: date })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type="submit">Add Risk</Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
