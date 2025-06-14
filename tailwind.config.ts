@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -68,6 +69,26 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			fontFamily: {
+				sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+			},
+			fontSize: {
+				'desktop-h1': ['36px', { lineHeight: '1.3', fontWeight: '600' }],
+				'desktop-h2': ['28px', { lineHeight: '1.3', fontWeight: '600' }],
+				'desktop-h3': ['22px', { lineHeight: '1.3', fontWeight: '600' }],
+				'desktop-h4': ['18px', { lineHeight: '1.3', fontWeight: '600' }],
+				'desktop-body': ['15px', { lineHeight: '1.5' }],
+				'desktop-caption': ['13px', { lineHeight: '1.4' }],
+				'desktop-table': ['14px', { lineHeight: '1.4' }],
+			},
+			spacing: {
+				'18': '4.5rem', // 72px
+				'22': '5.5rem', // 88px
+				'30': '7.5rem', // 120px
+			},
+			maxWidth: {
+				'screen-2xl': '1440px',
+			},
 			keyframes: {
 				'accordion-down': {
 					from: {
@@ -84,11 +105,36 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'slide-down': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(-10px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'fade-in': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'slide-down': 'slide-down 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out'
+			},
+			backdropBlur: {
+				xs: '2px',
 			}
 		}
 	},
