@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, FileText, Search, BarChart3, GitBranch } from "lucide-react";
+import { Plus, FileText, GitBranch, Download, Eye, Edit } from "lucide-react";
 import { AddTemplateModal } from "./AddTemplateModal";
 import { TemplateDetailModal } from "./TemplateDetailModal";
 
@@ -15,34 +15,53 @@ const mockTemplates = [
     id: "1",
     title: "Software License Agreement",
     type: "License Agreement",
-    jurisdiction: "US",
-    status: "Approved",
+    version: "v2.1",
+    jurisdiction: "UK",
+    entity: "TechCorp UK Ltd",
+    status: "Active",
     lastUpdated: "2024-01-15",
-    clauses: 12,
-    linkedContracts: 25,
-    version: "v2.1"
+    author: "Sarah Wilson",
+    usageCount: 45,
+    accessLevel: "Org-wide"
   },
   {
     id: "2",
-    title: "Employment Contract - Germany",
+    title: "Employment Contract - Standard",
     type: "Employment Contract",
-    jurisdiction: "Germany",
-    status: "In Review",
+    version: "v3.0",
+    jurisdiction: "EU",
+    entity: "TechCorp GmbH",
+    status: "Active",
     lastUpdated: "2024-01-20",
-    clauses: 18,
-    linkedContracts: 8,
-    version: "v1.3"
+    author: "Michael Chen",
+    usageCount: 78,
+    accessLevel: "Legal Team"
   },
   {
     id: "3",
-    title: "NDA - Standard",
+    title: "Non-Disclosure Agreement",
     type: "Non-Disclosure Agreement",
-    jurisdiction: "Multiple",
-    status: "Draft",
+    version: "v1.5",
+    jurisdiction: "US",
+    entity: "TechCorp Inc",
+    status: "Under Review",
     lastUpdated: "2024-01-18",
-    clauses: 8,
-    linkedContracts: 45,
-    version: "v3.0"
+    author: "Emily Davis",
+    usageCount: 32,
+    accessLevel: "Team"
+  },
+  {
+    id: "4",
+    title: "Service Agreement Template",
+    type: "Service Agreement",
+    version: "v2.0",
+    jurisdiction: "Multiple",
+    entity: "All Entities",
+    status: "Draft",
+    lastUpdated: "2024-01-22",
+    author: "David Kim",
+    usageCount: 12,
+    accessLevel: "Private"
   }
 ];
 
@@ -62,10 +81,20 @@ export function TemplateManagementDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Approved": return "bg-green-100 text-green-800";
-      case "In Review": return "bg-yellow-100 text-yellow-800";
-      case "Draft": return "bg-blue-100 text-blue-800";
+      case "Active": return "bg-green-100 text-green-800";
+      case "Draft": return "bg-yellow-100 text-yellow-800";
+      case "Under Review": return "bg-blue-100 text-blue-800";
       case "Archived": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getAccessLevelColor = (level: string) => {
+    switch (level) {
+      case "Private": return "bg-red-100 text-red-800";
+      case "Team": return "bg-blue-100 text-blue-800";
+      case "Legal Team": return "bg-purple-100 text-purple-800";
+      case "Org-wide": return "bg-green-100 text-green-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -86,32 +115,32 @@ export function TemplateManagementDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Approved</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">124</div>
-            <p className="text-xs text-muted-foreground">Ready to use</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">In Review</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Templates</CardTitle>
             <GitBranch className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
-            <p className="text-xs text-muted-foreground">Pending approval</p>
+            <div className="text-2xl font-bold">134</div>
+            <p className="text-xs text-muted-foreground">86% of total</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Most Used</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <Download className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">45</div>
-            <p className="text-xs text-muted-foreground">NDA Standard</p>
+            <div className="text-2xl font-bold">Employment</div>
+            <p className="text-xs text-muted-foreground">78 uses</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Recent Updates</CardTitle>
+            <Edit className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">5</div>
+            <p className="text-xs text-muted-foreground">Last 7 days</p>
           </CardContent>
         </Card>
       </div>
@@ -121,14 +150,12 @@ export function TemplateManagementDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Template Management</CardTitle>
-              <CardDescription>Manage contract templates with version control and approval workflows</CardDescription>
+              <CardDescription>Manage contract templates with version control and collaboration</CardDescription>
             </div>
-            <div className="flex space-x-2">
-              <Button onClick={() => setAddModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Template
-              </Button>
-            </div>
+            <Button onClick={() => setAddModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Template
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -153,6 +180,7 @@ export function TemplateManagementDashboard() {
                 <SelectItem value="nda">Non-Disclosure Agreement</SelectItem>
                 <SelectItem value="service">Service Agreement</SelectItem>
                 <SelectItem value="purchase">Purchase Agreement</SelectItem>
+                <SelectItem value="consultancy">Consultancy Agreement</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -160,10 +188,10 @@ export function TemplateManagementDashboard() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="in-review">In Review</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="under-review">Under Review</SelectItem>
                 <SelectItem value="archived">Archived</SelectItem>
               </SelectContent>
             </Select>
@@ -190,9 +218,11 @@ export function TemplateManagementDashboard() {
                 <TableHead>Type</TableHead>
                 <TableHead>Version</TableHead>
                 <TableHead>Jurisdiction</TableHead>
+                <TableHead>Entity</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Clauses</TableHead>
-                <TableHead>Linked Contracts</TableHead>
+                <TableHead>Access Level</TableHead>
+                <TableHead>Usage Count</TableHead>
+                <TableHead>Author</TableHead>
                 <TableHead>Last Updated</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -202,24 +232,37 @@ export function TemplateManagementDashboard() {
                 <TableRow key={template.id}>
                   <TableCell className="font-medium">{template.title}</TableCell>
                   <TableCell>{template.type}</TableCell>
-                  <TableCell>{template.version}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{template.version}</Badge>
+                  </TableCell>
                   <TableCell>{template.jurisdiction}</TableCell>
+                  <TableCell>{template.entity}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(template.status)}>
                       {template.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{template.clauses}</TableCell>
-                  <TableCell>{template.linkedContracts}</TableCell>
+                  <TableCell>
+                    <Badge className={getAccessLevelColor(template.accessLevel)}>
+                      {template.accessLevel}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{template.usageCount}</TableCell>
+                  <TableCell>{template.author}</TableCell>
                   <TableCell>{template.lastUpdated}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewTemplate(template)}
-                    >
-                      View
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewTemplate(template)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

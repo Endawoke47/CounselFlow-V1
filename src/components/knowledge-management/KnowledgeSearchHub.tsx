@@ -2,275 +2,365 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Eye, Copy, Download, Grid, List } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Brain, FileText, Filter, BookOpen, Lightbulb, TrendingUp } from "lucide-react";
 
 const mockSearchResults = [
   {
     id: "1",
-    title: "Data Protection Impact Assessment Template",
-    type: "Template",
-    snippet: "Standard DPIA template for GDPR compliance assessments including risk evaluation criteria...",
+    title: "GDPR Data Processing Guidelines",
+    type: "Playbook",
+    excerpt: "Comprehensive guide for processing personal data under GDPR regulations, including consent management and data subject rights...",
+    relevanceScore: 95,
     jurisdiction: "EU",
-    tags: ["GDPR", "DPIA", "Privacy"],
-    lastModified: "2024-01-15",
-    relevanceScore: 95
+    lastUpdated: "2024-01-15",
+    tags: ["GDPR", "Data Processing", "Privacy"]
   },
   {
     id: "2",
-    title: "Employment Termination Procedures",
-    type: "Playbook",
-    snippet: "Comprehensive guide for handling employee terminations across different jurisdictions...",
-    jurisdiction: "Multiple",
-    tags: ["Employment", "Termination", "HR"],
-    lastModified: "2024-01-20",
-    relevanceScore: 88
+    title: "Employment Contract Termination FAQ",
+    type: "FAQ",
+    excerpt: "Frequently asked questions about employment contract termination procedures, notice periods, and legal requirements...",
+    relevanceScore: 89,
+    jurisdiction: "UK",
+    lastUpdated: "2024-01-20",
+    tags: ["Employment", "Termination", "Contracts"]
   },
   {
     id: "3",
-    title: "IP License Agreement Clauses",
-    type: "Clause Library",
-    snippet: "Standard intellectual property licensing clauses with risk assessments and alternatives...",
-    jurisdiction: "US",
-    tags: ["IP", "Licensing", "Contracts"],
-    lastModified: "2024-01-18",
-    relevanceScore: 82
+    title: "IP Assignment Risk Assessment",
+    type: "Risk Note",
+    excerpt: "Risk assessment framework for intellectual property assignment clauses in employment and service agreements...",
+    relevanceScore: 84,
+    jurisdiction: "Multiple",
+    lastUpdated: "2024-01-18",
+    tags: ["IP", "Risk", "Assignment"]
   }
 ];
 
-const recentSearches = [
-  "GDPR compliance checklist",
-  "Employment contract termination",
-  "IP licensing terms",
-  "M&A due diligence"
+const mockSuggestions = [
+  "GDPR compliance procedures",
+  "Employment contract templates",
+  "Data retention policies",
+  "IP assignment clauses",
+  "Termination notice requirements"
 ];
 
-const suggestedTopics = [
-  "Contract Review Process",
-  "Regulatory Updates Q1 2024",
-  "Risk Assessment Templates",
-  "Compliance Training Materials"
+const mockTrendingTopics = [
+  { topic: "AI governance", searches: 156, trend: "+23%" },
+  { topic: "Remote work policies", searches: 134, trend: "+18%" },
+  { topic: "Data localization", searches: 98, trend: "+45%" },
+  { topic: "ESG compliance", searches: 87, trend: "+12%" }
+];
+
+const mockInsights = [
+  {
+    title: "Knowledge Gap Identified",
+    description: "Limited guidance on AI governance across all jurisdictions",
+    type: "warning",
+    category: "Gap Analysis"
+  },
+  {
+    title: "Popular Resource",
+    description: "GDPR compliance guide is the most accessed resource this month",
+    type: "info",
+    category: "Usage Analytics"
+  },
+  {
+    title: "Update Recommended",
+    description: "Employment law guidance needs review due to recent regulatory changes",
+    type: "suggestion",
+    category: "Content Review"
+  }
 ];
 
 export function KnowledgeSearchHub() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
-  const [jurisdictionFilter, setJurisdictionFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("relevance");
-  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
+  const [searchType, setSearchType] = useState("semantic");
+  const [entityFilter, setEntityFilter] = useState("all");
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = () => {
-    console.log("Searching for:", searchQuery);
+  const handleSearch = async () => {
+    setIsSearching(true);
+    // Simulate AI search delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSearching(false);
+    setHasSearched(true);
+  };
+
+  const getInsightIcon = (type: string) => {
+    switch (type) {
+      case "warning": return "🚨";
+      case "info": return "ℹ️";
+      case "suggestion": return "💡";
+      default: return "📋";
+    }
+  };
+
+  const getInsightColor = (type: string) => {
+    switch (type) {
+      case "warning": return "border-orange-200 bg-orange-50";
+      case "info": return "border-blue-200 bg-blue-50";
+      case "suggestion": return "border-green-200 bg-green-50";
+      default: return "border-gray-200 bg-gray-50";
+    }
   };
 
   return (
     <div className="space-y-6">
+      {/* Search Interface */}
       <Card>
         <CardHeader>
-          <CardTitle>AI-Powered Knowledge Search</CardTitle>
+          <CardTitle className="flex items-center">
+            <Brain className="h-5 w-5 mr-2" />
+            AI-Powered Knowledge Search
+          </CardTitle>
           <CardDescription>
-            Search using natural language or keywords to find relevant legal knowledge
+            Search across all knowledge entries using natural language queries and AI-powered semantic search
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search Bar */}
-          <div className="flex gap-2">
+          {/* Search Input */}
+          <div className="flex space-x-4">
             <div className="flex-1">
               <Input
-                placeholder="Ask a question or search for knowledge... (e.g., 'What are the GDPR compliance requirements for data processing?')"
+                placeholder="Ask anything about your knowledge base... e.g., 'What are the GDPR requirements for data processing?'"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
+                className="text-base"
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
-            <Button onClick={handleSearch}>
-              <Search className="h-4 w-4 mr-2" />
-              Search
+            <Button onClick={handleSearch} disabled={isSearching || !searchQuery.trim()}>
+              {isSearching ? (
+                <>
+                  <Brain className="h-4 w-4 mr-2 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Search className="h-4 w-4 mr-2" />
+                  Search
+                </>
+              )}
             </Button>
           </div>
 
-          {/* Filters and Sort */}
+          {/* Search Options */}
           <div className="flex flex-wrap items-center gap-4">
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Document Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="memo">Memo</SelectItem>
-                <SelectItem value="faq">FAQ</SelectItem>
-                <SelectItem value="playbook">Playbook</SelectItem>
-                <SelectItem value="template">Template</SelectItem>
-                <SelectItem value="clause">Clause</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Jurisdiction" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Jurisdictions</SelectItem>
-                <SelectItem value="uk">United Kingdom</SelectItem>
-                <SelectItem value="eu">European Union</SelectItem>
-                <SelectItem value="us">United States</SelectItem>
-                <SelectItem value="de">Germany</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="relevance">Relevance</SelectItem>
-                <SelectItem value="date">Last Modified</SelectItem>
-                <SelectItem value="title">Title A-Z</SelectItem>
-                <SelectItem value="type">Document Type</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <div className="ml-auto flex gap-2">
-              <Button
-                variant={viewMode === "cards" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("cards")}
-              >
-                <Grid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-              >
-                <List className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium">Search Type:</label>
+              <Select value={searchType} onValueChange={setSearchType}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="semantic">Semantic Search</SelectItem>
+                  <SelectItem value="keyword">Keyword Search</SelectItem>
+                  <SelectItem value="hybrid">Hybrid Search</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium">Entity:</label>
+              <Select value={entityFilter} onValueChange={setEntityFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Entities</SelectItem>
+                  <SelectItem value="uk">TechCorp UK Ltd</SelectItem>
+                  <SelectItem value="de">TechCorp GmbH</SelectItem>
+                  <SelectItem value="us">TechCorp Inc</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
+          {/* Quick Suggestions */}
+          {!hasSearched && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Try these suggestions:</label>
+              <div className="flex flex-wrap gap-2">
+                {mockSuggestions.map((suggestion, index) => (
+                  <Badge
+                    key={index}
+                    variant="outline"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => setSearchQuery(suggestion)}
+                  >
+                    {suggestion}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Search Results */}
-        <div className="lg:col-span-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Search Results ({mockSearchResults.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {viewMode === "cards" ? (
-                <div className="grid gap-4">
-                  {mockSearchResults.map((result) => (
-                    <Card key={result.id} className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-medium text-lg mb-1">{result.title}</h3>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="outline">{result.type}</Badge>
-                            <Badge variant="outline">{result.jurisdiction}</Badge>
-                            <span className="text-sm text-muted-foreground">
-                              {result.relevanceScore}% match
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3">{result.snippet}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-wrap gap-1">
-                          {result.tags.map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Copy className="h-4 w-4 mr-1" />
-                            Copy
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-1" />
-                            Download
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
+      {/* Trending Topics */}
+      {!hasSearched && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <TrendingUp className="h-5 w-5 mr-2" />
+              Trending Topics
+            </CardTitle>
+            <CardDescription>Popular search topics in your organization</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {mockTrendingTopics.map((topic, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">{topic.topic}</h4>
+                    <p className="text-sm text-muted-foreground">{topic.searches} searches</p>
+                  </div>
+                  <Badge variant="outline" className="text-green-600">
+                    {topic.trend}
+                  </Badge>
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  {mockSearchResults.map((result) => (
-                    <div key={result.id} className="flex items-center justify-between p-3 border rounded">
-                      <div className="flex-1">
-                        <h3 className="font-medium">{result.title}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">{result.type}</Badge>
-                          <Badge variant="outline" className="text-xs">{result.jurisdiction}</Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {result.lastModified}
-                          </span>
-                        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Search Results & Analytics */}
+      {hasSearched && (
+        <Tabs defaultValue="results" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="results">Search Results</TabsTrigger>
+            <TabsTrigger value="insights">AI Insights</TabsTrigger>
+            <TabsTrigger value="analytics">Knowledge Analytics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="results" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">
+                Found {mockSearchResults.length} results for "{searchQuery}"
+              </h3>
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4" />
+                <span className="text-sm text-muted-foreground">Sort by relevance</span>
+              </div>
+            </div>
+
+            {mockSearchResults.map((result) => (
+              <Card key={result.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <h4 className="font-semibold text-lg">{result.title}</h4>
+                        <Badge variant="outline">{result.type}</Badge>
+                        <Badge className="bg-green-100 text-green-800">
+                          {result.relevanceScore}% match
+                        </Badge>
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">View</Button>
-                        <Button variant="outline" size="sm">Copy</Button>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {result.jurisdiction} • Last updated: {result.lastUpdated}
+                      </p>
+                      <p className="text-sm mb-3">{result.excerpt}</p>
+                      <div className="flex items-center space-x-2">
+                        {result.tags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                    <Button variant="outline" size="sm">
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Entry
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </TabsContent>
+
+          <TabsContent value="insights" className="space-y-4">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center">
+                <Lightbulb className="h-5 w-5 mr-2" />
+                AI-Generated Insights
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Based on your search and knowledge usage patterns, here are some insights:
+              </p>
+
+              {mockInsights.map((insight, index) => (
+                <Card key={index} className={`border-l-4 ${getInsightColor(insight.type)}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-3">
+                      <span className="text-lg">{getInsightIcon(insight.type)}</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-medium">{insight.title}</h4>
+                          <Badge variant="outline" className="text-xs">
+                            {insight.category}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{insight.description}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Knowledge Usage Analytics</CardTitle>
+                <CardDescription>
+                  Insights into how your knowledge base is being used
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Most Accessed Content</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center p-3 bg-muted rounded">
+                        <span className="text-sm">GDPR Compliance Guide</span>
+                        <Badge>245 views</Badge>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-muted rounded">
+                        <span className="text-sm">Employment Contract FAQ</span>
+                        <Badge>189 views</Badge>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-muted rounded">
+                        <span className="text-sm">IP Assignment Guidelines</span>
+                        <Badge>156 views</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="font-medium">Content Gaps</h4>
+                    <div className="space-y-2">
+                      <div className="p-3 border rounded-lg bg-orange-50 border-orange-200">
+                        <h5 className="font-medium text-orange-900">Missing Topics</h5>
+                        <ul className="text-sm text-orange-800 mt-1 space-y-1">
+                          <li>• AI governance frameworks</li>
+                          <li>• Cryptocurrency regulations</li>
+                          <li>• ESG compliance guidelines</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Smart Suggestions Panel */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Recent Searches</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {recentSearches.map((search, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left text-sm p-2 rounded hover:bg-muted"
-                    onClick={() => setSearchQuery(search)}
-                  >
-                    {search}
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Suggested Topics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {suggestedTopics.map((topic, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left text-sm p-2 rounded hover:bg-muted"
-                    onClick={() => setSearchQuery(topic)}
-                  >
-                    {topic}
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }
