@@ -2,163 +2,244 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Download } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { 
+  Scale, 
+  AlertTriangle, 
+  Clock, 
+  DollarSign, 
+  TrendingUp, 
+  Users,
+  FileText,
+  CheckCircle
+} from "lucide-react";
 
 export function DisputesOverview() {
-  const summaryStats = [
-    { title: "Open Disputes", value: "24", description: "Active cases requiring attention", status: "warning" },
-    { title: "Escalated", value: "7", description: "High priority disputes", status: "destructive" },
-    { title: "Closed This Month", value: "12", description: "Recently resolved", status: "success" },
-    { title: "Total Exposure", value: "$2.4M", description: "Financial risk exposure", status: "default" }
-  ];
+  const stats = {
+    totalDisputes: 24,
+    activeDisputes: 18,
+    resolved: 6,
+    totalExposure: 2750000,
+    avgResolutionTime: 45,
+    criticalDisputes: 3
+  };
 
   const recentDisputes = [
     {
       id: "DIS-001",
       title: "Contract Breach - Supplier XYZ",
-      entity: "Tech Corp Ltd",
-      counterparty: "XYZ Supplies Inc",
       status: "In Review",
-      owner: "Sarah Johnson",
+      priority: "High",
       exposure: "$450,000",
-      provisioned: true,
-      lastUpdated: "2 hours ago"
+      deadline: "2024-02-15"
     },
     {
       id: "DIS-002", 
-      title: "Employment Dispute - Wrongful Termination",
-      entity: "Tech Corp UK",
-      counterparty: "John Smith",
+      title: "Employment Dispute",
       status: "Negotiation",
-      owner: "Mike Chen",
+      priority: "Medium",
       exposure: "$125,000",
-      provisioned: false,
-      lastUpdated: "1 day ago"
+      deadline: "2024-03-01"
     },
     {
       id: "DIS-003",
       title: "IP Infringement Claim",
-      entity: "Innovation Labs",
-      counterparty: "Patent Co LLC",
       status: "Escalated",
-      owner: "Lisa Wang",
+      priority: "Critical",
       exposure: "$800,000",
-      provisioned: true,
-      lastUpdated: "3 days ago"
+      deadline: "2024-01-30"
     }
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Open": return "bg-blue-100 text-blue-800";
       case "In Review": return "bg-yellow-100 text-yellow-800";
       case "Negotiation": return "bg-orange-100 text-orange-800";
       case "Escalated": return "bg-red-100 text-red-800";
-      case "Resolved": return "bg-green-100 text-green-800";
-      case "Closed": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "Critical": return "bg-red-100 text-red-800";
+      case "High": return "bg-orange-100 text-orange-800";
+      case "Medium": return "bg-yellow-100 text-yellow-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {summaryStats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.description}</p>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Disputes</CardTitle>
+            <Scale className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalDisputes}</div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              <span className="text-green-600 mr-1">+2</span>
+              from last month
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Disputes</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeDisputes}</div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              <span className="text-red-600 mr-1">{stats.criticalDisputes}</span>
+              critical priority
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Exposure</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              ${(stats.totalExposure / 1000000).toFixed(1)}M
+            </div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              <TrendingUp className="h-3 w-3 mr-1" />
+              15% from last quarter
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Resolution</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.avgResolutionTime}d</div>
+            <div className="flex items-center text-xs text-muted-foreground">
+              <span className="text-green-600 mr-1">-5d</span>
+              improvement
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Status Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Dispute Status Distribution</CardTitle>
+            <CardDescription>Current status of all active disputes</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Open</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={25} className="w-20 h-2" />
+                  <span className="text-sm font-medium">6</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">In Review</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={35} className="w-20 h-2" />
+                  <span className="text-sm font-medium">8</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Negotiation</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={20} className="w-20 h-2" />
+                  <span className="text-sm font-medium">5</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Escalated</span>
+                <div className="flex items-center gap-2">
+                  <Progress value={15} className="w-20 h-2" />
+                  <span className="text-sm font-medium">3</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Priority Breakdown</CardTitle>
+            <CardDescription>Disputes by priority level</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-4 bg-red-50 rounded-lg">
+                <div className="text-2xl font-bold text-red-600">3</div>
+                <div className="text-sm text-red-800">Critical</div>
+              </div>
+              <div className="text-center p-4 bg-orange-50 rounded-lg">
+                <div className="text-2xl font-bold text-orange-600">8</div>
+                <div className="text-sm text-orange-800">High</div>
+              </div>
+              <div className="text-center p-4 bg-yellow-50 rounded-lg">
+                <div className="text-2xl font-bold text-yellow-600">10</div>
+                <div className="text-sm text-yellow-800">Medium</div>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-600">3</div>
+                <div className="text-sm text-green-800">Low</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Disputes */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Recent Disputes</CardTitle>
-              <CardDescription>Latest dispute activity across all entities</CardDescription>
+              <CardDescription>Latest disputes requiring attention</CardDescription>
             </div>
             <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Export
+              View All
             </Button>
-          </div>
-          <div className="flex gap-4 mt-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search disputes..." className="pl-9" />
-            </div>
-            <Select>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="escalated">Escalated</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Entity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Entities</SelectItem>
-                <SelectItem value="tech-corp">Tech Corp Ltd</SelectItem>
-                <SelectItem value="tech-uk">Tech Corp UK</SelectItem>
-                <SelectItem value="innovation">Innovation Labs</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Dispute Title</TableHead>
-                <TableHead>Entity</TableHead>
-                <TableHead>Counterparty</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Owner</TableHead>
-                <TableHead>Exposure</TableHead>
-                <TableHead>Provisioned</TableHead>
-                <TableHead>Last Updated</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentDisputes.map((dispute) => (
-                <TableRow key={dispute.id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-medium">{dispute.title}</TableCell>
-                  <TableCell>{dispute.entity}</TableCell>
-                  <TableCell>{dispute.counterparty}</TableCell>
-                  <TableCell>
+          <div className="space-y-4">
+            {recentDisputes.map((dispute) => (
+              <div key={dispute.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h4 className="font-medium">{dispute.title}</h4>
                     <Badge className={getStatusColor(dispute.status)}>
                       {dispute.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell>{dispute.owner}</TableCell>
-                  <TableCell className="font-medium">{dispute.exposure}</TableCell>
-                  <TableCell>
-                    <Badge variant={dispute.provisioned ? "default" : "outline"}>
-                      {dispute.provisioned ? "Yes" : "No"}
+                    <Badge className={getPriorityColor(dispute.priority)}>
+                      {dispute.priority}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{dispute.lastUpdated}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span>{dispute.id}</span>
+                    <span>Exposure: {dispute.exposure}</span>
+                    <span>Deadline: {dispute.deadline}</span>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm">
+                  View Details
+                </Button>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>
