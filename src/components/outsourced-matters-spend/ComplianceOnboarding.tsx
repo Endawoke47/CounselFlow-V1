@@ -1,97 +1,152 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CheckCircle, AlertCircle, Clock, FileText, Shield, Users } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CheckCircle, Clock, AlertTriangle, FileText, Shield, Users, Building } from "lucide-react";
 
 export function ComplianceOnboarding() {
-  const complianceItems = [
+  const [activeTab, setActiveTab] = useState("onboarding");
+
+  const onboardingTasks = [
     {
-      vendor: "Davis Polk & Wardwell",
-      nda: { status: "Complete", date: "2024-01-15", expires: "2025-01-15" },
-      conflictCheck: { status: "Complete", date: "2024-03-01", expires: "2024-09-01" },
-      dataSecurity: { status: "Complete", date: "2024-02-15", expires: "2025-02-15" },
-      diversityInfo: { status: "Complete", date: "2024-01-20", expires: "N/A" },
-      complianceScore: 100
+      vendor: "Regional Law Associates",
+      status: "In Progress",
+      progress: 75,
+      completedSteps: 6,
+      totalSteps: 8,
+      startDate: "2024-03-01",
+      expectedCompletion: "2024-03-25",
+      assignedTo: "Sarah Johnson",
+      riskLevel: "Medium"
     },
     {
-      vendor: "Clifford Chance",
-      nda: { status: "Complete", date: "2024-01-10", expires: "2025-01-10" },
-      conflictCheck: { status: "Expired", date: "2023-12-01", expires: "2024-06-01" },
-      dataSecurity: { status: "Complete", date: "2024-02-20", expires: "2025-02-20" },
-      diversityInfo: { status: "Pending", date: "", expires: "" },
-      complianceScore: 65
+      vendor: "International Legal Partners",
+      status: "Pending Review",
+      progress: 95,
+      completedSteps: 19,
+      totalSteps: 20,
+      startDate: "2024-02-15",
+      expectedCompletion: "2024-03-15",
+      assignedTo: "Michael Brown",
+      riskLevel: "Low"
     },
     {
-      vendor: "Baker McKenzie",
-      nda: { status: "Complete", date: "2024-02-01", expires: "2025-02-01" },
-      conflictCheck: { status: "Complete", date: "2024-03-05", expires: "2024-09-05" },
-      dataSecurity: { status: "Pending", date: "", expires: "" },
-      diversityInfo: { status: "Complete", date: "2024-02-10", expires: "N/A" },
-      complianceScore: 75
-    },
-    {
-      vendor: "Local Boutique Firm",
-      nda: { status: "Pending", date: "", expires: "" },
-      conflictCheck: { status: "Pending", date: "", expires: "" },
-      dataSecurity: { status: "Pending", date: "", expires: "" },
-      diversityInfo: { status: "Pending", date: "", expires: "" },
-      complianceScore: 0
+      vendor: "Boutique Litigation Firm",
+      status: "Completed",
+      progress: 100,
+      completedSteps: 12,
+      totalSteps: 12,
+      startDate: "2024-01-10",
+      expectedCompletion: "2024-02-10",
+      assignedTo: "Emma Davis",
+      riskLevel: "Low"
     }
   ];
 
-  const requiredDocuments = [
+  const complianceRequirements = [
     {
-      name: "Non-Disclosure Agreement",
-      description: "Standard NDA covering confidentiality and data protection",
-      frequency: "Annual",
-      mandatory: true
+      category: "Legal Documentation",
+      requirements: [
+        { name: "Engagement Letter", status: "Complete", dueDate: "2024-03-10" },
+        { name: "Data Processing Agreement", status: "Pending", dueDate: "2024-03-15" },
+        { name: "Master Services Agreement", status: "Complete", dueDate: "2024-03-05" },
+        { name: "Liability Insurance Certificate", status: "In Review", dueDate: "2024-03-20" }
+      ]
     },
     {
-      name: "Conflict Check Certificate",
-      description: "Confirmation of no conflicts of interest",
-      frequency: "Per engagement",
-      mandatory: true
+      category: "Security & Privacy",
+      requirements: [
+        { name: "Security Assessment", status: "Complete", dueDate: "2024-03-12" },
+        { name: "Privacy Policy Review", status: "Pending", dueDate: "2024-03-18" },
+        { name: "Data Breach Response Plan", status: "Complete", dueDate: "2024-03-08" },
+        { name: "Access Control Setup", status: "In Progress", dueDate: "2024-03-22" }
+      ]
     },
     {
-      name: "Data Security Assessment",
-      description: "Security standards and data handling procedures",
-      frequency: "Annual",
-      mandatory: true
+      category: "Financial & Risk",
+      requirements: [
+        { name: "Financial Stability Check", status: "Complete", dueDate: "2024-03-01" },
+        { name: "Conflicts of Interest Review", status: "Complete", dueDate: "2024-03-03" },
+        { name: "Rate Schedule Agreement", status: "Pending", dueDate: "2024-03-25" },
+        { name: "Budget Framework Setup", status: "In Progress", dueDate: "2024-03-30" }
+      ]
+    }
+  ];
+
+  const dueDiligenceChecklist = [
+    {
+      area: "Business Information",
+      items: [
+        "Company registration and licensing",
+        "Professional certifications and memberships",
+        "Key personnel background checks",
+        "Business references verification"
+      ],
+      completionRate: 100
     },
     {
-      name: "Diversity & Inclusion Information",
-      description: "Firm diversity metrics and inclusion initiatives",
-      frequency: "Annual",
-      mandatory: false
+      area: "Financial Verification",
+      items: [
+        "Financial statements review",
+        "Credit rating assessment",
+        "Professional indemnity insurance",
+        "Payment terms negotiation"
+      ],
+      completionRate: 85
+    },
+    {
+      area: "Technical Capabilities",
+      items: [
+        "Practice area expertise verification",
+        "Technology infrastructure assessment",
+        "Case management system compatibility",
+        "Reporting capabilities evaluation"
+      ],
+      completionRate: 90
+    },
+    {
+      area: "Compliance & Risk",
+      items: [
+        "Regulatory compliance verification",
+        "Data protection compliance",
+        "Conflicts of interest screening",
+        "Risk management procedures"
+      ],
+      completionRate: 75
     }
   ];
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case "complete":
+      case "completed":
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       case "pending":
         return <Clock className="h-4 w-4 text-yellow-600" />;
-      case "expired":
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
+      case "in progress":
+      case "in review":
+        return <AlertTriangle className="h-4 w-4 text-blue-600" />;
       default:
-        return null;
+        return <Clock className="h-4 w-4 text-gray-600" />;
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "complete":
-        return <Badge variant="default">Complete</Badge>;
+      case "completed":
+        return "default";
       case "pending":
-        return <Badge variant="secondary">Pending</Badge>;
-      case "expired":
-        return <Badge variant="destructive">Expired</Badge>;
+        return "secondary";
+      case "in progress":
+      case "in review":
+        return "outline";
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return "outline";
     }
   };
 
@@ -100,183 +155,191 @@ export function ComplianceOnboarding() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Compliance & Onboarding</h2>
-          <p className="text-muted-foreground">Manage vendor compliance requirements and documentation</p>
+          <p className="text-muted-foreground">Manage vendor onboarding processes and compliance requirements</p>
         </div>
         <Button>
-          <FileText className="h-4 w-4 mr-2" />
-          Upload Document
+          <Building className="h-4 w-4 mr-2" />
+          Start New Onboarding
         </Button>
       </div>
 
-      {/* Required Documents */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Required Documentation
-          </CardTitle>
-          <CardDescription>Standard compliance requirements for all vendors</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {requiredDocuments.map((doc, index) => (
-              <div key={index} className="p-4 border rounded-lg">
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-medium">{doc.name}</h4>
-                  {doc.mandatory && <Badge variant="outline" className="text-xs">Required</Badge>}
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">{doc.description}</p>
-                <div className="text-xs text-muted-foreground">
-                  Frequency: {doc.frequency}
-                </div>
-              </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="onboarding">Onboarding Status</TabsTrigger>
+          <TabsTrigger value="requirements">Requirements</TabsTrigger>
+          <TabsTrigger value="duediligence">Due Diligence</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="onboarding" className="space-y-6">
+          {/* Onboarding Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Onboardings</CardTitle>
+                <Users className="h-4 w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">3</div>
+                <p className="text-xs text-muted-foreground">2 completing this month</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Avg Completion Time</CardTitle>
+                <Clock className="h-4 w-4 text-green-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">28 days</div>
+                <p className="text-xs text-muted-foreground">-5 days improvement</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Completed YTD</CardTitle>
+                <CheckCircle className="h-4 w-4 text-purple-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">12</div>
+                <p className="text-xs text-muted-foreground">+4 vs last year</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Compliance Rate</CardTitle>
+                <Shield className="h-4 w-4 text-orange-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">94%</div>
+                <p className="text-xs text-muted-foreground">+2% this quarter</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Active Onboarding */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Onboarding Projects</CardTitle>
+              <CardDescription>Current vendor onboarding initiatives and their progress</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Vendor</TableHead>
+                    <TableHead>Progress</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Assigned To</TableHead>
+                    <TableHead>Expected Completion</TableHead>
+                    <TableHead>Risk Level</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {onboardingTasks.map((task, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{task.vendor}</TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <Progress value={task.progress} className="h-2" />
+                          <div className="text-xs text-muted-foreground">
+                            {task.completedSteps}/{task.totalSteps} steps
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusColor(task.status)}>
+                          {task.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{task.assignedTo}</TableCell>
+                      <TableCell>{task.expectedCompletion}</TableCell>
+                      <TableCell>
+                        <Badge variant={task.riskLevel === "High" ? "destructive" : task.riskLevel === "Medium" ? "secondary" : "outline"}>
+                          {task.riskLevel}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            View
+                          </Button>
+                          <Button size="sm">
+                            Update
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="requirements" className="space-y-6">
+          {/* Compliance Requirements */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {complianceRequirements.map((category, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{category.category}</CardTitle>
+                  <CardDescription>
+                    {category.requirements.filter(r => r.status === "Complete").length} of {category.requirements.length} complete
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {category.requirements.map((req, reqIndex) => (
+                      <div key={reqIndex} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(req.status)}
+                          <span className="text-sm">{req.name}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {req.dueDate}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
 
-      {/* Compliance Status Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Vendor Compliance Status
-          </CardTitle>
-          <CardDescription>Current compliance status for all active vendors</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Vendor</TableHead>
-                <TableHead>NDA</TableHead>
-                <TableHead>Conflict Check</TableHead>
-                <TableHead>Data Security</TableHead>
-                <TableHead>Diversity Info</TableHead>
-                <TableHead>Compliance Score</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {complianceItems.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{item.vendor}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(item.nda.status)}
-                      {getStatusBadge(item.nda.status)}
+        <TabsContent value="duediligence" className="space-y-6">
+          {/* Due Diligence Checklist */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Due Diligence Checklist</CardTitle>
+              <CardDescription>Comprehensive vendor assessment framework</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {dueDiligenceChecklist.map((area, index) => (
+                  <div key={index} className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">{area.area}</h4>
+                      <Badge variant={area.completionRate === 100 ? "default" : "secondary"}>
+                        {area.completionRate}%
+                      </Badge>
                     </div>
-                    {item.nda.expires && item.nda.expires !== "N/A" && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Expires: {item.nda.expires}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(item.conflictCheck.status)}
-                      {getStatusBadge(item.conflictCheck.status)}
+                    <Progress value={area.completionRate} className="h-2" />
+                    <div className="space-y-2">
+                      {area.items.map((item, itemIndex) => (
+                        <div key={itemIndex} className="flex items-center gap-2 text-sm">
+                          <CheckCircle className="h-3 w-3 text-green-600" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
                     </div>
-                    {item.conflictCheck.expires && item.conflictCheck.expires !== "N/A" && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Expires: {item.conflictCheck.expires}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(item.dataSecurity.status)}
-                      {getStatusBadge(item.dataSecurity.status)}
-                    </div>
-                    {item.dataSecurity.expires && item.dataSecurity.expires !== "N/A" && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Expires: {item.dataSecurity.expires}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(item.diversityInfo.status)}
-                      {getStatusBadge(item.diversityInfo.status)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <Progress value={item.complianceScore} className="h-2" />
-                      <div className="text-sm font-medium">{item.complianceScore}%</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        Review
-                      </Button>
-                      {item.complianceScore < 100 && (
-                        <Button size="sm">
-                          Request Docs
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      {/* Risk Flags */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-red-600" />
-            Compliance Risk Flags
-          </CardTitle>
-          <CardDescription>Items requiring immediate attention</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border border-red-200 rounded-lg bg-red-50">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <div>
-                  <div className="font-medium">Clifford Chance - Conflict Check Expired</div>
-                  <div className="text-sm text-muted-foreground">Expired on 2024-06-01, renewal required</div>
-                </div>
+                  </div>
+                ))}
               </div>
-              <Button variant="outline" size="sm">
-                Request Renewal
-              </Button>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 border border-yellow-200 rounded-lg bg-yellow-50">
-              <div className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-yellow-600" />
-                <div>
-                  <div className="font-medium">Local Boutique Firm - Missing All Documentation</div>
-                  <div className="text-sm text-muted-foreground">No compliance documents on file</div>
-                </div>
-              </div>
-              <Button variant="outline" size="sm">
-                Send Onboarding
-              </Button>
-            </div>
-            
-            <div className="flex items-center justify-between p-3 border border-yellow-200 rounded-lg bg-yellow-50">
-              <div className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-yellow-600" />
-                <div>
-                  <div className="font-medium">Baker McKenzie - Data Security Assessment Pending</div>
-                  <div className="text-sm text-muted-foreground">Document requested 2 weeks ago</div>
-                </div>
-              </div>
-              <Button variant="outline" size="sm">
-                Follow Up
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
