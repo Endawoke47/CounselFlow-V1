@@ -4,13 +4,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, Download } from "lucide-react";
+import { Search, Filter, Download, Eye, Edit } from "lucide-react";
 
-export function ContractsList() {
+interface Contract {
+  id: number;
+  title: string;
+  entity: string;
+  status: string;
+  renewalDate: string;
+  owner: string;
+  value: string;
+  type: string;
+}
+
+interface ContractsListProps {
+  contracts?: Contract[];
+  onViewContract?: (contract: Contract) => void;
+  onEditContract?: (contract: Contract) => void;
+}
+
+export function ContractsList({ contracts: propContracts, onViewContract, onEditContract }: ContractsListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const contracts = [
+  const defaultContracts = [
     {
       id: 1,
       title: "Software License Agreement",
@@ -62,6 +79,8 @@ export function ContractsList() {
       type: "Employment"
     }
   ];
+
+  const contracts = propContracts || defaultContracts;
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -161,9 +180,22 @@ export function ContractsList() {
                   <TableCell>{contract.value}</TableCell>
                   <TableCell>{contract.type}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => onViewContract?.(contract)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => onEditContract?.(contract)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
