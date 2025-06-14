@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SpendOverviewDashboard } from "./SpendOverviewDashboard";
+import { OutsourcedMatters } from "./OutsourcedMatters";
 import { VendorManagement } from "./VendorManagement";
 import { SpendTracking } from "./SpendTracking";
 import { PerformanceEvaluation } from "./PerformanceEvaluation";
@@ -23,8 +24,9 @@ export function OutsourcedMattersSpendDashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="matters">Matters</TabsTrigger>
           <TabsTrigger value="vendors">Vendors</TabsTrigger>
           <TabsTrigger value="spend">Spend & Budget</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
@@ -34,6 +36,10 @@ export function OutsourcedMattersSpendDashboard() {
 
         <TabsContent value="overview" className="space-y-6">
           <SpendOverviewDashboard />
+        </TabsContent>
+
+        <TabsContent value="matters" className="space-y-6">
+          <OutsourcedMatters />
         </TabsContent>
 
         <TabsContent value="vendors" className="space-y-6">
