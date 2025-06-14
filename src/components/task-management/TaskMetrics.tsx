@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -68,7 +67,7 @@ export function TaskMetrics() {
   const taskTrends = [
     { month: "Sep", created: 42, completed: 38, overdue: 8 },
     { month: "Oct", created: 48, completed: 45, overdue: 6 },
-    { month: "Nov", created: 52, created: 49, overdue: 4 },
+    { month: "Nov", created: 52, completed: 49, overdue: 4 },
     { month: "Dec", created: 38, completed: 41, overdue: 3 },
     { month: "Jan", created: 45, completed: 43, overdue: 5 }
   ];
