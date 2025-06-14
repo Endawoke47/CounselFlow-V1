@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +17,76 @@ import {
   MapPin,
   Briefcase
 } from "lucide-react";
+import { EntityDetailModal } from "./EntityDetailModal";
+import { AddEntityModal } from "./AddEntityModal";
+import { StatutoryRegisterDetail } from "./StatutoryRegisterDetail";
+import { MeetingScheduler } from "./MeetingScheduler";
+import { GroupStructureViewer } from "./GroupStructureViewer";
 
 export function CompanySecretarialDashboard() {
+  const [selectedEntity, setSelectedEntity] = useState<any>(null);
+  const [isEntityModalOpen, setIsEntityModalOpen] = useState(false);
+  const [isAddEntityModalOpen, setIsAddEntityModalOpen] = useState(false);
+  const [isMeetingSchedulerOpen, setIsMeetingSchedulerOpen] = useState(false);
+  const [selectedRegister, setSelectedRegister] = useState<string | null>(null);
+  const [showGroupStructure, setShowGroupStructure] = useState(false);
+
+  const entities = [
+    {
+      id: 1,
+      name: "Acme Corporation Ltd",
+      jurisdiction: "United Kingdom",
+      companyNumber: "12345678",
+      status: "Active",
+      pendingFilings: 3
+    },
+    {
+      id: 2,
+      name: "Global Tech Solutions Pte Ltd",
+      jurisdiction: "Singapore",
+      uen: "201912345G",
+      status: "Active",
+      pendingFilings: 1,
+      hasOverdue: true
+    },
+    {
+      id: 3,
+      name: "Innovation Holdings Inc",
+      jurisdiction: "Delaware, USA",
+      fileNumber: "7891234",
+      status: "Dormant",
+      pendingFilings: 0
+    }
+  ];
+
+  const handleEntityClick = (entity: any) => {
+    setSelectedEntity(entity);
+    setIsEntityModalOpen(true);
+  };
+
+  const handleAddEntity = (entityData: any) => {
+    console.log("Adding new entity:", entityData);
+    // Here you would typically save to your backend
+  };
+
+  const handleScheduleMeeting = (meetingData: any) => {
+    console.log("Scheduling meeting:", meetingData);
+    // Here you would typically save to your backend
+  };
+
+  if (showGroupStructure) {
+    return <GroupStructureViewer />;
+  }
+
+  if (selectedRegister) {
+    return (
+      <StatutoryRegisterDetail 
+        registerType={selectedRegister as "directors" | "members" | "charges"}
+        onBack={() => setSelectedRegister(null)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -131,81 +200,42 @@ export function CompanySecretarialDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Sample Entity Rows */}
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Building2 className="h-8 w-8 text-primary" />
-                      <div>
-                        <h3 className="font-semibold">Acme Corporation Ltd</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            United Kingdom
-                          </span>
-                          <span>Company Number: 12345678</span>
-                          <Badge variant="secondary">Active</Badge>
+                {entities.map((entity) => (
+                  <div key={entity.id} className="border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors" onClick={() => handleEntityClick(entity)}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Building2 className="h-8 w-8 text-primary" />
+                        <div>
+                          <h3 className="font-semibold">{entity.name}</h3>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {entity.jurisdiction}
+                            </span>
+                            <span>
+                              {entity.companyNumber ? `Company Number: ${entity.companyNumber}` : 
+                               entity.uen ? `UEN: ${entity.uen}` : 
+                               `File Number: ${entity.fileNumber}`}
+                            </span>
+                            <Badge variant="secondary">{entity.status}</Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">3 Pending Filings</Badge>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Building2 className="h-8 w-8 text-primary" />
-                      <div>
-                        <h3 className="font-semibold">Global Tech Solutions Pte Ltd</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            Singapore
-                          </span>
-                          <span>UEN: 201912345G</span>
-                          <Badge variant="secondary">Active</Badge>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        {entity.hasOverdue ? (
+                          <Badge variant="destructive">Overdue Filing</Badge>
+                        ) : entity.pendingFilings > 0 ? (
+                          <Badge variant="outline">{entity.pendingFilings} Pending Filings</Badge>
+                        ) : (
+                          <Badge variant="outline">No Pending Actions</Badge>
+                        )}
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="destructive">Overdue Filing</Badge>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
                   </div>
-                </div>
-
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Building2 className="h-8 w-8 text-muted-foreground" />
-                      <div>
-                        <h3 className="font-semibold">Innovation Holdings Inc</h3>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            Delaware, USA
-                          </span>
-                          <span>File Number: 7891234</span>
-                          <Badge variant="outline">Dormant</Badge>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">No Pending Actions</Badge>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -219,7 +249,7 @@ export function CompanySecretarialDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
+                <Card className="cursor-pointer hover:bg-accent transition-colors" onClick={() => setSelectedRegister("directors")}>
                   <CardHeader>
                     <CardTitle className="text-lg">Directors Register</CardTitle>
                     <CardDescription>Track director appointments and resignations</CardDescription>
@@ -234,7 +264,7 @@ export function CompanySecretarialDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="cursor-pointer hover:bg-accent transition-colors" onClick={() => setSelectedRegister("members")}>
                   <CardHeader>
                     <CardTitle className="text-lg">Members Register</CardTitle>
                     <CardDescription>Manage shareholder records and transfers</CardDescription>
@@ -249,7 +279,7 @@ export function CompanySecretarialDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="cursor-pointer hover:bg-accent transition-colors" onClick={() => setSelectedRegister("charges")}>
                   <CardHeader>
                     <CardTitle className="text-lg">Charges Register</CardTitle>
                     <CardDescription>Monitor security interests and charges</CardDescription>
@@ -383,11 +413,11 @@ export function CompanySecretarialDashboard() {
               <CardDescription>Interactive organizational chart and ownership structure</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
+              <div className="text-center py-12">
                 <Building2 className="h-16 w-16 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-medium mb-2">Organization Chart</h3>
-                <p className="text-sm">Interactive group structure visualization will be displayed here</p>
-                <Button variant="outline" className="mt-4">
+                <p className="text-sm text-muted-foreground mb-4">Interactive group structure visualization</p>
+                <Button onClick={() => setShowGroupStructure(true)}>
                   View Full Structure
                 </Button>
               </div>
@@ -395,6 +425,28 @@ export function CompanySecretarialDashboard() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modals */}
+      <EntityDetailModal
+        entity={selectedEntity}
+        isOpen={isEntityModalOpen}
+        onClose={() => {
+          setIsEntityModalOpen(false);
+          setSelectedEntity(null);
+        }}
+      />
+
+      <AddEntityModal
+        isOpen={isAddEntityModalOpen}
+        onClose={() => setIsAddEntityModalOpen(false)}
+        onSave={handleAddEntity}
+      />
+
+      <MeetingScheduler
+        isOpen={isMeetingSchedulerOpen}
+        onClose={() => setIsMeetingSchedulerOpen(false)}
+        onSave={handleScheduleMeeting}
+      />
     </div>
   );
 }
