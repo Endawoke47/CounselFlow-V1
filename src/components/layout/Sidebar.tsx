@@ -81,7 +81,7 @@ const modules = [
     icon: Database,
   },
   {
-    title: "Legal Spend",
+    title: "Outsourcing & Spend",
     url: "/spend",
     icon: CreditCard,
   },
