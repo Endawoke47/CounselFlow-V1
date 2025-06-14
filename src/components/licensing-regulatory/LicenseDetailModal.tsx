@@ -3,9 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, FileText, User, Building, MapPin, Clock, Upload } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Calendar, MapPin, User, FileText, AlertTriangle, Clock, Plus, Edit, Download } from "lucide-react";
 
 interface LicenseDetailModalProps {
   license: any;
@@ -18,23 +18,22 @@ export function LicenseDetailModal({ license, onOpenChange }: LicenseDetailModal
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Active":
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">Active</Badge>;
       case "Expiring":
-        return <Badge className="bg-orange-100 text-orange-800">Expiring</Badge>;
+        return <Badge variant="secondary" className="bg-orange-100 text-orange-800">Expiring</Badge>;
       case "Overdue":
-        return <Badge className="bg-red-100 text-red-800">Overdue</Badge>;
+        return <Badge variant="secondary" className="bg-red-100 text-red-800">Overdue</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
-  const getRenewalProgress = (status: string) => {
-    switch (status) {
+  const getRenewalProgress = () => {
+    switch (license.renewalStatus) {
       case "Not Started": return 0;
-      case "In Progress": return 50;
-      case "Submitted": return 75;
+      case "In Progress": return 40;
+      case "Submitted": return 80;
       case "Completed": return 100;
-      case "Overdue": return 0;
       default: return 0;
     }
   };
@@ -45,20 +44,19 @@ export function LicenseDetailModal({ license, onOpenChange }: LicenseDetailModal
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl">{license.title}</DialogTitle>
-            {getStatusBadge(license.status)}
+            <div className="flex gap-2">
+              {getStatusBadge(license.status)}
+              <Button variant="outline" size="sm">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </div>
           </div>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* License Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center space-x-2">
-              <Building className="h-4 w-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm text-muted-foreground">Entity</p>
-                <p className="font-medium">{license.entity}</p>
-              </div>
-            </div>
             <div className="flex items-center space-x-2">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <div>
@@ -80,108 +78,175 @@ export function LicenseDetailModal({ license, onOpenChange }: LicenseDetailModal
                 <p className="font-medium">{license.owner}</p>
               </div>
             </div>
+            <div className="flex items-center space-x-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-sm text-muted-foreground">Regulator</p>
+                <p className="font-medium">{license.regulator}</p>
+              </div>
+            </div>
           </div>
 
           <Tabs defaultValue="details" className="space-y-4">
             <TabsList>
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="renewal">Renewal</TabsTrigger>
+              <TabsTrigger value="details">License Details</TabsTrigger>
+              <TabsTrigger value="renewal">Renewal Process</TabsTrigger>
+              <TabsTrigger value="compliance">Compliance History</TabsTrigger>
               <TabsTrigger value="documents">Documents</TabsTrigger>
-              <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
 
             <TabsContent value="details">
-              <Card>
-                <CardHeader>
-                  <CardTitle>License Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>License Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Entity</label>
+                      <p className="mt-1">{license.entity}</p>
+                    </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">License Type</label>
                       <p className="mt-1">{license.type}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Regulator</label>
-                      <p className="mt-1">{license.regulator}</p>
+                      <label className="text-sm font-medium text-muted-foreground">License Number</label>
+                      <p className="mt-1">FS-{license.id}-2024</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">License ID</label>
-                      <p className="mt-1">FS-2024-001</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Issued Date</label>
+                      <label className="text-sm font-medium text-muted-foreground">Issue Date</label>
                       <p className="mt-1">2021-12-15</p>
                     </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Key Requirements</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Annual regulatory returns
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        Quarterly financial statements
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        Staff certification updates
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        Client money rules compliance
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="renewal">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Renewal Process</CardTitle>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Task
+                    </Button>
                   </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Notes</label>
-                    <p className="mt-1 text-sm">This license allows us to provide financial advisory services in the UK market. Annual compliance reporting required.</p>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium">Renewal Progress</span>
+                      <span className="text-sm text-muted-foreground">{getRenewalProgress()}%</span>
+                    </div>
+                    <Progress value={getRenewalProgress()} className="h-2" />
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Tags</label>
-                    <div className="mt-1 flex gap-2">
-                      <Badge variant="outline">Financial</Badge>
-                      <Badge variant="outline">UK</Badge>
-                      <Badge variant="outline">Critical</Badge>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div>
+                          <p className="font-medium">Submit application form</p>
+                          <p className="text-sm text-muted-foreground">Completed on 2024-05-15</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800">Completed</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <div>
+                          <p className="font-medium">Regulatory review</p>
+                          <p className="text-sm text-muted-foreground">Expected completion: 2024-07-30</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+                        <div>
+                          <p className="font-medium">Pay renewal fees</p>
+                          <p className="text-sm text-muted-foreground">Due: 2024-08-15</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline">Pending</Badge>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="renewal">
+            <TabsContent value="compliance">
               <Card>
                 <CardHeader>
-                  <CardTitle>Renewal Status</CardTitle>
+                  <CardTitle>Compliance History</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Renewal Progress</span>
-                      <span className="text-sm text-muted-foreground">{license.renewalStatus}</span>
-                    </div>
-                    <Progress value={getRenewalProgress(license.renewalStatus)} className="h-2" />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Renewal Due</label>
-                      <p className="mt-1 flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        90 days before expiry
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Renewal Type</label>
-                      <p className="mt-1">Annual</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-muted-foreground">Renewal Tasks</label>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between p-3 border rounded-md">
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div>
-                          <p className="font-medium">Prepare renewal documentation</p>
-                          <p className="text-sm text-muted-foreground">Due: 2024-09-15</p>
+                          <p className="font-medium">Annual Return Filed</p>
+                          <p className="text-sm text-muted-foreground">Filed on time - March 2024</p>
                         </div>
-                        <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>
                       </div>
-                      <div className="flex items-center justify-between p-3 border rounded-md">
+                      <Badge className="bg-green-100 text-green-800">Compliant</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                         <div>
-                          <p className="font-medium">Submit renewal application</p>
-                          <p className="text-sm text-muted-foreground">Due: 2024-10-15</p>
+                          <p className="font-medium">Staff Certification Update</p>
+                          <p className="text-sm text-muted-foreground">Minor delay - December 2023</p>
                         </div>
-                        <Badge variant="outline">Pending</Badge>
                       </div>
+                      <Badge className="bg-orange-100 text-orange-800">Warning</Badge>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <AlertTriangle className="w-4 h-4 text-red-600" />
+                        <div>
+                          <p className="font-medium">Quarterly Report</p>
+                          <p className="text-sm text-muted-foreground">Late submission - September 2023</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-red-100 text-red-800">Breach</Badge>
                     </div>
                   </div>
-
-                  <Button className="w-full">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Renewal Documents
-                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -189,7 +254,13 @@ export function LicenseDetailModal({ license, onOpenChange }: LicenseDetailModal
             <TabsContent value="documents">
               <Card>
                 <CardHeader>
-                  <CardTitle>License Documents</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>License Documents</CardTitle>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Upload Document
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -198,48 +269,41 @@ export function LicenseDetailModal({ license, onOpenChange }: LicenseDetailModal
                         <FileText className="h-4 w-4" />
                         <div>
                           <p className="font-medium">Original License Certificate</p>
-                          <p className="text-sm text-muted-foreground">Uploaded: 2021-12-15</p>
+                          <p className="text-sm text-muted-foreground">license-certificate.pdf • 2.1 MB</p>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">Download</Button>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
                     </div>
+                    
                     <div className="flex items-center justify-between p-3 border rounded-md">
                       <div className="flex items-center gap-3">
                         <FileText className="h-4 w-4" />
                         <div>
-                          <p className="font-medium">Annual Compliance Report 2023</p>
-                          <p className="text-sm text-muted-foreground">Uploaded: 2024-01-15</p>
+                          <p className="font-medium">Application Form 2024</p>
+                          <p className="text-sm text-muted-foreground">renewal-application.pdf • 1.5 MB</p>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">Download</Button>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
                     </div>
-                  </div>
-                  <Button variant="outline" className="w-full mt-4">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Document
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
 
-            <TabsContent value="history">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Audit History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="border-l-2 border-blue-500 pl-4 pb-4">
-                      <p className="font-medium">License created</p>
-                      <p className="text-sm text-muted-foreground">2021-12-15 by Sarah Johnson</p>
-                    </div>
-                    <div className="border-l-2 border-green-500 pl-4 pb-4">
-                      <p className="font-medium">Renewal task assigned</p>
-                      <p className="text-sm text-muted-foreground">2024-06-15 by Michael Chen</p>
-                    </div>
-                    <div className="border-l-2 border-orange-500 pl-4 pb-4">
-                      <p className="font-medium">Status updated to Expiring</p>
-                      <p className="text-sm text-muted-foreground">2024-06-20 by System</p>
+                    <div className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <FileText className="h-4 w-4" />
+                        <div>
+                          <p className="font-medium">Supporting Documents</p>
+                          <p className="text-sm text-muted-foreground">supporting-docs.zip • 5.2 MB</p>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
