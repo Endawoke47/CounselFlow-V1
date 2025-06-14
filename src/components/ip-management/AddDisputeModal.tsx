@@ -1,11 +1,15 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 interface AddDisputeModalProps {
   open: boolean;
@@ -13,135 +17,216 @@ interface AddDisputeModalProps {
 }
 
 export function AddDisputeModal({ open, onOpenChange }: AddDisputeModalProps) {
-  const [disputeType, setDisputeType] = useState("");
-  const [asset, setAsset] = useState("");
-  const [counterparty, setCounterparty] = useState("");
-  const [jurisdiction, setJurisdiction] = useState("");
-  const [priority, setPriority] = useState("");
-  const [counsel, setCounsel] = useState("");
-  const [description, setDescription] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    disputeType: "",
+    relatedAsset: "",
+    defendant: "",
+    priority: "",
+    status: "",
+    valueAtRisk: "",
+    filedDate: undefined as Date | undefined,
+    attorney: "",
+    nextAction: "",
+    actionDueDate: undefined as Date | undefined
+  });
+
+  const disputeTypes = [
+    "Patent Infringement",
+    "Trademark Opposition",
+    "Copyright Violation",
+    "Trade Secret Misappropriation",
+    "License Dispute",
+    "Ownership Challenge",
+    "Other"
+  ];
+
+  const priorities = ["Low", "Medium", "High", "Critical"];
+  const statuses = ["Investigation", "Active Litigation", "Settlement Negotiation", "Cease & Desist Sent"];
+  const attorneys = ["Johnson & Associates", "IP Legal Partners", "Internal Legal", "Smith & Partners"];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Adding dispute:", { 
-      disputeType, asset, counterparty, jurisdiction, priority, counsel, description 
-    });
+    console.log("Creating new IP dispute:", formData);
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Log IP Dispute</DialogTitle>
-          <DialogDescription>
-            Record a new intellectual property dispute or legal proceeding
-          </DialogDescription>
+          <DialogTitle>Report IP Dispute</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <Label htmlFor="title">Dispute Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter dispute title"
+                required
+              />
+            </div>
+            
             <div>
-              <Label htmlFor="dispute-type">Dispute Type *</Label>
-              <Select value={disputeType} onValueChange={setDisputeType}>
+              <Label htmlFor="disputeType">Dispute Type *</Label>
+              <Select value={formData.disputeType} onValueChange={(value) => setFormData({ ...formData, disputeType: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder="Select dispute type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="opposition">Opposition</SelectItem>
-                  <SelectItem value="infringement">Infringement</SelectItem>
-                  <SelectItem value="cancellation">Cancellation</SelectItem>
-                  <SelectItem value="cease-desist">Cease & Desist</SelectItem>
-                  <SelectItem value="litigation">Litigation</SelectItem>
-                  <SelectItem value="invalidation">Invalidation</SelectItem>
+                  {disputeTypes.map(type => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+            
             <div>
-              <Label htmlFor="asset">IP Asset *</Label>
-              <Select value={asset} onValueChange={setAsset}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select asset" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="techbrand-logo">TechBrand Logo</SelectItem>
-                  <SelectItem value="ai-processing">AI Processing Method</SelectItem>
-                  <SelectItem value="dataflow-system">DataFlow System</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="relatedAsset">Related IP Asset</Label>
+              <Input
+                id="relatedAsset"
+                value={formData.relatedAsset}
+                onChange={(e) => setFormData({ ...formData, relatedAsset: e.target.value })}
+                placeholder="e.g., PAT-001, TM-045"
+              />
             </div>
-          </div>
-
-          <div>
-            <Label htmlFor="counterparty">Counterparty *</Label>
-            <Input
-              id="counterparty"
-              value={counterparty}
-              onChange={(e) => setCounterparty(e.target.value)}
-              placeholder="Enter counterparty name"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
+            
             <div>
-              <Label htmlFor="jurisdiction">Jurisdiction *</Label>
-              <Select value={jurisdiction} onValueChange={setJurisdiction}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select jurisdiction" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="eu">European Union</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="cn">China</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="defendant">Defendant/Opposing Party</Label>
+              <Input
+                id="defendant"
+                value={formData.defendant}
+                onChange={(e) => setFormData({ ...formData, defendant: e.target.value })}
+                placeholder="Enter opposing party name"
+              />
             </div>
+            
             <div>
-              <Label htmlFor="priority">Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
+              <Label htmlFor="priority">Priority *</Label>
+              <Select value={formData.priority} onValueChange={(value) => setFormData({ ...formData, priority: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
+                  {priorities.map(priority => (
+                    <SelectItem key={priority} value={priority}>{priority}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+            
             <div>
-              <Label htmlFor="counsel">Counsel Type</Label>
-              <Select value={counsel} onValueChange={setCounsel}>
+              <Label htmlFor="status">Current Status</Label>
+              <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select counsel" />
+                  <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="internal">Internal</SelectItem>
-                  <SelectItem value="external">External</SelectItem>
-                  <SelectItem value="mixed">Mixed Team</SelectItem>
+                  {statuses.map(status => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+            
+            <div>
+              <Label htmlFor="valueAtRisk">Value at Risk</Label>
+              <Input
+                id="valueAtRisk"
+                value={formData.valueAtRisk}
+                onChange={(e) => setFormData({ ...formData, valueAtRisk: e.target.value })}
+                placeholder="Enter monetary value"
+              />
+            </div>
+            
+            <div>
+              <Label>Filed Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.filedDate ? format(formData.filedDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.filedDate}
+                    onSelect={(date) => setFormData({ ...formData, filedDate: date })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div>
+              <Label htmlFor="attorney">Assigned Attorney</Label>
+              <Select value={formData.attorney} onValueChange={(value) => setFormData({ ...formData, attorney: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select attorney" />
+                </SelectTrigger>
+                <SelectContent>
+                  {attorneys.map(attorney => (
+                    <SelectItem key={attorney} value={attorney}>{attorney}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="nextAction">Next Action</Label>
+              <Input
+                id="nextAction"
+                value={formData.nextAction}
+                onChange={(e) => setFormData({ ...formData, nextAction: e.target.value })}
+                placeholder="Enter next required action"
+              />
+            </div>
+            
+            <div>
+              <Label>Action Due Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.actionDueDate ? format(formData.actionDueDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.actionDueDate}
+                    onSelect={(date) => setFormData({ ...formData, actionDueDate: date })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div className="md:col-span-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Provide detailed description of the dispute"
+                rows={4}
+              />
+            </div>
           </div>
-
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the dispute details, background, and current status"
-              rows={4}
-            />
-          </div>
-
-          <div className="flex justify-end space-x-2">
+          
+          <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Log Dispute</Button>
+            <Button type="submit">
+              Create Dispute
+            </Button>
           </div>
         </form>
       </DialogContent>

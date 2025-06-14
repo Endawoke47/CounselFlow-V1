@@ -1,53 +1,273 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { 
-  Building2, 
-  Calendar, 
+  FileText, 
+  Scale, 
   AlertTriangle, 
-  TrendingUp,
-  FileText,
-  Scale,
+  TrendingUp, 
+  Users, 
+  Clock,
+  Building2,
   Shield,
-  BarChart3
+  BookOpen,
+  DollarSign,
+  CheckSquare,
+  Target
 } from "lucide-react";
 
 export function DashboardOverview() {
+  const stats = [
+    {
+      title: "Active Matters",
+      value: "47",
+      change: "+8% from last month",
+      icon: FileText,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50"
+    },
+    {
+      title: "Open Disputes",
+      value: "12",
+      change: "+2 new this week",
+      icon: Scale,
+      color: "text-red-600",
+      bgColor: "bg-red-50"
+    },
+    {
+      title: "Contract Reviews",
+      value: "23",
+      change: "5 due this week",
+      icon: AlertTriangle,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50"
+    },
+    {
+      title: "Legal Spend",
+      value: "$284K",
+      change: "-12% from last quarter",
+      icon: DollarSign,
+      color: "text-green-600",
+      bgColor: "bg-green-50"
+    }
+  ];
+
+  const recentMatters = [
+    {
+      id: "MAT-2024-001",
+      title: "Vendor Agreement Review - TechCorp",
+      type: "Contract Review",
+      priority: "High",
+      assignee: "Sarah Chen",
+      dueDate: "2024-02-15",
+      status: "In Progress"
+    },
+    {
+      id: "MAT-2024-002",
+      title: "Employment Law Consultation",
+      type: "Legal Advice",
+      priority: "Medium",
+      assignee: "David Park",
+      dueDate: "2024-02-18",
+      status: "Under Review"
+    },
+    {
+      id: "MAT-2024-003",
+      title: "IP License Agreement",
+      type: "Contract Review",
+      priority: "High",
+      assignee: "Emily Rodriguez",
+      dueDate: "2024-02-20",
+      status: "Draft Review"
+    }
+  ];
+
+  const upcomingTasks = [
+    {
+      id: 1,
+      title: "Board Meeting Preparation",
+      dueDate: "Tomorrow",
+      assignee: "Legal Team",
+      priority: "Critical"
+    },
+    {
+      id: 2,
+      title: "Compliance Audit Review",
+      dueDate: "Feb 16",
+      assignee: "Sarah Chen",
+      priority: "High"
+    },
+    {
+      id: 3,
+      title: "Contract Template Update",
+      dueDate: "Feb 18",
+      assignee: "David Park",
+      priority: "Medium"
+    }
+  ];
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "Critical": return "bg-red-100 text-red-800";
+      case "High": return "bg-orange-100 text-orange-800";
+      case "Medium": return "bg-yellow-100 text-yellow-800";
+      case "Low": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "In Progress": return "bg-blue-100 text-blue-800";
+      case "Under Review": return "bg-yellow-100 text-yellow-800";
+      case "Draft Review": return "bg-purple-100 text-purple-800";
+      case "Completed": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Legal Operations Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
-          Centralized view of your legal operations across all entities and jurisdictions
+        <h1 className="text-3xl font-bold tracking-tight">Legal Operations Dashboard</h1>
+        <p className="text-muted-foreground">
+          Welcome back! Here's what's happening with your legal operations today.
         </p>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => (
+          <Card key={index} className="hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {stat.title}
+              </CardTitle>
+              <div className={`p-2 rounded-full ${stat.bgColor}`}>
+                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Matters */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Entities</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Recent Matters</CardTitle>
+              <Button variant="outline" size="sm">View All</Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">247</div>
-            <p className="text-xs text-muted-foreground">
-              +12 from last month
-            </p>
+            <div className="space-y-4">
+              {recentMatters.map((matter) => (
+                <div key={matter.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-sm">{matter.title}</h4>
+                      <Badge className={getPriorityColor(matter.priority)}>
+                        {matter.priority}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>{matter.id}</span>
+                      <span>{matter.type}</span>
+                      <span>Due: {matter.dueDate}</span>
+                    </div>
+                  </div>
+                  <Badge className={getStatusColor(matter.status)}>
+                    {matter.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Tasks */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Upcoming Tasks</CardTitle>
+              <Button variant="outline" size="sm">View All</Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {upcomingTasks.map((task) => (
+                <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-sm">{task.title}</h4>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
+                      <span>Due: {task.dueDate}</span>
+                      <span>Assigned: {task.assignee}</span>
+                    </div>
+                  </div>
+                  <Badge className={getPriorityColor(task.priority)}>
+                    {task.priority}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Department Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Team Workload</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span>Sarah Chen</span>
+                  <span>85%</span>
+                </div>
+                <Progress value={85} className="h-2" />
+              </div>
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span>David Park</span>
+                  <span>72%</span>
+                </div>
+                <Progress value={72} className="h-2" />
+              </div>
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span>Emily Rodriguez</span>
+                  <span>68%</span>
+                </div>
+                <Progress value={68} className="h-2" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Filings</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">SLA Performance</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">
-              5 due this week
+            <div className="text-2xl font-bold text-green-600">94%</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              On-time completion rate
             </p>
+            <div className="mt-3">
+              <Progress value={94} className="h-2" />
+            </div>
           </CardContent>
         </Card>
 
@@ -57,183 +277,16 @@ export function DashboardOverview() {
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">
-              3 high priority
+            <div className="text-2xl font-bold text-orange-600">5</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Active risk items requiring attention
             </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Compliance Score</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">94%</div>
-            <p className="text-xs text-muted-foreground">
-              +2% from last quarter
-            </p>
+            <Button variant="outline" size="sm" className="mt-3 w-full">
+              Review Risks
+            </Button>
           </CardContent>
         </Card>
       </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Common tasks and shortcuts</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <Building2 className="h-6 w-6" />
-              <span>Add Entity</span>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <Calendar className="h-6 w-6" />
-              <span>Schedule Meeting</span>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <FileText className="h-6 w-6" />
-              <span>Generate Document</span>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <BarChart3 className="h-6 w-6" />
-              <span>View Reports</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Activity & Upcoming Deadlines */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest updates across all modules</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3 p-3 border rounded-lg">
-              <Building2 className="h-4 w-4 text-primary" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">Entity registration updated</p>
-                <p className="text-xs text-muted-foreground">Acme Corp Ltd - UK</p>
-              </div>
-              <Badge variant="secondary">2 hours ago</Badge>
-            </div>
-            
-            <div className="flex items-center gap-3 p-3 border rounded-lg">
-              <Scale className="h-4 w-4 text-primary" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">Board resolution approved</p>
-                <p className="text-xs text-muted-foreground">Resolution #2024-015</p>
-              </div>
-              <Badge variant="secondary">5 hours ago</Badge>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 border rounded-lg">
-              <FileText className="h-4 w-4 text-primary" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">Contract lifecycle updated</p>
-                <p className="text-xs text-muted-foreground">Service Agreement #SA-2024-089</p>
-              </div>
-              <Badge variant="secondary">1 day ago</Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Deadlines</CardTitle>
-            <CardDescription>Critical dates requiring attention</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3 p-3 border rounded-lg border-orange-200 bg-orange-50">
-              <Calendar className="h-4 w-4 text-orange-600" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">Annual Return Filing</p>
-                <p className="text-xs text-muted-foreground">Global Tech Solutions Ltd</p>
-              </div>
-              <Badge variant="destructive">3 days</Badge>
-            </div>
-            
-            <div className="flex items-center gap-3 p-3 border rounded-lg border-yellow-200 bg-yellow-50">
-              <Shield className="h-4 w-4 text-yellow-600" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">License Renewal</p>
-                <p className="text-xs text-muted-foreground">Financial Services License - SG</p>
-              </div>
-              <Badge variant="secondary">7 days</Badge>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 border rounded-lg">
-              <Building2 className="h-4 w-4 text-primary" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">Board Meeting</p>
-                <p className="text-xs text-muted-foreground">Quarterly Review - Q4 2024</p>
-              </div>
-              <Badge variant="outline">14 days</Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Module Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Module Overview</CardTitle>
-          <CardDescription>Status across all CounselFlow modules</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Building2 className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Company Secretarial</span>
-              </div>
-              <div className="text-2xl font-bold mb-1">247</div>
-              <div className="text-xs text-muted-foreground">Active entities</div>
-            </div>
-
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Contracts</span>
-              </div>
-              <div className="text-2xl font-bold mb-1">1,432</div>
-              <div className="text-xs text-muted-foreground">Active contracts</div>
-            </div>
-
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Scale className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Disputes</span>
-              </div>
-              <div className="text-2xl font-bold mb-1">23</div>
-              <div className="text-xs text-muted-foreground">Open cases</div>
-            </div>
-
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">IP Portfolio</span>
-              </div>
-              <div className="text-2xl font-bold mb-1">156</div>
-              <div className="text-xs text-muted-foreground">Active assets</div>
-            </div>
-
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <BarChart3 className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Risk Score</span>
-              </div>
-              <div className="text-2xl font-bold mb-1">Low</div>
-              <div className="text-xs text-muted-foreground">Overall assessment</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

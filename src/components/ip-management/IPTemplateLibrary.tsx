@@ -1,367 +1,337 @@
 
 import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, FileText, Download, Eye, Edit, Search, Filter } from "lucide-react";
-
-const mockTemplates = [
-  {
-    id: "1",
-    title: "Patent License Agreement",
-    category: "Licensing",
-    type: "Contract Template",
-    jurisdiction: "Multi-Jurisdictional",
-    lastUpdated: "2024-01-15",
-    usage: 42,
-    status: "Active",
-    description: "Comprehensive patent licensing agreement template with royalty provisions"
-  },
-  {
-    id: "2",
-    title: "Trademark Opposition Filing",
-    category: "Disputes",
-    type: "Legal Filing",
-    jurisdiction: "US",
-    lastUpdated: "2023-12-20",
-    usage: 18,
-    status: "Active",
-    description: "Template for filing trademark opposition proceedings with USPTO"
-  },
-  {
-    id: "3",
-    title: "IP Assignment Agreement",
-    category: "Assignments",
-    type: "Contract Template",
-    jurisdiction: "UK",
-    lastUpdated: "2024-01-10",
-    usage: 35,
-    status: "Active",
-    description: "Employee IP assignment and invention disclosure agreement"
-  },
-  {
-    id: "4",
-    title: "Cease and Desist Letter",
-    category: "Enforcement",
-    type: "Legal Notice",
-    jurisdiction: "Multi-Jurisdictional",
-    lastUpdated: "2023-11-28",
-    usage: 23,
-    status: "Active",
-    description: "Formal cease and desist letter template for IP infringement"
-  },
-  {
-    id: "5",
-    title: "Prior Art Search Report",
-    category: "Research",
-    type: "Analysis Template",
-    jurisdiction: "Global",
-    lastUpdated: "2023-10-15",
-    usage: 67,
-    status: "Review Required",
-    description: "Comprehensive prior art search and analysis report template"
-  },
-  {
-    id: "6",
-    title: "Patent Prosecution Memo",
-    category: "Prosecution",
-    type: "Internal Memo",
-    jurisdiction: "EP",
-    lastUpdated: "2023-09-22",
-    usage: 89,
-    status: "Active",
-    description: "Template for patent prosecution strategy and office action responses"
-  }
-];
-
-const mockCategories = [
-  { name: "Licensing", count: 12, color: "bg-blue-100 text-blue-800" },
-  { name: "Disputes", count: 8, color: "bg-red-100 text-red-800" },
-  { name: "Assignments", count: 15, color: "bg-green-100 text-green-800" },
-  { name: "Enforcement", count: 6, color: "bg-purple-100 text-purple-800" },
-  { name: "Research", count: 9, color: "bg-orange-100 text-orange-800" },
-  { name: "Prosecution", count: 11, color: "bg-teal-100 text-teal-800" }
-];
+import { 
+  FileText, 
+  Search, 
+  Download, 
+  Eye, 
+  Plus,
+  Filter,
+  Star,
+  Clock,
+  Users
+} from "lucide-react";
 
 export function IPTemplateLibrary() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedType, setSelectedType] = useState("all");
-  const [selectedJurisdiction, setSelectedJurisdiction] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Active":
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
-      case "Review Required":
-        return <Badge className="bg-yellow-100 text-yellow-800">Review Required</Badge>;
-      case "Deprecated":
-        return <Badge className="bg-gray-100 text-gray-800">Deprecated</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  const templates = [
+    {
+      id: "TPL-001",
+      title: "Patent Application Template",
+      category: "Patents",
+      type: "Application",
+      description: "Comprehensive template for utility patent applications including claims, drawings, and specifications",
+      lastUpdated: "2024-01-15",
+      downloads: 156,
+      rating: 4.8,
+      author: "IP Legal Team",
+      fileSize: "2.3 MB",
+      format: "DOCX",
+      jurisdiction: "US"
+    },
+    {
+      id: "TPL-002",
+      title: "Trademark License Agreement",
+      category: "Trademarks",
+      type: "License",
+      description: "Standard template for trademark licensing agreements with customizable terms and conditions",
+      lastUpdated: "2024-01-10",
+      downloads: 89,
+      rating: 4.6,
+      author: "Sarah Chen",
+      fileSize: "850 KB",
+      format: "DOCX",
+      jurisdiction: "Multi"
+    },
+    {
+      id: "TPL-003",
+      title: "IP Assignment Agreement",
+      category: "General",
+      type: "Assignment",
+      description: "Template for transferring intellectual property rights from inventors to company",
+      lastUpdated: "2024-01-08",
+      downloads: 203,
+      rating: 4.9,
+      author: "David Park",
+      fileSize: "1.2 MB",
+      format: "PDF",
+      jurisdiction: "US"
+    },
+    {
+      id: "TPL-004",
+      title: "Copyright License Template",
+      category: "Copyright",
+      type: "License",
+      description: "Flexible template for licensing copyrighted materials with various usage rights",
+      lastUpdated: "2023-12-20",
+      downloads: 67,
+      rating: 4.5,
+      author: "Emily Rodriguez",
+      fileSize: "720 KB",
+      format: "DOCX",
+      jurisdiction: "Global"
+    },
+    {
+      id: "TPL-005",
+      title: "Trade Secret Protection Agreement",
+      category: "Trade Secrets",
+      type: "Protection",
+      description: "Comprehensive template for protecting confidential information and trade secrets",
+      lastUpdated: "2024-01-05",
+      downloads: 124,
+      rating: 4.7,
+      author: "Legal Operations",
+      fileSize: "1.5 MB",
+      format: "DOCX",
+      jurisdiction: "US, EU"
+    },
+    {
+      id: "TPL-006",
+      title: "Patent Search Report Template",
+      category: "Patents",
+      type: "Report",
+      description: "Structured template for documenting prior art search results and analysis",
+      lastUpdated: "2023-12-15",
+      downloads: 78,
+      rating: 4.4,
+      author: "Research Team",
+      fileSize: "980 KB",
+      format: "XLSX",
+      jurisdiction: "Global"
     }
+  ];
+
+  const categories = [
+    { value: "all", label: "All Categories" },
+    { value: "Patents", label: "Patents" },
+    { value: "Trademarks", label: "Trademarks" },
+    { value: "Copyright", label: "Copyright" },
+    { value: "Trade Secrets", label: "Trade Secrets" },
+    { value: "General", label: "General" }
+  ];
+
+  const types = [
+    { value: "all", label: "All Types" },
+    { value: "Application", label: "Applications" },
+    { value: "License", label: "Licenses" },
+    { value: "Assignment", label: "Assignments" },
+    { value: "Protection", label: "Protection" },
+    { value: "Report", label: "Reports" }
+  ];
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case "Patents": return "bg-blue-100 text-blue-800";
+      case "Trademarks": return "bg-green-100 text-green-800";
+      case "Copyright": return "bg-purple-100 text-purple-800";
+      case "Trade Secrets": return "bg-orange-100 text-orange-800";
+      case "General": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "Application": return "bg-indigo-100 text-indigo-800";
+      case "License": return "bg-emerald-100 text-emerald-800";
+      case "Assignment": return "bg-amber-100 text-amber-800";
+      case "Protection": return "bg-red-100 text-red-800";
+      case "Report": return "bg-cyan-100 text-cyan-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = categoryFilter === "all" || template.category === categoryFilter;
+    const matchesType = typeFilter === "all" || template.type === typeFilter;
+    
+    return matchesSearch && matchesCategory && matchesType;
+  });
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star 
+        key={i} 
+        className={`h-3 w-3 ${i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
+      />
+    ));
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">IP Template Library</h2>
-          <p className="text-muted-foreground">
-            Standardized templates for IP legal documents and processes
-          </p>
-        </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Template
-        </Button>
-      </div>
-
-      {/* Template Categories Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {mockCategories.map((category) => (
-          <Card key={category.name} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold">{category.count}</div>
-              <div className="text-sm font-medium">{category.name}</div>
-              <Badge className={`${category.color} mt-2`} variant="secondary">
-                Templates
-              </Badge>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Usage Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Templates</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">61</div>
-            <p className="text-xs text-muted-foreground">
-              Across all categories
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Most Used</CardTitle>
-            <Download className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">89</div>
-            <p className="text-xs text-muted-foreground">
-              Patent Prosecution Memo
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Recent Updates</CardTitle>
-            <Edit className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">
-              Updated this month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Review Required</CardTitle>
-            <Filter className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">
-              Templates pending review
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Search and Filters */}
+      {/* Header */}
       <Card>
         <CardHeader>
-          <CardTitle>Template Search & Filters</CardTitle>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              IP Template Library
+            </CardTitle>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Upload Template
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search templates..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                className="pl-10"
               />
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="licensing">Licensing</SelectItem>
-                <SelectItem value="disputes">Disputes</SelectItem>
-                <SelectItem value="assignments">Assignments</SelectItem>
-                <SelectItem value="enforcement">Enforcement</SelectItem>
-                <SelectItem value="research">Research</SelectItem>
-                <SelectItem value="prosecution">Prosecution</SelectItem>
+                {categories.map(category => (
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Template Type" />
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="contract">Contract Template</SelectItem>
-                <SelectItem value="filing">Legal Filing</SelectItem>
-                <SelectItem value="memo">Internal Memo</SelectItem>
-                <SelectItem value="notice">Legal Notice</SelectItem>
-                <SelectItem value="analysis">Analysis Template</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={selectedJurisdiction} onValueChange={setSelectedJurisdiction}>
-              <SelectTrigger>
-                <SelectValue placeholder="Jurisdiction" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Jurisdictions</SelectItem>
-                <SelectItem value="us">United States</SelectItem>
-                <SelectItem value="eu">European Union</SelectItem>
-                <SelectItem value="uk">United Kingdom</SelectItem>
-                <SelectItem value="multi">Multi-Jurisdictional</SelectItem>
-                <SelectItem value="global">Global</SelectItem>
+                {types.map(type => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export List
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Templates Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Template Library ({mockTemplates.length})</CardTitle>
-          <CardDescription>Available IP legal document templates and forms</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Template Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Jurisdiction</TableHead>
-                <TableHead>Usage Count</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockTemplates.map((template) => (
-                <TableRow key={template.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{template.title}</div>
-                      <div className="text-sm text-muted-foreground line-clamp-1">
-                        {template.description}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{template.category}</Badge>
-                  </TableCell>
-                  <TableCell className="text-sm">{template.type}</TableCell>
-                  <TableCell className="text-sm">{template.jurisdiction}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Download className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-sm">{template.usage}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm">{template.lastUpdated}</TableCell>
-                  <TableCell>{getStatusBadge(template.status)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      {/* Templates Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredTemplates.map((template) => (
+          <Card key={template.id} className="hover:shadow-md transition-shadow">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="font-medium text-lg">{template.title}</h3>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className={getCategoryColor(template.category)}>
+                      {template.category}
+                    </Badge>
+                    <Badge className={getTypeColor(template.type)}>
+                      {template.type}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  {renderStars(template.rating)}
+                  <span className="text-sm text-muted-foreground ml-1">
+                    {template.rating}
+                  </span>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                {template.description}
+              </p>
+              
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Author:</span>
+                  <span>{template.author}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Format:</span>
+                  <span>{template.format}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Size:</span>
+                  <span>{template.fileSize}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Jurisdiction:</span>
+                  <span>{template.jurisdiction}</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {template.lastUpdated}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="h-4 w-4" />
+                    {template.downloads}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 mt-4">
+                <Button variant="outline" size="sm" className="flex-1">
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview
+                </Button>
+                <Button size="sm" className="flex-1">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       {/* Popular Templates */}
       <Card>
         <CardHeader>
           <CardTitle>Most Popular Templates</CardTitle>
-          <CardDescription>Frequently used templates across the organization</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="font-medium">Patent Prosecution Memo</div>
-                  <div className="text-sm text-muted-foreground">89 uses</div>
+          <div className="space-y-3">
+            {templates
+              .sort((a, b) => b.downloads - a.downloads)
+              .slice(0, 3)
+              .map((template, index) => (
+                <div key={template.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <div className="font-medium">{template.title}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {template.downloads} downloads • {template.rating} ★
+                      </div>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Download className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Badge className="bg-blue-100 text-blue-800">Prosecution</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                Template for patent prosecution strategy and office action responses
-              </p>
-            </div>
-            <div className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="font-medium">Prior Art Search Report</div>
-                  <div className="text-sm text-muted-foreground">67 uses</div>
-                </div>
-                <Badge className="bg-orange-100 text-orange-800">Research</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                Comprehensive prior art search and analysis report template
-              </p>
-            </div>
-            <div className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="font-medium">Patent License Agreement</div>
-                  <div className="text-sm text-muted-foreground">42 uses</div>
-                </div>
-                <Badge className="bg-blue-100 text-blue-800">Licensing</Badge>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">
-                Comprehensive patent licensing agreement template with royalty provisions
-              </p>
-            </div>
+              ))
+            }
           </div>
         </CardContent>
       </Card>

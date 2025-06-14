@@ -1,11 +1,15 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 interface AddIPAssetModalProps {
   open: boolean;
@@ -13,20 +17,28 @@ interface AddIPAssetModalProps {
 }
 
 export function AddIPAssetModal({ open, onOpenChange }: AddIPAssetModalProps) {
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("");
-  const [owner, setOwner] = useState("");
-  const [jurisdiction, setJurisdiction] = useState("");
-  const [registrationNo, setRegistrationNo] = useState("");
-  const [filingDate, setFilingDate] = useState("");
-  const [classes, setClasses] = useState("");
-  const [description, setDescription] = useState("");
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    type: "",
+    inventor: "",
+    assignee: "",
+    jurisdiction: "",
+    filingDate: undefined as Date | undefined,
+    status: "",
+    estimatedValue: "",
+    applicationNumber: "",
+    priorityDate: undefined as Date | undefined,
+    tags: ""
+  });
+
+  const assetTypes = ["Patent", "Trademark", "Copyright", "Trade Secret", "Design"];
+  const statuses = ["Active", "Pending", "Abandoned", "Expired"];
+  const jurisdictions = ["US", "EU", "UK", "Global", "US, EU", "US, EU, UK"];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Adding IP asset:", { 
-      title, type, owner, jurisdiction, registrationNo, filingDate, classes, description 
-    });
+    console.log("Creating new IP asset:", formData);
     onOpenChange(false);
   };
 
@@ -34,121 +46,173 @@ export function AddIPAssetModal({ open, onOpenChange }: AddIPAssetModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add IP Asset</DialogTitle>
-          <DialogDescription>
-            Register a new intellectual property asset
-          </DialogDescription>
+          <DialogTitle>Add New IP Asset</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="title">Asset Title *</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter asset title"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <Label htmlFor="title">Asset Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter asset title"
+                required
+              />
+            </div>
+            
             <div>
               <Label htmlFor="type">Asset Type *</Label>
-              <Select value={type} onValueChange={setType}>
+              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder="Select asset type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="trademark">Trademark</SelectItem>
-                  <SelectItem value="patent">Patent</SelectItem>
-                  <SelectItem value="copyright">Copyright</SelectItem>
-                  <SelectItem value="design">Industrial Design</SelectItem>
-                  <SelectItem value="domain">Domain Name</SelectItem>
-                  <SelectItem value="trade-secret">Trade Secret</SelectItem>
+                  {assetTypes.map(type => (
+                    <SelectItem key={type} value={type}>{type}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+            
             <div>
-              <Label htmlFor="owner">Owner Entity *</Label>
-              <Select value={owner} onValueChange={setOwner}>
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select owner" />
+                  <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="techcorp-ltd">TechCorp Ltd</SelectItem>
-                  <SelectItem value="techcorp-inc">TechCorp Inc</SelectItem>
-                  <SelectItem value="techcorp-uk">TechCorp UK</SelectItem>
-                  <SelectItem value="techcorp-gmbh">TechCorp GmbH</SelectItem>
+                  {statuses.map(status => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+            
             <div>
-              <Label htmlFor="jurisdiction">Jurisdiction *</Label>
-              <Select value={jurisdiction} onValueChange={setJurisdiction}>
+              <Label htmlFor="inventor">Inventor/Creator</Label>
+              <Input
+                id="inventor"
+                value={formData.inventor}
+                onChange={(e) => setFormData({ ...formData, inventor: e.target.value })}
+                placeholder="Enter inventor name"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="assignee">Assignee</Label>
+              <Input
+                id="assignee"
+                value={formData.assignee}
+                onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
+                placeholder="Enter assignee name"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="jurisdiction">Jurisdiction</Label>
+              <Select value={formData.jurisdiction} onValueChange={(value) => setFormData({ ...formData, jurisdiction: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select jurisdiction" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="ep">European Union</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="cn">China</SelectItem>
-                  <SelectItem value="jp">Japan</SelectItem>
-                  <SelectItem value="au">Australia</SelectItem>
+                  {jurisdictions.map(jurisdiction => (
+                    <SelectItem key={jurisdiction} value={jurisdiction}>{jurisdiction}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+            
             <div>
-              <Label htmlFor="registration-no">Registration/Application No.</Label>
+              <Label htmlFor="applicationNumber">Application Number</Label>
               <Input
-                id="registration-no"
-                value={registrationNo}
-                onChange={(e) => setRegistrationNo(e.target.value)}
-                placeholder="Enter registration number"
+                id="applicationNumber"
+                value={formData.applicationNumber}
+                onChange={(e) => setFormData({ ...formData, applicationNumber: e.target.value })}
+                placeholder="Enter application number"
+              />
+            </div>
+            
+            <div>
+              <Label>Filing Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.filingDate ? format(formData.filingDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.filingDate}
+                    onSelect={(date) => setFormData({ ...formData, filingDate: date })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div>
+              <Label>Priority Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {formData.priorityDate ? format(formData.priorityDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={formData.priorityDate}
+                    onSelect={(date) => setFormData({ ...formData, priorityDate: date })}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div>
+              <Label htmlFor="estimatedValue">Estimated Value</Label>
+              <Input
+                id="estimatedValue"
+                value={formData.estimatedValue}
+                onChange={(e) => setFormData({ ...formData, estimatedValue: e.target.value })}
+                placeholder="Enter estimated value"
+              />
+            </div>
+            
+            <div className="md:col-span-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Provide detailed description of the IP asset"
+                rows={4}
+              />
+            </div>
+            
+            <div className="md:col-span-2">
+              <Label htmlFor="tags">Tags</Label>
+              <Input
+                id="tags"
+                value={formData.tags}
+                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                placeholder="Enter tags separated by commas"
               />
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="filing-date">Filing Date</Label>
-              <Input
-                id="filing-date"
-                type="date"
-                value={filingDate}
-                onChange={(e) => setFilingDate(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="classes">Classes/Classification</Label>
-              <Input
-                id="classes"
-                value={classes}
-                onChange={(e) => setClasses(e.target.value)}
-                placeholder="e.g., Class 9, 42 or G06F 17/30"
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the IP asset"
-              rows={3}
-            />
-          </div>
-
-          <div className="flex justify-end space-x-2">
+          
+          <div className="flex justify-end gap-3">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Add Asset</Button>
+            <Button type="submit">
+              Create Asset
+            </Button>
           </div>
         </form>
       </DialogContent>

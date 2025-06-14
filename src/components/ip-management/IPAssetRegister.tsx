@@ -1,221 +1,239 @@
 
 import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Plus, Filter, Download, Eye, Edit } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Filter, Plus, Shield, FileText, Eye, Calendar } from "lucide-react";
 import { AddIPAssetModal } from "./AddIPAssetModal";
 import { IPAssetDetailModal } from "./IPAssetDetailModal";
 
-const mockIPAssets = [
-  {
-    id: "1",
-    title: "TechBrand Logo",
-    type: "Trademark",
-    owner: "TechCorp Ltd",
-    jurisdiction: "US",
-    registrationNo: "US2024001234",
-    filingDate: "2024-01-15",
-    status: "Registered",
-    renewalDate: "2029-01-15",
-    classes: "Class 9, 42",
-    linkedContracts: 3,
-    linkedDisputes: 0
-  },
-  {
-    id: "2",
-    title: "AI Processing Method",
-    type: "Patent",
-    owner: "TechCorp Inc",
-    jurisdiction: "EP",
-    registrationNo: "EP3456789",
-    filingDate: "2023-06-10",
-    status: "Granted",
-    renewalDate: "2025-06-10",
-    classes: "G06F 17/30",
-    linkedContracts: 1,
-    linkedDisputes: 1
-  },
-  {
-    id: "3",
-    title: "Product Manual v2.0",
-    type: "Copyright",
-    owner: "TechCorp UK",
-    jurisdiction: "UK",
-    registrationNo: "CR-2024-789",
-    filingDate: "2024-02-20",
-    status: "Registered",
-    renewalDate: "2074-02-20",
-    classes: "Literary Work",
-    linkedContracts: 0,
-    linkedDisputes: 0
-  }
-];
-
 export function IPAssetRegister() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
-  const [selectedJurisdiction, setSelectedJurisdiction] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<any>(null);
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Registered":
-      case "Granted":
-        return <Badge className="bg-green-100 text-green-800">Registered</Badge>;
-      case "Pending":
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
-      case "Opposed":
-        return <Badge className="bg-red-100 text-red-800">Opposed</Badge>;
-      case "Expired":
-        return <Badge className="bg-gray-100 text-gray-800">Expired</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  const assets = [
+    {
+      id: "PAT-001",
+      title: "Machine Learning Data Processing Algorithm",
+      type: "Patent",
+      status: "Active",
+      jurisdiction: "US, EU, UK",
+      filingDate: "2023-03-15",
+      expiryDate: "2043-03-15",
+      inventor: "Dr. Sarah Chen",
+      assignee: "TechCorp Inc.",
+      renewalDue: "2024-03-15",
+      value: "$450,000",
+      maintenanceCost: "$12,500"
+    },
+    {
+      id: "TM-045",
+      title: "CounselFlow Brand Name",
+      type: "Trademark",
+      status: "Active",
+      jurisdiction: "Global",
+      filingDate: "2022-01-10",
+      expiryDate: "2032-01-10",
+      inventor: "Legal Team",
+      assignee: "CounselFlow Ltd.",
+      renewalDue: "2024-03-22",
+      value: "$125,000",
+      maintenanceCost: "$3,200"
+    },
+    {
+      id: "PAT-023",
+      title: "Automated Contract Analysis System",
+      type: "Patent",
+      status: "Pending",
+      jurisdiction: "US",
+      filingDate: "2023-11-20",
+      expiryDate: "2043-11-20",
+      inventor: "David Park",
+      assignee: "TechCorp Inc.",
+      renewalDue: "N/A",
+      value: "$320,000",
+      maintenanceCost: "$0"
+    },
+    {
+      id: "CR-089",
+      title: "Legal Documentation Templates",
+      type: "Copyright",
+      status: "Active",
+      jurisdiction: "US, EU",
+      filingDate: "2022-06-05",
+      expiryDate: "2092-06-05",
+      inventor: "Emily Rodriguez",
+      assignee: "CounselFlow Ltd.",
+      renewalDue: "N/A",
+      value: "$85,000",
+      maintenanceCost: "$0"
+    },
+    {
+      id: "TS-156",
+      title: "Proprietary Risk Assessment Formula",
+      type: "Trade Secret",
+      status: "Active",
+      jurisdiction: "Internal",
+      filingDate: "2021-09-12",
+      expiryDate: "Indefinite",
+      inventor: "Risk Analysis Team",
+      assignee: "TechCorp Inc.",
+      renewalDue: "N/A",
+      value: "$280,000",
+      maintenanceCost: "$500"
+    }
+  ];
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "Patent": return "bg-blue-100 text-blue-800";
+      case "Trademark": return "bg-green-100 text-green-800";
+      case "Copyright": return "bg-purple-100 text-purple-800";
+      case "Trade Secret": return "bg-orange-100 text-orange-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
-  const handleViewAsset = (asset: any) => {
-    setSelectedAsset(asset);
-    setShowDetailModal(true);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Active": return "bg-green-100 text-green-800";
+      case "Pending": return "bg-yellow-100 text-yellow-800";
+      case "Expired": return "bg-red-100 text-red-800";
+      case "Abandoned": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
   };
+
+  const filteredAssets = assets.filter(asset => {
+    const matchesSearch = asset.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         asset.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = typeFilter === "all" || asset.type === typeFilter;
+    const matchesStatus = statusFilter === "all" || asset.status === statusFilter;
+    
+    return matchesSearch && matchesType && matchesStatus;
+  });
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">IP Asset Register</h2>
-          <p className="text-muted-foreground">
-            Centralized registry of all intellectual property assets
-          </p>
-        </div>
-        <Button onClick={() => setShowAddModal(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add IP Asset
-        </Button>
-      </div>
-
-      {/* Search and Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Search & Filter Assets</CardTitle>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              IP Asset Register
+            </CardTitle>
+            <Button onClick={() => setShowAddModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Asset
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search assets..."
+                placeholder="Search assets by title or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
+                className="pl-10"
               />
             </div>
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Asset Type" />
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="trademark">Trademark</SelectItem>
-                <SelectItem value="patent">Patent</SelectItem>
-                <SelectItem value="copyright">Copyright</SelectItem>
-                <SelectItem value="design">Industrial Design</SelectItem>
-                <SelectItem value="domain">Domain Name</SelectItem>
-                <SelectItem value="trade-secret">Trade Secret</SelectItem>
+                <SelectItem value="Patent">Patents</SelectItem>
+                <SelectItem value="Trademark">Trademarks</SelectItem>
+                <SelectItem value="Copyright">Copyrights</SelectItem>
+                <SelectItem value="Trade Secret">Trade Secrets</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={selectedJurisdiction} onValueChange={setSelectedJurisdiction}>
-              <SelectTrigger>
-                <SelectValue placeholder="Jurisdiction" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Jurisdictions</SelectItem>
-                <SelectItem value="us">United States</SelectItem>
-                <SelectItem value="ep">European Union</SelectItem>
-                <SelectItem value="uk">United Kingdom</SelectItem>
-                <SelectItem value="cn">China</SelectItem>
-                <SelectItem value="jp">Japan</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="registered">Registered</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="opposed">Opposed</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Expired">Expired</SelectItem>
+                <SelectItem value="Abandoned">Abandoned</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export
+              <Filter className="h-4 w-4 mr-2" />
+              More Filters
             </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Assets Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>IP Assets ({mockIPAssets.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
+                <TableHead>Asset Details</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Owner</TableHead>
-                <TableHead>Jurisdiction</TableHead>
-                <TableHead>Registration No.</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Renewal Date</TableHead>
-                <TableHead>Classes</TableHead>
-                <TableHead>Links</TableHead>
+                <TableHead>Jurisdiction</TableHead>
+                <TableHead>Value</TableHead>
+                <TableHead>Next Renewal</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockIPAssets.map((asset) => (
-                <TableRow key={asset.id}>
-                  <TableCell className="font-medium">{asset.title}</TableCell>
+              {filteredAssets.map((asset) => (
+                <TableRow key={asset.id} className="hover:bg-muted/50">
                   <TableCell>
-                    <Badge variant="outline">{asset.type}</Badge>
+                    <div>
+                      <div className="font-medium">{asset.title}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {asset.id} • Filed: {asset.filingDate}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Inventor: {asset.inventor}
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell>{asset.owner}</TableCell>
+                  <TableCell>
+                    <Badge className={getTypeColor(asset.type)}>
+                      {asset.type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(asset.status)}>
+                      {asset.status}
+                    </Badge>
+                  </TableCell>
                   <TableCell>{asset.jurisdiction}</TableCell>
-                  <TableCell className="font-mono text-sm">{asset.registrationNo}</TableCell>
-                  <TableCell>{getStatusBadge(asset.status)}</TableCell>
-                  <TableCell>{asset.renewalDate}</TableCell>
-                  <TableCell className="text-sm">{asset.classes}</TableCell>
                   <TableCell>
-                    <div className="text-sm">
-                      <div>Contracts: {asset.linkedContracts}</div>
-                      <div>Disputes: {asset.linkedDisputes}</div>
+                    <div>
+                      <div className="font-medium">{asset.value}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Maintenance: {asset.maintenanceCost}
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewAsset(asset)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      {asset.renewalDue}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setSelectedAsset(asset)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -224,11 +242,15 @@ export function IPAssetRegister() {
         </CardContent>
       </Card>
 
-      <AddIPAssetModal open={showAddModal} onOpenChange={setShowAddModal} />
+      <AddIPAssetModal 
+        open={showAddModal} 
+        onOpenChange={setShowAddModal} 
+      />
+      
       <IPAssetDetailModal 
-        open={showDetailModal} 
-        onOpenChange={setShowDetailModal}
         asset={selectedAsset}
+        open={!!selectedAsset}
+        onOpenChange={() => setSelectedAsset(null)}
       />
     </div>
   );

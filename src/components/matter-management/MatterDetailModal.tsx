@@ -2,26 +2,20 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { 
-  FileText, 
-  Clock, 
   User, 
-  Building, 
+  Clock, 
   Calendar, 
-  AlertTriangle, 
+  DollarSign, 
+  FileText, 
   MessageSquare,
-  Paperclip,
-  Edit,
-  Save,
-  X
+  CheckSquare,
+  AlertTriangle,
+  TrendingUp
 } from "lucide-react";
-import { useState } from "react";
 
 interface MatterDetailModalProps {
   matter: any;
@@ -30,327 +24,341 @@ interface MatterDetailModalProps {
 }
 
 export function MatterDetailModal({ matter, open, onOpenChange }: MatterDetailModalProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [newComment, setNewComment] = useState("");
-
   if (!matter) return null;
 
-  const getStatusColor = (status: string) => {
-    const colors = {
-      "In Progress": "bg-blue-100 text-blue-800",
-      "Pending Review": "bg-yellow-100 text-yellow-800",
-      "Complete": "bg-green-100 text-green-800",
-      "On Hold": "bg-gray-100 text-gray-800"
-    };
-    return colors[status as keyof typeof colors] || "bg-gray-100 text-gray-800";
-  };
-
-  const getPriorityColor = (priority: string) => {
-    const colors = {
-      "High": "bg-red-100 text-red-800",
-      "Medium": "bg-orange-100 text-orange-800",
-      "Low": "bg-green-100 text-green-800"
-    };
-    return colors[priority as keyof typeof colors] || "bg-gray-100 text-gray-800";
-  };
-
-  const mockComments = [
+  const activities = [
     {
       id: 1,
-      author: "Sarah Chen",
-      content: "Initial review completed. Contract terms look standard.",
-      timestamp: "2024-01-16 10:30 AM",
-      type: "comment"
+      type: "status_change",
+      description: "Matter status changed to In Progress",
+      user: "Sarah Chen",
+      timestamp: "2024-02-12 10:30 AM"
     },
     {
       id: 2,
-      author: "System",
-      content: "Matter assigned to Sarah Chen",
-      timestamp: "2024-01-15 2:15 PM",
-      type: "system"
+      type: "comment",
+      description: "Added initial review comments",
+      user: "David Park",
+      timestamp: "2024-02-11 3:45 PM"
+    },
+    {
+      id: 3,
+      type: "assignment",
+      description: "Matter assigned to Legal Team",
+      user: "System",
+      timestamp: "2024-02-10 9:15 AM"
     }
   ];
 
-  const mockDocuments = [
-    { name: "Vendor Agreement Draft.pdf", size: "2.1 MB", uploadedBy: "John Doe", date: "2024-01-15" },
-    { name: "Legal Review Notes.docx", size: "0.8 MB", uploadedBy: "Sarah Chen", date: "2024-01-16" }
+  const tasks = [
+    {
+      id: 1,
+      title: "Review contract terms",
+      status: "Completed",
+      assignee: "Sarah Chen",
+      dueDate: "2024-02-15"
+    },
+    {
+      id: 2,
+      title: "Legal risk assessment",
+      status: "In Progress",
+      assignee: "David Park",
+      dueDate: "2024-02-18"
+    },
+    {
+      id: 3,
+      title: "Stakeholder review",
+      status: "Pending",
+      assignee: "Emily Rodriguez",
+      dueDate: "2024-02-20"
+    }
   ];
+
+  const documents = [
+    {
+      id: 1,
+      name: "Vendor Agreement Draft v1.0.pdf",
+      size: "2.3 MB",
+      uploadedBy: "Sarah Chen",
+      uploadedAt: "2024-02-12 10:30 AM"
+    },
+    {
+      id: 2,
+      name: "Legal Review Checklist.docx",
+      size: "156 KB",
+      uploadedBy: "David Park",
+      uploadedAt: "2024-02-11 3:45 PM"
+    }
+  ];
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "High": return "bg-red-100 text-red-800";
+      case "Medium": return "bg-yellow-100 text-yellow-800";
+      case "Low": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "In Progress": return "bg-blue-100 text-blue-800";
+      case "Completed": return "bg-green-100 text-green-800";
+      case "Pending": return "bg-yellow-100 text-yellow-800";
+      case "On Hold": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              {matter.title}
-            </DialogTitle>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-                {isEditing ? "Save" : "Edit"}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-                <X className="h-4 w-4" />
-              </Button>
+            <div>
+              <DialogTitle className="text-xl">{matter.title}</DialogTitle>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge className={getPriorityColor(matter.priority)}>
+                  {matter.priority} Priority
+                </Badge>
+                <Badge className={getStatusColor(matter.status)}>
+                  {matter.status}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  {matter.id}
+                </span>
+              </div>
             </div>
+            <Button variant="outline">
+              Edit Matter
+            </Button>
           </div>
         </DialogHeader>
 
-        <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="details">Details</TabsTrigger>
+        <Tabs defaultValue="overview" className="mt-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
-            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="details" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Basic Information */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Matter Information</CardTitle>
+                  <CardTitle className="text-base">Matter Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <User className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <Label className="text-sm font-medium">Matter ID</Label>
-                      <p className="text-sm text-muted-foreground">{matter.id}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Type</Label>
-                      <p className="text-sm text-muted-foreground">{matter.type}</p>
+                      <div className="text-sm text-muted-foreground">Assigned to</div>
+                      <div className="font-medium">{matter.owner}</div>
                     </div>
                   </div>
                   
-                  <div>
-                    <Label className="text-sm font-medium">Status</Label>
-                    <div className="mt-1">
-                      {isEditing ? (
-                        <Select defaultValue={matter.status}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="In Progress">In Progress</SelectItem>
-                            <SelectItem value="Pending Review">Pending Review</SelectItem>
-                            <SelectItem value="Complete">Complete</SelectItem>
-                            <SelectItem value="On Hold">On Hold</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Badge className={getStatusColor(matter.status)}>
-                          {matter.status}
-                        </Badge>
-                      )}
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-sm text-muted-foreground">Due Date</div>
+                      <div className="font-medium">{matter.dueDate}</div>
                     </div>
                   </div>
-
-                  <div>
-                    <Label className="text-sm font-medium">Priority</Label>
-                    <div className="mt-1">
-                      {isEditing ? (
-                        <Select defaultValue={matter.priority}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Low">Low</SelectItem>
-                            <SelectItem value="Medium">Medium</SelectItem>
-                            <SelectItem value="High">High</SelectItem>
-                            <SelectItem value="Critical">Critical</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Badge className={getPriorityColor(matter.priority)}>
-                          {matter.priority}
-                        </Badge>
-                      )}
+                  
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-sm text-muted-foreground">Created</div>
+                      <div className="font-medium">{matter.createdDate}</div>
                     </div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
+                  
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <Label className="text-sm font-medium">Business Unit</Label>
-                      <p className="text-sm text-muted-foreground">{matter.businessUnit}</p>
-                    </div>
-                    <div>
-                      <Label className="text-sm font-medium">Owner</Label>
-                      <p className="text-sm text-muted-foreground">{matter.owner}</p>
+                      <div className="text-sm text-muted-foreground">Type</div>
+                      <div className="font-medium">{matter.type}</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Timeline & Dates */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Timeline</CardTitle>
+                  <CardTitle className="text-base">Progress Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-sm font-medium">Created Date</Label>
-                      <p className="text-sm text-muted-foreground">{matter.createdDate}</p>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Overall Progress</span>
+                      <span>65%</span>
                     </div>
-                    <div>
-                      <Label className="text-sm font-medium">Due Date</Label>
-                      <p className="text-sm text-muted-foreground">{matter.dueDate}</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: '65%' }}></div>
                     </div>
                   </div>
                   
-                  <div>
-                    <Label className="text-sm font-medium">SLA Status</Label>
-                    <div className="flex items-center gap-2 mt-1">
-                      {matter.slaStatus === "At Risk" ? (
-                        <AlertTriangle className="h-4 w-4 text-red-500" />
-                      ) : (
-                        <Clock className="h-4 w-4 text-green-500" />
-                      )}
-                      <span className="text-sm">{matter.slaStatus}</span>
+                  <Separator />
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm">Completed Tasks</span>
+                      <span className="text-sm font-medium">3 of 5</span>
                     </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium">Risk Level</Label>
-                    <p className="text-sm text-muted-foreground">{matter.riskLevel}</p>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Days Remaining</span>
+                      <span className="text-sm font-medium">8 days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm">Budget Used</span>
+                      <span className="text-sm font-medium">$12,500</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Description */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Description</CardTitle>
+                <CardTitle className="text-base">Description</CardTitle>
               </CardHeader>
               <CardContent>
-                {isEditing ? (
-                  <Textarea 
-                    placeholder="Enter matter description..."
-                    defaultValue="Review and analysis of vendor agreement for procurement department. Includes terms negotiation and risk assessment."
-                    rows={4}
-                  />
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Review and analysis of vendor agreement for procurement department. Includes terms negotiation and risk assessment.
-                  </p>
-                )}
+                <p className="text-sm text-muted-foreground">
+                  Comprehensive review of vendor agreement with TechCorp including terms analysis, 
+                  risk assessment, and compliance verification. The matter involves multiple 
+                  stakeholders and requires coordination with procurement and finance teams.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
 
+          <TabsContent value="tasks" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium">Matter Tasks</h3>
+              <Button size="sm">
+                <CheckSquare className="h-4 w-4 mr-2" />
+                Add Task
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              {tasks.map((task) => (
+                <Card key={task.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium">{task.title}</h4>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                          <span>Assigned: {task.assignee}</span>
+                          <span>Due: {task.dueDate}</span>
+                        </div>
+                      </div>
+                      <Badge className={getStatusColor(task.status)}>
+                        {task.status}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
           <TabsContent value="documents" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Documents</CardTitle>
-                  <Button size="sm">
-                    <Paperclip className="h-4 w-4 mr-2" />
-                    Upload Document
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {mockDocuments.map((doc, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium">Matter Documents</h3>
+              <Button size="sm">
+                <FileText className="h-4 w-4 mr-2" />
+                Upload Document
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              {documents.map((doc) => (
+                <Card key={doc.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5 text-muted-foreground" />
+                        <FileText className="h-8 w-8 text-blue-600" />
                         <div>
-                          <p className="font-medium">{doc.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {doc.size} • Uploaded by {doc.uploadedBy} on {doc.date}
-                          </p>
+                          <h4 className="font-medium">{doc.name}</h4>
+                          <div className="text-sm text-muted-foreground">
+                            {doc.size} • Uploaded by {doc.uploadedBy} on {doc.uploadedAt}
+                          </div>
                         </div>
                       </div>
                       <Button variant="outline" size="sm">
                         Download
                       </Button>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Comments & Updates</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Add Comment */}
-                <div className="space-y-2">
-                  <Label>Add Comment</Label>
-                  <Textarea 
-                    placeholder="Add a comment..."
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    rows={3}
-                  />
-                  <Button size="sm">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Post Comment
-                  </Button>
-                </div>
-
-                {/* Comments List */}
-                <div className="space-y-3">
-                  {mockComments.map((comment) => (
-                    <div key={comment.id} className="border-l-2 border-muted pl-4 py-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <User className="h-4 w-4" />
-                        <span className="font-medium text-sm">{comment.author}</span>
-                        <span className="text-xs text-muted-foreground">{comment.timestamp}</span>
-                        {comment.type === "system" && (
-                          <Badge variant="outline" className="text-xs">System</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{comment.content}</p>
+            <h3 className="text-lg font-medium">Activity Timeline</h3>
+            
+            <div className="space-y-4">
+              {activities.map((activity) => (
+                <div key={activity.id} className="flex gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <MessageSquare className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm">{activity.description}</p>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {activity.user} • {activity.timestamp}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
           </TabsContent>
 
-          <TabsContent value="timeline" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Matter Timeline</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <div>
-                      <p className="font-medium">Matter Created</p>
-                      <p className="text-sm text-muted-foreground">January 15, 2024 at 2:00 PM</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                    <div>
-                      <p className="font-medium">Assigned to Sarah Chen</p>
-                      <p className="text-sm text-muted-foreground">January 15, 2024 at 2:15 PM</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                      <p className="font-medium">Initial Review Completed</p>
-                      <p className="text-sm text-muted-foreground">January 16, 2024 at 10:30 AM</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Time Spent</CardTitle>
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">28.5h</div>
+                  <p className="text-xs text-muted-foreground">
+                    65% of estimated time
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Budget Used</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">$12,500</div>
+                  <p className="text-xs text-muted-foreground">
+                    62% of allocated budget
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Risk Score</CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">Medium</div>
+                  <p className="text-xs text-muted-foreground">
+                    2 risk factors identified
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>

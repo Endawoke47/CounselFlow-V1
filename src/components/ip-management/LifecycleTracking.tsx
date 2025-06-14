@@ -1,403 +1,312 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, Clock, AlertTriangle, CheckCircle, XCircle, Eye, FileText } from "lucide-react";
-
-const mockLifecycleEvents = [
-  {
-    id: "1",
-    asset: "TechBrand Logo",
-    type: "Trademark",
-    event: "Renewal Due",
-    currentStage: "Registered",
-    dueDate: "2024-02-15",
-    daysRemaining: 12,
-    priority: "High",
-    jurisdiction: "US",
-    status: "Pending Action",
-    nextSteps: "File renewal application",
-    cost: "$500"
-  },
-  {
-    id: "2",
-    asset: "AI Processing Method",
-    type: "Patent",
-    event: "Office Action Response",
-    currentStage: "Under Examination",
-    dueDate: "2024-02-28",
-    daysRemaining: 25,
-    priority: "Critical",
-    jurisdiction: "EP",
-    status: "Draft Response",
-    nextSteps: "Review examiner comments",
-    cost: "$8,500"
-  },
-  {
-    id: "3",
-    asset: "DataFlow System",
-    type: "Patent",
-    event: "Grant Maintenance",
-    currentStage: "Granted",
-    dueDate: "2024-03-20",
-    daysRemaining: 45,
-    priority: "Medium",
-    jurisdiction: "US",
-    status: "Monitor",
-    nextSteps: "Prepare maintenance fee",
-    cost: "$1,600"
-  },
-  {
-    id: "4",
-    asset: "Product Manual v2.0",
-    type: "Copyright",
-    event: "Registration Complete",
-    currentStage: "Published",
-    dueDate: "2024-01-30",
-    daysRemaining: -3,
-    priority: "Low",
-    jurisdiction: "UK",
-    status: "Completed",
-    nextSteps: "Update asset register",
-    cost: "$200"
-  }
-];
-
-const mockAssetTimelines = [
-  {
-    asset: "TechBrand Logo",
-    type: "Trademark",
-    stages: [
-      { name: "Application Filed", status: "completed", date: "2023-01-15" },
-      { name: "Examination", status: "completed", date: "2023-04-20" },
-      { name: "Publication", status: "completed", date: "2023-07-10" },
-      { name: "Registration", status: "completed", date: "2023-10-15" },
-      { name: "First Renewal", status: "upcoming", date: "2024-02-15" },
-      { name: "Second Renewal", status: "future", date: "2029-02-15" }
-    ]
-  },
-  {
-    asset: "AI Processing Method",
-    type: "Patent",
-    stages: [
-      { name: "Priority Filing", status: "completed", date: "2023-03-01" },
-      { name: "PCT Filing", status: "completed", date: "2024-02-28" },
-      { name: "EP Regional Phase", status: "active", date: "2024-09-01" },
-      { name: "Examination", status: "active", date: "2024-12-15" },
-      { name: "Grant Decision", status: "pending", date: "2025-06-01" },
-      { name: "Opposition Period", status: "future", date: "2025-09-01" }
-    ]
-  }
-];
+import { 
+  Calendar, 
+  Clock, 
+  AlertTriangle, 
+  CheckCircle, 
+  FileText,
+  DollarSign,
+  ArrowRight
+} from "lucide-react";
 
 export function LifecycleTracking() {
-  const [activeTab, setActiveTab] = useState("deadlines");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPriority, setSelectedPriority] = useState("all");
-  const [selectedType, setSelectedType] = useState("all");
+  const lifecycleStages = [
+    {
+      stage: "Conception",
+      description: "Idea generation and initial documentation",
+      color: "bg-blue-500",
+      completed: true
+    },
+    {
+      stage: "Prior Art Search",
+      description: "Research existing patents and publications",
+      color: "bg-blue-500",
+      completed: true
+    },
+    {
+      stage: "Application Filing",
+      description: "Submit patent application to USPTO",
+      color: "bg-blue-500",
+      completed: true
+    },
+    {
+      stage: "Examination",
+      description: "Patent office review and examination",
+      color: "bg-yellow-500",
+      completed: false,
+      current: true
+    },
+    {
+      stage: "Grant/Registration",
+      description: "Patent granted and published",
+      color: "bg-gray-300",
+      completed: false
+    },
+    {
+      stage: "Maintenance",
+      description: "Ongoing renewals and maintenance fees",
+      color: "bg-gray-300",
+      completed: false
+    }
+  ];
 
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case "Critical":
-        return <Badge className="bg-red-100 text-red-800">Critical</Badge>;
-      case "High":
-        return <Badge className="bg-orange-100 text-orange-800">High</Badge>;
-      case "Medium":
-        return <Badge className="bg-yellow-100 text-yellow-800">Medium</Badge>;
-      case "Low":
-        return <Badge className="bg-green-100 text-green-800">Low</Badge>;
-      default:
-        return <Badge variant="outline">{priority}</Badge>;
+  const activeAssets = [
+    {
+      id: "PAT-001",
+      title: "ML Data Processing Algorithm",
+      currentStage: "Maintenance",
+      nextMilestone: "Renewal Payment",
+      dueDate: "2024-03-15",
+      daysRemaining: 45,
+      estimatedCost: "$12,500",
+      riskLevel: "Low"
+    },
+    {
+      id: "PAT-023",
+      title: "Contract Analysis System",
+      currentStage: "Examination",
+      nextMilestone: "Office Action Response",
+      dueDate: "2024-02-28",
+      daysRemaining: 12,
+      estimatedCost: "$8,500",
+      riskLevel: "Medium"
+    },
+    {
+      id: "TM-045",
+      title: "CounselFlow Brand",
+      currentStage: "Maintenance",
+      nextMilestone: "Renewal Filing",
+      dueDate: "2024-03-22",
+      daysRemaining: 52,
+      estimatedCost: "$3,200",
+      riskLevel: "Low"
+    },
+    {
+      id: "PAT-067",
+      title: "Risk Assessment Framework",
+      currentStage: "Prior Art Search",
+      nextMilestone: "Application Filing",
+      dueDate: "2024-02-20",
+      daysRemaining: 4,
+      estimatedCost: "$15,000",
+      riskLevel: "High"
+    }
+  ];
+
+  const upcomingMilestones = [
+    {
+      date: "2024-02-16",
+      type: "Deadline",
+      description: "Office Action Response - PAT-023",
+      priority: "High"
+    },
+    {
+      date: "2024-02-20",
+      type: "Filing",
+      description: "Patent Application - PAT-067",
+      priority: "Critical"
+    },
+    {
+      date: "2024-02-25",
+      type: "Review",
+      description: "Trademark Search Results - TM-078",
+      priority: "Medium"
+    },
+    {
+      date: "2024-03-01",
+      type: "Payment",
+      description: "Maintenance Fee - PAT-012",
+      priority: "High"
+    }
+  ];
+
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case "High": return "bg-red-100 text-red-800";
+      case "Medium": return "bg-yellow-100 text-yellow-800";
+      case "Low": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Pending Action":
-        return <Badge className="bg-red-100 text-red-800">Pending Action</Badge>;
-      case "Draft Response":
-        return <Badge className="bg-yellow-100 text-yellow-800">Draft Response</Badge>;
-      case "Monitor":
-        return <Badge className="bg-blue-100 text-blue-800">Monitor</Badge>;
-      case "Completed":
-        return <Badge className="bg-green-100 text-green-800">Completed</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "Critical": return "bg-red-100 text-red-800";
+      case "High": return "bg-orange-100 text-orange-800";
+      case "Medium": return "bg-yellow-100 text-yellow-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
   const getDaysRemainingColor = (days: number) => {
-    if (days < 0) return "text-red-600 font-semibold";
-    if (days <= 7) return "text-red-500 font-medium";
-    if (days <= 30) return "text-orange-500";
-    return "text-muted-foreground";
-  };
-
-  const getStageIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "active":
-        return <Clock className="h-4 w-4 text-blue-500" />;
-      case "upcoming":
-        return <AlertTriangle className="h-4 w-4 text-orange-500" />;
-      case "pending":
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case "future":
-        return <XCircle className="h-4 w-4 text-gray-400" />;
-      default:
-        return <XCircle className="h-4 w-4 text-gray-400" />;
-    }
+    if (days <= 7) return "text-red-600";
+    if (days <= 30) return "text-orange-600";
+    return "text-green-600";
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Lifecycle Tracking</h2>
-          <p className="text-muted-foreground">
-            Track IP asset lifecycles, deadlines, and renewal requirements
-          </p>
-        </div>
-      </div>
-
-      {/* Deadline Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">3</div>
-            <p className="text-xs text-muted-foreground">
-              Immediate attention required
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Due This Week</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">7</div>
-            <p className="text-xs text-muted-foreground">
-              Critical deadlines approaching
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Due This Month</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">
-              Plan ahead for renewals
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tracked</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,247</div>
-            <p className="text-xs text-muted-foreground">
-              Active lifecycle events
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="flex space-x-4 border-b">
-        <button
-          className={`pb-2 px-1 ${activeTab === "deadlines" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-          onClick={() => setActiveTab("deadlines")}
-        >
-          Upcoming Deadlines
-        </button>
-        <button
-          className={`pb-2 px-1 ${activeTab === "timelines" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-          onClick={() => setActiveTab("timelines")}
-        >
-          Asset Timelines
-        </button>
-        <button
-          className={`pb-2 px-1 ${activeTab === "calendar" ? "border-b-2 border-primary text-primary" : "text-muted-foreground"}`}
-          onClick={() => setActiveTab("calendar")}
-        >
-          Calendar View
-        </button>
-      </div>
-
-      {activeTab === "deadlines" && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Upcoming Deadlines & Actions</CardTitle>
-              <div className="flex gap-4">
-                <Input
-                  placeholder="Search assets..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64"
-                />
-                <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="critical">Critical</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="trademark">Trademark</SelectItem>
-                    <SelectItem value="patent">Patent</SelectItem>
-                    <SelectItem value="copyright">Copyright</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Asset</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Event</TableHead>
-                  <TableHead>Current Stage</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead>Days Remaining</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Next Steps</TableHead>
-                  <TableHead>Est. Cost</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockLifecycleEvents.map((event) => (
-                  <TableRow key={event.id}>
-                    <TableCell className="font-medium">{event.asset}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{event.type}</Badge>
-                    </TableCell>
-                    <TableCell>{event.event}</TableCell>
-                    <TableCell className="text-sm">{event.currentStage}</TableCell>
-                    <TableCell className="text-sm">{event.dueDate}</TableCell>
-                    <TableCell className={getDaysRemainingColor(event.daysRemaining)}>
-                      {event.daysRemaining < 0 ? `${Math.abs(event.daysRemaining)} days overdue` : `${event.daysRemaining} days`}
-                    </TableCell>
-                    <TableCell>{getPriorityBadge(event.priority)}</TableCell>
-                    <TableCell>{getStatusBadge(event.status)}</TableCell>
-                    <TableCell className="text-sm">{event.nextSteps}</TableCell>
-                    <TableCell className="font-medium">{event.cost}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {activeTab === "timelines" && (
-        <div className="space-y-6">
-          {mockAssetTimelines.map((timeline) => (
-            <Card key={timeline.asset}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">{timeline.asset}</CardTitle>
-                    <CardDescription>{timeline.type} Lifecycle Timeline</CardDescription>
+      {/* Lifecycle Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle>IP Lifecycle Process</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            {lifecycleStages.map((stage, index) => (
+              <div key={stage.stage} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div 
+                    className={`w-4 h-4 rounded-full ${stage.color} ${stage.current ? 'ring-4 ring-blue-200' : ''}`}
+                  />
+                  <div className="text-center mt-2 max-w-24">
+                    <div className="text-xs font-medium">{stage.stage}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {stage.description}
+                    </div>
                   </div>
+                </div>
+                {index < lifecycleStages.length - 1 && (
+                  <ArrowRight className="h-4 w-4 text-muted-foreground mx-4" />
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Active Assets Tracking */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Active Assets Lifecycle</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {activeAssets.map((asset) => (
+              <div key={asset.id} className="border rounded-lg p-4 hover:bg-muted/50">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 className="font-medium">{asset.title}</h4>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <span>{asset.id}</span>
+                      <span>•</span>
+                      <span>Current: {asset.currentStage}</span>
+                    </div>
+                  </div>
+                  <Badge className={getRiskColor(asset.riskLevel)}>
+                    {asset.riskLevel} Risk
+                  </Badge>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <div className="text-sm text-muted-foreground">Next Milestone</div>
+                    <div className="font-medium">{asset.nextMilestone}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Due Date</div>
+                    <div className="font-medium">{asset.dueDate}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Days Remaining</div>
+                    <div className={`font-medium ${getDaysRemainingColor(asset.daysRemaining)}`}>
+                      {asset.daysRemaining} days
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Est. Cost</div>
+                    <div className="font-medium">{asset.estimatedCost}</div>
+                  </div>
+                </div>
+                
+                <div className="flex justify-end mt-3">
                   <Button variant="outline" size="sm">
-                    <Eye className="h-4 w-4 mr-2" />
                     View Details
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {timeline.stages.map((stage, index) => (
-                    <div key={index} className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 w-48">
-                        {getStageIcon(stage.status)}
-                        <span className={`text-sm ${stage.status === 'completed' ? 'text-muted-foreground' : 'font-medium'}`}>
-                          {stage.name}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <Progress 
-                          value={stage.status === 'completed' ? 100 : stage.status === 'active' ? 50 : 0} 
-                          className="h-2"
-                        />
-                      </div>
-                      <div className="text-sm text-muted-foreground w-24">
-                        {stage.date}
-                      </div>
-                      <div className="w-24">
-                        {stage.status === 'upcoming' && (
-                          <Badge className="bg-orange-100 text-orange-800">Due Soon</Badge>
-                        )}
-                        {stage.status === 'active' && (
-                          <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>
-                        )}
-                        {stage.status === 'completed' && (
-                          <Badge className="bg-green-100 text-green-800">Complete</Badge>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {activeTab === "calendar" && (
+      {/* Upcoming Milestones */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Calendar View</CardTitle>
-            <CardDescription>Visual timeline of all IP lifecycle events</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Upcoming Milestones
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-12 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4" />
-              <h3 className="text-lg font-medium">Calendar Integration Coming Soon</h3>
-              <p>Interactive calendar view of all IP deadlines and milestones</p>
+            <div className="space-y-3">
+              {upcomingMilestones.map((milestone, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge className={getPriorityColor(milestone.priority)}>
+                        {milestone.priority}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {milestone.type}
+                      </span>
+                    </div>
+                    <div className="font-medium text-sm">{milestone.description}</div>
+                    <div className="text-xs text-muted-foreground">{milestone.date}</div>
+                  </div>
+                  <Button variant="ghost" size="sm">
+                    <Clock className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
-      )}
+
+        {/* Cost Tracking */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Cost Tracking
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="text-sm text-muted-foreground">Q1 2024 Budget</div>
+                <div className="text-2xl font-bold">$125,000</div>
+                <div className="text-sm text-green-600">15% under budget</div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm">Filing Fees</span>
+                  <span className="text-sm font-medium">$45,000</span>
+                </div>
+                <Progress value={36} className="h-2" />
+                
+                <div className="flex justify-between">
+                  <span className="text-sm">Maintenance Fees</span>
+                  <span className="text-sm font-medium">$28,500</span>
+                </div>
+                <Progress value={23} className="h-2" />
+                
+                <div className="flex justify-between">
+                  <span className="text-sm">Attorney Fees</span>
+                  <span className="text-sm font-medium">$32,000</span>
+                </div>
+                <Progress value={26} className="h-2" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

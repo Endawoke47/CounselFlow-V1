@@ -1,234 +1,254 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { BarChart3, TrendingUp, AlertTriangle, DollarSign, FileText, Calendar } from "lucide-react";
+import { 
+  Shield, 
+  TrendingUp, 
+  AlertTriangle, 
+  DollarSign,
+  Calendar,
+  FileText,
+  Clock,
+  Target
+} from "lucide-react";
 
 export function IPDashboardOverview() {
+  const stats = [
+    {
+      title: "Total IP Assets",
+      value: "156",
+      change: "+12 this quarter",
+      icon: Shield,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50"
+    },
+    {
+      title: "Active Patents",
+      value: "34",
+      change: "8 pending approval",
+      icon: FileText,
+      color: "text-green-600",
+      bgColor: "bg-green-50"
+    },
+    {
+      title: "Renewals Due",
+      value: "7",
+      change: "Next 30 days",
+      icon: Calendar,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50"
+    },
+    {
+      title: "IP Revenue",
+      value: "$2.3M",
+      change: "+18% YoY",
+      icon: DollarSign,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50"
+    }
+  ];
+
+  const upcomingRenewals = [
+    {
+      id: "PAT-001",
+      title: "Machine Learning Algorithm Patent",
+      type: "Patent",
+      renewalDate: "2024-03-15",
+      jurisdiction: "US",
+      cost: "$12,500"
+    },
+    {
+      id: "TM-045",
+      title: "CounselFlow Trademark",
+      type: "Trademark",
+      renewalDate: "2024-03-22",
+      jurisdiction: "EU",
+      cost: "$3,200"
+    },
+    {
+      id: "PAT-023",
+      title: "Data Processing System",
+      type: "Patent",
+      renewalDate: "2024-04-01",
+      jurisdiction: "UK",
+      cost: "$8,900"
+    }
+  ];
+
+  const portfolioValue = [
+    {
+      category: "Patents",
+      value: 1200000,
+      percentage: 52,
+      count: 34
+    },
+    {
+      category: "Trademarks",
+      value: 680000,
+      percentage: 30,
+      count: 89
+    },
+    {
+      category: "Trade Secrets",
+      value: 420000,
+      percentage: 18,
+      count: 33
+    }
+  ];
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "Patent": return "bg-blue-100 text-blue-800";
+      case "Trademark": return "bg-green-100 text-green-800";
+      case "Copyright": return "bg-purple-100 text-purple-800";
+      case "Trade Secret": return "bg-orange-100 text-orange-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total IP Assets</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,247</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from last quarter
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Renewals</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">
-              Next 90 days
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Disputes</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">
-              2 critical priority
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">License Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$2.4M</div>
-            <p className="text-xs text-muted-foreground">
-              YTD licensing income
-            </p>
-          </CardContent>
-        </Card>
+        {stats.map((stat, index) => (
+          <Card key={index} className="hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {stat.title}
+              </CardTitle>
+              <div className={`p-2 rounded-full ${stat.bgColor}`}>
+                <stat.icon className={`h-4 w-4 ${stat.color}`} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Portfolio Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Portfolio Value Breakdown */}
         <Card>
           <CardHeader>
-            <CardTitle>Portfolio by Asset Type</CardTitle>
-            <CardDescription>Distribution of IP assets across categories</CardDescription>
+            <CardTitle>Portfolio Value</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Trademarks</span>
-                <span className="text-sm font-medium">685 (55%)</span>
-              </div>
-              <Progress value={55} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Patents</span>
-                <span className="text-sm font-medium">312 (25%)</span>
-              </div>
-              <Progress value={25} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Copyrights</span>
-                <span className="text-sm font-medium">150 (12%)</span>
-              </div>
-              <Progress value={12} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Designs</span>
-                <span className="text-sm font-medium">75 (6%)</span>
-              </div>
-              <Progress value={6} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Domain Names</span>
-                <span className="text-sm font-medium">25 (2%)</span>
-              </div>
-              <Progress value={2} className="h-2" />
+          <CardContent>
+            <div className="space-y-4">
+              {portfolioValue.map((item, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{item.category}</span>
+                    <div className="text-right">
+                      <div className="text-sm font-bold">
+                        ${(item.value / 1000000).toFixed(1)}M
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {item.count} assets
+                      </div>
+                    </div>
+                  </div>
+                  <Progress value={item.percentage} className="h-2" />
+                  <div className="text-xs text-muted-foreground">
+                    {item.percentage}% of total portfolio
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
+        {/* Upcoming Renewals */}
         <Card>
           <CardHeader>
-            <CardTitle>Geographic Distribution</CardTitle>
-            <CardDescription>IP protection by jurisdiction</CardDescription>
+            <div className="flex items-center justify-between">
+              <CardTitle>Upcoming Renewals</CardTitle>
+              <Button variant="outline" size="sm">
+                <Calendar className="h-4 w-4 mr-2" />
+                View Calendar
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">United States</span>
-                <span className="text-sm font-medium">423 (34%)</span>
-              </div>
-              <Progress value={34} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">European Union</span>
-                <span className="text-sm font-medium">298 (24%)</span>
-              </div>
-              <Progress value={24} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">United Kingdom</span>
-                <span className="text-sm font-medium">187 (15%)</span>
-              </div>
-              <Progress value={15} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">China</span>
-                <span className="text-sm font-medium">149 (12%)</span>
-              </div>
-              <Progress value={12} className="h-2" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Other</span>
-                <span className="text-sm font-medium">190 (15%)</span>
-              </div>
-              <Progress value={15} className="h-2" />
+          <CardContent>
+            <div className="space-y-4">
+              {upcomingRenewals.map((renewal) => (
+                <div key={renewal.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-sm">{renewal.title}</h4>
+                      <Badge className={getTypeColor(renewal.type)}>
+                        {renewal.type}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>{renewal.id}</span>
+                      <span>{renewal.jurisdiction}</span>
+                      <span>Due: {renewal.renewalDate}</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium text-sm">{renewal.cost}</div>
+                    <Button variant="ghost" size="sm">
+                      Schedule
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Urgent Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Risk Alerts and Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle>Urgent Actions Required</CardTitle>
-            <CardDescription>Critical deadlines and actions</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 border rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-                <div className="flex-1">
-                  <div className="font-medium">Trademark Renewal - "TechBrand"</div>
-                  <div className="text-sm text-muted-foreground">Due: Tomorrow (US)</div>
-                </div>
-                <Badge variant="destructive">Critical</Badge>
-              </div>
-              <div className="flex items-center gap-3 p-3 border rounded-lg">
-                <Calendar className="h-5 w-5 text-orange-500" />
-                <div className="flex-1">
-                  <div className="font-medium">Patent Office Action Response</div>
-                  <div className="text-sm text-muted-foreground">Due: 5 days (EP)</div>
-                </div>
-                <Badge variant="outline">High</Badge>
-              </div>
-              <div className="flex items-center gap-3 p-3 border rounded-lg">
-                <TrendingUp className="h-5 w-5 text-blue-500" />
-                <div className="flex-1">
-                  <div className="font-medium">Opposition Period Ends</div>
-                  <div className="text-sm text-muted-foreground">Monitor: 2 weeks (UK)</div>
-                </div>
-                <Badge variant="outline">Medium</Badge>
-              </div>
-            </div>
+            <div className="text-2xl font-bold text-orange-600">7</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Assets requiring action within 60 days
+            </p>
+            <Button variant="outline" size="sm" className="mt-3 w-full">
+              Review Items
+            </Button>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest updates and changes</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Maintenance Costs</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                <div>
-                  <div className="font-medium">New trademark filed</div>
-                  <div className="text-sm text-muted-foreground">
-                    "InnovateTech" registered in 3 jurisdictions
-                  </div>
-                  <div className="text-xs text-muted-foreground">2 hours ago</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                <div>
-                  <div className="font-medium">License agreement executed</div>
-                  <div className="text-sm text-muted-foreground">
-                    Patent portfolio licensed to MegaCorp Inc.
-                  </div>
-                  <div className="text-xs text-muted-foreground">1 day ago</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-                <div>
-                  <div className="font-medium">Opposition filed</div>
-                  <div className="text-sm text-muted-foreground">
-                    Competitor challenged "DataFlow" trademark
-                  </div>
-                  <div className="text-xs text-muted-foreground">3 days ago</div>
-                </div>
-              </div>
-            </div>
+            <div className="text-2xl font-bold text-foreground">$58K</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Projected annual maintenance fees
+            </p>
+            <Button variant="outline" size="sm" className="mt-3 w-full">
+              View Budget
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">ROI Performance</CardTitle>
+            <TrendingUp className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">324%</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Average return on IP investments
+            </p>
+            <Button variant="outline" size="sm" className="mt-3 w-full">
+              View Analysis
+            </Button>
           </CardContent>
         </Card>
       </div>
