@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { FileText, Calendar, DollarSign, User, Building2, Clock, AlertTriangle, CheckCircle, Edit, Download, Bell } from "lucide-react";
+import { DocumentManagement } from "./DocumentManagement";
 
 interface Contract {
   id: number;
@@ -20,6 +20,7 @@ interface Contract {
   description?: string;
   startDate?: string;
   endDate?: string;
+  documents?: any[];
 }
 
 interface ContractDetailModalProps {
@@ -207,39 +208,11 @@ export function ContractDetailModal({ contract, isOpen, onClose }: ContractDetai
           </TabsContent>
 
           <TabsContent value="documents" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Contract Documents</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-blue-500" />
-                      <div>
-                        <p className="font-medium">Original Contract.pdf</p>
-                        <p className="text-sm text-muted-foreground">Uploaded 2024-06-15</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-green-500" />
-                      <div>
-                        <p className="font-medium">Amendment_1.pdf</p>
-                        <p className="text-sm text-muted-foreground">Uploaded 2024-06-20</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <DocumentManagement
+              contractId={contract.id}
+              documents={contract.documents || []}
+              readonly={true}
+            />
           </TabsContent>
 
           <TabsContent value="activity" className="space-y-4">
