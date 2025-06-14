@@ -1,3 +1,4 @@
+
 import { 
   Building2, 
   FileText, 
@@ -12,7 +13,8 @@ import {
   Settings,
   CheckSquare,
   Users,
-  TrendingUp
+  TrendingUp,
+  Database
 } from "lucide-react";
 import {
   Sidebar as SidebarPrimitive,
@@ -72,6 +74,11 @@ const modules = [
     title: "IP Management",
     url: "/ip",
     icon: Shield,
+  },
+  {
+    title: "Data Protection",
+    url: "/data-protection",
+    icon: Database,
   },
   {
     title: "Legal Spend",

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,7 @@ import LicensingRegulatory from "./pages/LicensingRegulatory";
 import PolicyManagement from "./pages/PolicyManagement";
 import KnowledgeManagement from "./pages/KnowledgeManagement";
 import IPManagement from "./pages/IPManagement";
+import DataProtection from "./pages/DataProtection";
 import OutsourcedMattersSpend from "./pages/OutsourcedMattersSpend";
 import NotFound from "./pages/NotFound";
 import RiskDashboard from "./pages/RiskDashboard";
@@ -37,6 +39,7 @@ const App = () => (
           <Route path="/policy-management" element={<PolicyManagement />} />
           <Route path="/knowledge-management" element={<KnowledgeManagement />} />
           <Route path="/ip-management" element={<IPManagement />} />
+          <Route path="/data-protection" element={<DataProtection />} />
           <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
           <Route path="/risk-dashboard" element={<RiskDashboard />} />
           <Route path="/task-management" element={<TaskManagement />} />
