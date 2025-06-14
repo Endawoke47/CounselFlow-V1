@@ -9,6 +9,7 @@ import { NewMatterModal } from "./NewMatterModal";
 import { MatterDetailModal } from "./MatterDetailModal";
 import { AssignmentDashboard } from "./AssignmentDashboard";
 import { ReportingDashboard } from "./ReportingDashboard";
+import { AdviceLibrary } from "./AdviceLibrary";
 
 export function MatterManagementDashboard() {
   const [showNewMatterModal, setShowNewMatterModal] = useState(false);
@@ -64,11 +65,7 @@ export function MatterManagementDashboard() {
         </TabsContent>
 
         <TabsContent value="advice" className="space-y-6">
-          <div className="text-center py-12">
-            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Advice Library</h3>
-            <p className="text-muted-foreground">Searchable repository of legal advice and guidance</p>
-          </div>
+          <AdviceLibrary />
         </TabsContent>
 
         <TabsContent value="reporting" className="space-y-6">

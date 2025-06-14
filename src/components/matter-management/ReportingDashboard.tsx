@@ -1,303 +1,286 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-import { Download, Calendar, Filter, TrendingUp, Clock, Target, AlertTriangle } from "lucide-react";
-
-const chartConfig = {
-  matters: {
-    label: "Matters",
-    color: "hsl(var(--chart-1))",
-  },
-  advice: {
-    label: "Advice",
-    color: "hsl(var(--chart-2))",
-  },
-  sla: {
-    label: "SLA Compliance",
-    color: "hsl(var(--chart-3))",
-  },
-};
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  Area,
+  AreaChart
+} from "recharts";
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Users, 
+  Clock, 
+  FileText, 
+  AlertTriangle,
+  Download,
+  Calendar,
+  DollarSign
+} from "lucide-react";
 
 export function ReportingDashboard() {
-  const mattersData = [
-    { department: "HR", matters: 15, advice: 8, slaCompliance: 92 },
-    { department: "IT", matters: 12, advice: 18, slaCompliance: 88 },
-    { department: "Procurement", matters: 20, advice: 12, slaCompliance: 95 },
-    { department: "Finance", matters: 8, advice: 5, slaCompliance: 100 },
-    { department: "Operations", matters: 18, advice: 22, slaCompliance: 85 }
+  const mattersByType = [
+    { name: "Contract Review", value: 15, color: "#3b82f6" },
+    { name: "Legal Advice", value: 12, color: "#10b981" },
+    { name: "Compliance", value: 8, color: "#f59e0b" },
+    { name: "Litigation", value: 5, color: "#ef4444" },
+    { name: "Regulatory", value: 7, color: "#8b5cf6" }
   ];
 
-  const matterTypeData = [
-    { name: "Contract Review", value: 35, color: "#3b82f6" },
-    { name: "Legal Advice", value: 28, color: "#10b981" },
-    { name: "Compliance", value: 20, color: "#f59e0b" },
-    { name: "Regulatory", value: 12, color: "#ef4444" },
-    { name: "Other", value: 5, color: "#8b5cf6" }
+  const monthlyTrends = [
+    { month: "Jan", matters: 42, resolved: 38, pending: 4 },
+    { month: "Feb", matters: 45, resolved: 41, pending: 4 },
+    { month: "Mar", matters: 38, resolved: 35, pending: 3 },
+    { month: "Apr", matters: 52, resolved: 48, pending: 4 },
+    { month: "May", matters: 47, resolved: 44, pending: 3 },
+    { month: "Jun", matters: 49, resolved: 45, pending: 4 }
   ];
 
-  const timelineData = [
-    { month: "Jan", opened: 25, closed: 22, pending: 3 },
-    { month: "Feb", opened: 30, closed: 28, pending: 5 },
-    { month: "Mar", opened: 35, closed: 32, pending: 8 },
-    { month: "Apr", opened: 28, closed: 30, pending: 6 },
-    { month: "May", opened: 32, closed: 29, pending: 9 },
-    { month: "Jun", opened: 38, closed: 35, pending: 12 }
+  const slaPerformance = [
+    { department: "HR", onTime: 92, breached: 8 },
+    { department: "IT", onTime: 85, breached: 15 },
+    { department: "Procurement", onTime: 88, breached: 12 },
+    { department: "Finance", onTime: 95, breached: 5 },
+    { department: "Operations", onTime: 82, breached: 18 }
   ];
 
-  const topMatters = [
-    { id: "MAT-2024-001", title: "M&A Due Diligence Review", exposure: "High", days: 45 },
-    { id: "MAT-2024-015", title: "Regulatory Compliance Audit", exposure: "High", days: 38 },
-    { id: "MAT-2024-023", title: "IP Licensing Agreement", exposure: "Medium", days: 32 },
-    { id: "MAT-2024-031", title: "Employment Dispute", exposure: "Medium", days: 28 }
+  const workloadData = [
+    { name: "Jan", workload: 85 },
+    { name: "Feb", workload: 88 },
+    { name: "Mar", workload: 75 },
+    { name: "Apr", workload: 92 },
+    { name: "May", workload: 89 },
+    { name: "Jun", workload: 87 }
+  ];
+
+  const keyMetrics = [
+    {
+      title: "Total Matters",
+      value: "47",
+      change: "+12%",
+      trend: "up",
+      icon: FileText,
+      color: "text-blue-600"
+    },
+    {
+      title: "Avg Resolution Time",
+      value: "12.5 days",
+      change: "-1.2 days",
+      trend: "down",
+      icon: Clock,
+      color: "text-green-600"
+    },
+    {
+      title: "SLA Compliance",
+      value: "89%",
+      change: "+3%",
+      trend: "up",
+      icon: AlertTriangle,
+      color: "text-orange-600"
+    },
+    {
+      title: "Team Utilization",
+      value: "85%",
+      change: "-2%",
+      trend: "down",
+      icon: Users,
+      color: "text-purple-600"
+    }
   ];
 
   return (
     <div className="space-y-6">
-      {/* Filters and Controls */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Value & Performance Reporting
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Calendar className="h-4 w-4 mr-2" />
-                Last 6 Months
-              </Button>
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
-              <Button size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export Report
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="All Entities" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Entities</SelectItem>
-                <SelectItem value="parent">Parent Company</SelectItem>
-                <SelectItem value="sub1">Subsidiary 1</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="All Departments" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Departments</SelectItem>
-                <SelectItem value="hr">Human Resources</SelectItem>
-                <SelectItem value="it">Information Technology</SelectItem>
-                <SelectItem value="procurement">Procurement</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Matter Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="contract">Contract Review</SelectItem>
-                <SelectItem value="advice">Legal Advice</SelectItem>
-                <SelectItem value="compliance">Compliance</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Input type="date" placeholder="Date Range" />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Matter Management Reporting</h2>
+          <p className="text-muted-foreground">Analytics and insights for legal matters</p>
+        </div>
+        <div className="flex gap-2">
+          <Select defaultValue="last-6-months">
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="last-month">Last Month</SelectItem>
+              <SelectItem value="last-3-months">Last 3 Months</SelectItem>
+              <SelectItem value="last-6-months">Last 6 Months</SelectItem>
+              <SelectItem value="last-year">Last Year</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
+      </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {keyMetrics.map((metric, index) => (
+          <Card key={index}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">{metric.title}</CardTitle>
+              <metric.icon className={`h-4 w-4 ${metric.color}`} />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{metric.value}</div>
+              <div className="flex items-center text-xs text-muted-foreground">
+                {metric.trend === "up" ? (
+                  <TrendingUp className="h-3 w-3 mr-1 text-green-600" />
+                ) : (
+                  <TrendingDown className="h-3 w-3 mr-1 text-red-600" />
+                )}
+                <span className={metric.trend === "up" ? "text-green-600" : "text-red-600"}>
+                  {metric.change}
+                </span>
+                <span className="ml-1">from last period</span>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Matter Distribution */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Matters Handled</CardTitle>
-            <Target className="h-4 w-4 text-blue-500" />
+          <CardHeader>
+            <CardTitle>Matters by Type</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">187</div>
-            <p className="text-xs text-muted-foreground">+12% from last quarter</p>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={mattersByType}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {mattersByType.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
+        {/* SLA Performance */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">SLA Compliance</CardTitle>
-            <Clock className="h-4 w-4 text-green-500" />
+          <CardHeader>
+            <CardTitle>SLA Performance by Department</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">92%</div>
-            <p className="text-xs text-muted-foreground">Above 90% target</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Turnaround</CardTitle>
-            <TrendingUp className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8.5 days</div>
-            <p className="text-xs text-muted-foreground">-1.2 days from last quarter</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">High-Risk Matters</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">8</div>
-            <p className="text-xs text-muted-foreground">Requires attention</p>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={slaPerformance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="department" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="onTime" fill="#10b981" name="On Time" />
+                <Bar dataKey="breached" fill="#ef4444" name="Breached" />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
+      {/* Monthly Trends */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Monthly Matter Trends</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={monthlyTrends}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Area type="monotone" dataKey="matters" stackId="1" stroke="#3b82f6" fill="#3b82f6" name="Total Matters" />
+              <Area type="monotone" dataKey="resolved" stackId="2" stroke="#10b981" fill="#10b981" name="Resolved" />
+              <Area type="monotone" dataKey="pending" stackId="2" stroke="#f59e0b" fill="#f59e0b" name="Pending" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Department Performance */}
+        {/* Team Workload */}
         <Card>
           <CardHeader>
-            <CardTitle>Department Performance</CardTitle>
+            <CardTitle>Team Workload Trends</CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig}>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={mattersData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="department" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="matters" fill="var(--color-matters)" />
-                  <Bar dataKey="advice" fill="var(--color-advice)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={workloadData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="workload" stroke="#8b5cf6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Matter Types Distribution */}
+        {/* Performance Summary */}
         <Card>
           <CardHeader>
-            <CardTitle>Matter Types Distribution</CardTitle>
+            <CardTitle>Performance Summary</CardTitle>
           </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig}>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={matterTypeData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {matterTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </PieChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <div>
+                <p className="font-medium text-green-800">Matters Resolved</p>
+                <p className="text-sm text-green-600">This month</p>
+              </div>
+              <div className="text-2xl font-bold text-green-800">42</div>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+              <div>
+                <p className="font-medium text-orange-800">SLA Breaches</p>
+                <p className="text-sm text-orange-600">This month</p>
+              </div>
+              <div className="text-2xl font-bold text-orange-800">5</div>
+            </div>
 
-      {/* Timeline and Top Matters */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Matter Timeline */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Matter Resolution Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig}>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={timelineData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="opened" stroke="#3b82f6" strokeWidth={2} />
-                  <Line type="monotone" dataKey="closed" stroke="#10b981" strokeWidth={2} />
-                  <Line type="monotone" dataKey="pending" stroke="#f59e0b" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div>
+                <p className="font-medium text-blue-800">Active Matters</p>
+                <p className="text-sm text-blue-600">Currently open</p>
+              </div>
+              <div className="text-2xl font-bold text-blue-800">23</div>
+            </div>
 
-        {/* Top High-Risk Matters */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Top High-Risk Matters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {topMatters.map((matter, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">{matter.title}</p>
-                    <p className="text-xs text-muted-foreground">{matter.id}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge className={
-                      matter.exposure === "High" ? "bg-red-100 text-red-800" : "bg-orange-100 text-orange-800"
-                    }>
-                      {matter.exposure}
-                    </Badge>
-                    <p className="text-xs text-muted-foreground mt-1">{matter.days} days open</p>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              <div>
+                <p className="font-medium text-purple-800">Team Members</p>
+                <p className="text-sm text-purple-600">Active this month</p>
+              </div>
+              <div className="text-2xl font-bold text-purple-800">8</div>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Report Templates */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Report Templates</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-              <Download className="h-6 w-6 mb-2" />
-              Executive Summary
-            </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-              <TrendingUp className="h-6 w-6 mb-2" />
-              Performance Report
-            </Button>
-            <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-              <AlertTriangle className="h-6 w-6 mb-2" />
-              Risk Assessment
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
