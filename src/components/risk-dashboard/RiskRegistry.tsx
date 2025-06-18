@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,91 +5,31 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Filter, AlertTriangle, Eye, Edit, Calendar, User } from "lucide-react";
+import { Plus, Search, Filter, AlertTriangle, Eye, Edit, Calendar, User, Link } from "lucide-react";
 import { AddRiskModal } from "./AddRiskModal";
+import { RelationshipsPanel } from "@/components/ui/relationships-panel";
+import { RelatedItem } from "@/services/relationshipService";
+import { CentralDataService } from "@/services/centralDataService";
 
-const mockRisks = [
-  {
-    id: "RSK-2024-001",
-    title: "GDPR Compliance Gap",
-    category: "Regulatory",
-    riskLevel: "Critical",
-    probability: 85,
-    impact: "High",
-    riskScore: 8.5,
-    owner: "Jane Smith",
-    status: "Open",
-    identifiedDate: "2024-01-15",
-    reviewDate: "2024-02-15",
-    description: "Gap in GDPR compliance procedures for cross-border data transfers",
-    mitigationActions: 3,
-    lastUpdate: "2024-01-20"
-  },
-  {
-    id: "RSK-2024-002",
-    title: "Vendor Dependency Risk",
-    category: "Operational",
-    riskLevel: "High",
-    probability: 70,
-    impact: "Medium",
-    riskScore: 7.0,
-    owner: "Mike Johnson",
-    status: "In Progress",
-    identifiedDate: "2024-01-10",
-    reviewDate: "2024-03-10",
-    description: "Over-reliance on single vendor for critical services",
-    mitigationActions: 2,
-    lastUpdate: "2024-01-18"
-  },
-  {
-    id: "RSK-2024-003",
-    title: "Cyber Security Vulnerability",
-    category: "Cyber Security",
-    riskLevel: "Critical",
-    probability: 60,
-    impact: "Critical",
-    riskScore: 9.0,
-    owner: "Sarah Davis",
-    status: "Mitigated",
-    identifiedDate: "2023-12-20",
-    reviewDate: "2024-01-20",
-    description: "Critical vulnerabilities in customer-facing applications",
-    mitigationActions: 5,
-    lastUpdate: "2024-01-22"
-  },
-  {
-    id: "RSK-2024-004",
-    title: "Market Volatility Impact",
-    category: "Financial",
-    riskLevel: "Medium",
-    probability: 45,
-    impact: "High",
-    riskScore: 6.5,
-    owner: "David Wilson",
-    status: "Open",
-    identifiedDate: "2024-01-05",
-    reviewDate: "2024-04-05",
-    description: "Potential impact of market volatility on revenue streams",
-    mitigationActions: 1,
-    lastUpdate: "2024-01-12"
-  },
-  {
-    id: "RSK-2024-005",
-    title: "Reputation Management",
-    category: "Reputational",
-    riskLevel: "Medium",
-    probability: 30,
-    impact: "Medium",
-    riskScore: 4.5,
-    owner: "Lisa Chen",
-    status: "Monitoring",
-    identifiedDate: "2023-11-15",
-    reviewDate: "2024-02-15",
-    description: "Potential negative publicity from recent industry changes",
-    mitigationActions: 2,
-    lastUpdate: "2024-01-08"
-  }
-];
+const centralRisks = CentralDataService.getRisks();
+
+// Transform central data to match component interface
+const mockRisks = centralRisks.map(risk => ({
+  id: risk.id.toUpperCase(),
+  title: risk.title,
+  category: risk.category,
+  riskLevel: risk.severity,
+  probability: risk.probability === 'High' ? 85 : risk.probability === 'Medium' ? 60 : 35,
+  impact: risk.severity,
+  riskScore: risk.riskScore / 10,
+  owner: CentralDataService.getPersonById(risk.ownerId)?.fullName || 'Unassigned',
+  status: risk.status,
+  identifiedDate: risk.identifiedDate.toLocaleDateString(),
+  reviewDate: risk.reviewDate.toLocaleDateString(),
+  description: risk.description,
+  mitigationActions: risk.mitigationStatus === 'In Progress' ? 3 : risk.mitigationStatus === 'Planned' ? 1 : 0,
+  lastUpdate: risk.reviewDate.toLocaleDateString()
+}));
 
 export function RiskRegistry() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,6 +37,8 @@ export function RiskRegistry() {
   const [selectedRiskLevel, setSelectedRiskLevel] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedRisk, setSelectedRisk] = useState<any>(null);
+  const [showRelationships, setShowRelationships] = useState(false);
 
   const filteredRisks = mockRisks.filter(risk => {
     const matchesSearch = risk.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -335,6 +276,18 @@ export function RiskRegistry() {
                         <Button variant="ghost" size="sm">
                           <Edit className="h-3 w-3" />
                         </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRisk(risk);
+                            setShowRelationships(true);
+                          }}
+                          title="View Related Items"
+                        >
+                          <Link className="h-3 w-3" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -344,6 +297,28 @@ export function RiskRegistry() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Relationships Panel */}
+      {showRelationships && selectedRisk && (
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Related Items</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowRelationships(false)}
+            >
+              Close
+            </Button>
+          </div>
+          <RelationshipsPanel
+            itemId={selectedRisk.id.toLowerCase().replace('rsk-2024-', 'risk-')}
+            itemType="risks"
+            itemTitle={selectedRisk.title}
+            onItemClick={(item) => console.log('Related item clicked:', item)}
+          />
+        </div>
+      )}
 
       <AddRiskModal open={showAddModal} onOpenChange={setShowAddModal} />
     </div>

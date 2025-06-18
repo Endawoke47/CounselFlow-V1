@@ -1,60 +1,25 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Filter, AlertTriangle, Clock, User } from "lucide-react";
+import { Search, Filter, AlertTriangle, Clock, User, Link } from "lucide-react";
+import { RelationshipsPanel } from "@/components/ui/relationships-panel";
+import { RelatedItem } from "@/services/relationshipService";
+import { CentralDataService } from "@/services/centralDataService";
 
 interface MattersListProps {
   onMatterSelect: (matter: any) => void;
+  onRelatedItemClick?: (item: RelatedItem) => void;
 }
 
-export function MattersList({ onMatterSelect }: MattersListProps) {
+export function MattersList({ onMatterSelect, onRelatedItemClick }: MattersListProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMatter, setSelectedMatter] = useState<any>(null);
+  const [showRelationships, setShowRelationships] = useState(false);
 
-  const matters = [
-    {
-      id: "MAT-2024-001",
-      title: "Contract Review - Vendor Agreement",
-      businessUnit: "Procurement",
-      owner: "Sarah Chen",
-      status: "In Progress",
-      priority: "High",
-      slaStatus: "On Track",
-      riskLevel: "Medium",
-      createdDate: "2024-01-15",
-      dueDate: "2024-01-25",
-      type: "Contract Review"
-    },
-    {
-      id: "MAT-2024-002", 
-      title: "Employment Law Advice - Remote Work Policy",
-      businessUnit: "HR",
-      owner: "David Park",
-      status: "Pending Review",
-      priority: "Medium",
-      slaStatus: "At Risk",
-      riskLevel: "Low",
-      createdDate: "2024-01-18",
-      dueDate: "2024-01-28",
-      type: "Legal Advice"
-    },
-    {
-      id: "MAT-2024-003",
-      title: "Regulatory Compliance - Data Privacy Assessment",
-      businessUnit: "IT",
-      owner: "Emily Rodriguez",
-      status: "Complete",
-      priority: "High",
-      slaStatus: "Completed",
-      riskLevel: "High",
-      createdDate: "2024-01-10",
-      dueDate: "2024-01-20",
-      type: "Compliance"
-    }
-  ];
+  const matters = CentralDataService.getMatters();
 
   const getStatusBadge = (status: string) => {
     const colors = {
@@ -82,82 +47,121 @@ export function MattersList({ onMatterSelect }: MattersListProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            All Matters
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search matters..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 w-64"
-              />
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              All Matters
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search matters..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 w-64"
+                />
+              </div>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filter
+              </Button>
             </div>
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Matter ID</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Business Unit</TableHead>
+                <TableHead>Owner</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>SLA</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {matters.map((matter) => (
+                <TableRow 
+                  key={matter.id} 
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => onMatterSelect(matter)}
+                >
+                  <TableCell className="font-medium">{matter.matterNumber}</TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{matter.title}</div>
+                      <div className="text-sm text-muted-foreground">{matter.type}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{matter.businessUnit}</TableCell>
+                  <TableCell>{matter.owner}</TableCell>
+                  <TableCell>
+                    <Badge className={getStatusBadge(matter.status)}>
+                      {matter.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getPriorityBadge(matter.priority)}>
+                      {matter.priority}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      {getSLAIcon(matter.slaStatus)}
+                      <span className="text-sm">{matter.slaStatus}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>{matter.dueDate.toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedMatter(matter);
+                        setShowRelationships(true);
+                      }}
+                      title="View Related Items"
+                    >
+                      <Link className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Relationships Panel */}
+      {showRelationships && selectedMatter && (
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Related Items</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowRelationships(false)}
+            >
+              Close
             </Button>
           </div>
+          <RelationshipsPanel
+            itemId={selectedMatter.id.replace('MAT-2024-', 'matter-')}
+            itemType="matters"
+            itemTitle={selectedMatter.title}
+            onItemClick={onRelatedItemClick}
+          />
         </div>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Matter ID</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Business Unit</TableHead>
-              <TableHead>Owner</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>SLA</TableHead>
-              <TableHead>Due Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {matters.map((matter) => (
-              <TableRow 
-                key={matter.id} 
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => onMatterSelect(matter)}
-              >
-                <TableCell className="font-medium">{matter.id}</TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{matter.title}</div>
-                    <div className="text-sm text-muted-foreground">{matter.type}</div>
-                  </div>
-                </TableCell>
-                <TableCell>{matter.businessUnit}</TableCell>
-                <TableCell>{matter.owner}</TableCell>
-                <TableCell>
-                  <Badge className={getStatusBadge(matter.status)}>
-                    {matter.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge className={getPriorityBadge(matter.priority)}>
-                    {matter.priority}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    {getSLAIcon(matter.slaStatus)}
-                    <span className="text-sm">{matter.slaStatus}</span>
-                  </div>
-                </TableCell>
-                <TableCell>{matter.dueDate}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }

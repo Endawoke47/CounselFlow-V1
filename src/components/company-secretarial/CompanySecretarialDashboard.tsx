@@ -15,13 +15,20 @@ import {
   Filter,
   MoreHorizontal,
   MapPin,
-  Briefcase
+  Briefcase,
+  Clock,
+  CheckCircle,
+  BookOpen
 } from "lucide-react";
 import { EntityDetailModal } from "./EntityDetailModal";
 import { AddEntityModal } from "./AddEntityModal";
 import { StatutoryRegisterDetail } from "./StatutoryRegisterDetail";
 import { MeetingScheduler } from "./MeetingScheduler";
 import { GroupStructureViewer } from "./GroupStructureViewer";
+import { AIResolutionDrafter } from "./AIResolutionDrafter";
+import { MeetingCalendar } from "./MeetingCalendar";
+import { BoardPackManager } from "./BoardPackManager";
+import { CentralDataService } from "@/services/centralDataService";
 
 export function CompanySecretarialDashboard() {
   const [selectedEntity, setSelectedEntity] = useState<any>(null);
@@ -30,34 +37,9 @@ export function CompanySecretarialDashboard() {
   const [isMeetingSchedulerOpen, setIsMeetingSchedulerOpen] = useState(false);
   const [selectedRegister, setSelectedRegister] = useState<string | null>(null);
   const [showGroupStructure, setShowGroupStructure] = useState(false);
+  const [activeView, setActiveView] = useState<'dashboard' | 'resolutions' | 'calendar' | 'boardpacks'>('dashboard');
 
-  const entities = [
-    {
-      id: 1,
-      name: "Acme Corporation Ltd",
-      jurisdiction: "United Kingdom",
-      companyNumber: "12345678",
-      status: "Active",
-      pendingFilings: 3
-    },
-    {
-      id: 2,
-      name: "Global Tech Solutions Pte Ltd",
-      jurisdiction: "Singapore",
-      uen: "201912345G",
-      status: "Active",
-      pendingFilings: 1,
-      hasOverdue: true
-    },
-    {
-      id: 3,
-      name: "Innovation Holdings Inc",
-      jurisdiction: "Delaware, USA",
-      fileNumber: "7891234",
-      status: "Dormant",
-      pendingFilings: 0
-    }
-  ];
+  const entities = CentralDataService.getEntities();
 
   const handleEntityClick = (entity: any) => {
     setSelectedEntity(entity);
@@ -87,6 +69,19 @@ export function CompanySecretarialDashboard() {
     );
   }
 
+  // Render different views based on activeView
+  if (activeView === 'resolutions') {
+    return <AIResolutionDrafter />;
+  }
+
+  if (activeView === 'calendar') {
+    return <MeetingCalendar />;
+  }
+
+  if (activeView === 'boardpacks') {
+    return <BoardPackManager />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -98,19 +93,41 @@ export function CompanySecretarialDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button>
+          <Button onClick={() => setActiveView('resolutions')} variant="outline">
+            <Briefcase className="h-4 w-4 mr-2" />
+            AI Resolutions
+          </Button>
+          <Button onClick={() => setActiveView('calendar')} variant="outline">
+            <Calendar className="h-4 w-4 mr-2" />
+            Meeting Calendar
+          </Button>
+          <Button onClick={() => setActiveView('boardpacks')} variant="outline">
+            <FileText className="h-4 w-4 mr-2" />
+            Board Packs
+          </Button>
+          <Button onClick={() => setIsAddEntityModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Entity
-          </Button>
-          <Button variant="outline">
-            <Calendar className="h-4 w-4 mr-2" />
-            Schedule Meeting
           </Button>
         </div>
       </div>
 
+      {/* Quick Access Info */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-start gap-3">
+          <Building2 className="h-5 w-5 text-blue-600 mt-0.5" />
+          <div>
+            <h3 className="font-medium text-blue-900">Entity-Centric Document Management</h3>
+            <p className="text-sm text-blue-700 mt-1">
+              Constitutional documents and statutory registers are now managed per entity. 
+              Click on any entity below to access its documents, registers, and AI-powered features.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Entities</CardTitle>
@@ -118,51 +135,73 @@ export function CompanySecretarialDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">247</div>
-            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
-              <span>Active: 231</span>
-              <span>Dormant: 16</span>
+            <div className="text-xs text-muted-foreground mt-1">
+              <span className="text-green-600">231 Active</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Filings</CardTitle>
+            <CardTitle className="text-sm font-medium">Documents</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
-              <span className="text-red-600">Overdue: 3</span>
-              <span className="text-orange-600">Due: 5</span>
+            <div className="text-2xl font-bold">156</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              <span className="text-blue-600">423 Clauses</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Board Meetings</CardTitle>
+            <CardTitle className="text-sm font-medium">AI Resolutions</CardTitle>
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">89</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              <span className="text-purple-600">34 This Month</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Board Packs</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">34</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              <span className="text-orange-600">12 Pending</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Meetings</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
-            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
-              <span>This Month: 4</span>
-              <span>Upcoming: 8</span>
+            <div className="text-xs text-muted-foreground mt-1">
+              <span className="text-green-600">7 Confirmed</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Compliance Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">Compliance</CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">8</div>
-            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
-              <span className="text-red-600">High: 3</span>
-              <span className="text-orange-600">Medium: 5</span>
+            <div className="text-xs text-muted-foreground mt-1">
+              <span className="text-red-600">3 High Priority</span>
             </div>
           </CardContent>
         </Card>
@@ -170,13 +209,48 @@ export function CompanySecretarialDashboard() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="entities" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="entities">Entity Directory</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="registers">Statutory Registers</TabsTrigger>
           <TabsTrigger value="filings">Regulatory Filings</TabsTrigger>
           <TabsTrigger value="meetings">Meetings & Resolutions</TabsTrigger>
+          <TabsTrigger value="calendar">Meeting Calendar</TabsTrigger>
           <TabsTrigger value="structure">Group Structure</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="documents" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Constitutional Documents</CardTitle>
+                  <CardDescription>AI-powered document analysis and clause extraction - now managed per entity</CardDescription>
+                </div>
+                <Badge variant="outline">Entity-Specific</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-6 border rounded-lg">
+                  <FileText className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-1">Upload & Analyze</h3>
+                  <p className="text-sm text-muted-foreground">Upload constitutional documents for AI analysis</p>
+                </div>
+                <div className="text-center p-6 border rounded-lg">
+                  <Search className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-1">AI Query</h3>
+                  <p className="text-sm text-muted-foreground">Ask questions about your documents</p>
+                </div>
+                <div className="text-center p-6 border rounded-lg">
+                  <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-1">Extract Clauses</h3>
+                  <p className="text-sm text-muted-foreground">Automatically extract key governance clauses</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="entities" className="space-y-4">
           <Card>
@@ -207,17 +281,25 @@ export function CompanySecretarialDashboard() {
                         <Building2 className="h-8 w-8 text-primary" />
                         <div>
                           <h3 className="font-semibold">{entity.name}</h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                             <span className="flex items-center gap-1">
                               <MapPin className="h-3 w-3" />
                               {entity.jurisdiction}
                             </span>
                             <span>
-                              {entity.companyNumber ? `Company Number: ${entity.companyNumber}` : 
-                               entity.uen ? `UEN: ${entity.uen}` : 
-                               `File Number: ${entity.fileNumber}`}
+                              Company Number: {entity.companyNumber}
                             </span>
                             <Badge variant="secondary">{entity.status}</Badge>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <FileText className="h-3 w-3" />
+                              {entity.documentCount} Documents
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <BookOpen className="h-3 w-3" />
+                              {entity.registerEntries} Register Entries
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -356,50 +438,140 @@ export function CompanySecretarialDashboard() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="meetings" className="space-y-4">
+        <TabsContent value="calendar" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Board Meetings & Resolutions</CardTitle>
-              <CardDescription>Manage meeting schedules, agendas, and resolutions</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Meeting Calendar</CardTitle>
+                  <CardDescription>Visual calendar with notice tracking and status management</CardDescription>
+                </div>
+                <Button onClick={() => setActiveView('calendar')}>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  View Calendar
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Upcoming Meetings</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="border-l-4 border-primary pl-4">
-                        <h4 className="font-semibold">Board Meeting - Q4 Review</h4>
-                        <p className="text-sm text-muted-foreground">Acme Corporation Ltd</p>
-                        <p className="text-xs text-muted-foreground">Dec 15, 2024 at 2:00 PM</p>
-                      </div>
-                      <div className="border-l-4 border-primary pl-4">
-                        <h4 className="font-semibold">AGM 2024</h4>
-                        <p className="text-sm text-muted-foreground">Global Tech Solutions Pte Ltd</p>
-                        <p className="text-xs text-muted-foreground">Dec 20, 2024 at 10:00 AM</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-6 border rounded-lg">
+                  <Calendar className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-1">Visual Calendar</h3>
+                  <p className="text-sm text-muted-foreground">Month and list views of all meetings</p>
+                </div>
+                <div className="text-center p-6 border rounded-lg">
+                  <Clock className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-1">Notice Tracking</h3>
+                  <p className="text-sm text-muted-foreground">Track notice requirements and deadlines</p>
+                </div>
+                <div className="text-center p-6 border rounded-lg">
+                  <CheckCircle className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold mb-1">Status Management</h3>
+                  <p className="text-sm text-muted-foreground">Tentative vs confirmed meeting status</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Recent Resolutions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="border rounded p-3">
-                        <h4 className="font-semibold">Resolution #2024-015</h4>
-                        <p className="text-sm text-muted-foreground">Approval of new banking facilities</p>
-                        <Badge variant="secondary" className="mt-2">Approved</Badge>
-                      </div>
-                      <div className="border rounded p-3">
-                        <h4 className="font-semibold">Resolution #2024-014</h4>
-                        <p className="text-sm text-muted-foreground">Director appointment</p>
-                        <Badge variant="secondary" className="mt-2">Approved</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
+        <TabsContent value="meetings" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>AI Resolution Drafter</CardTitle>
+                    <CardDescription>Generate professional resolutions with AI</CardDescription>
+                  </div>
+                  <Button onClick={() => setActiveView('resolutions')} variant="outline">
+                    <Briefcase className="h-4 w-4 mr-2" />
+                    Draft Resolution
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center p-6 border rounded-lg">
+                    <Briefcase className="h-8 w-8 mx-auto mb-2 text-primary" />
+                    <h3 className="font-semibold mb-1">AI-Powered Templates</h3>
+                    <p className="text-sm text-muted-foreground">Director appointments, banking resolutions, share allotments</p>
+                  </div>
+                  <div className="text-center p-6 border rounded-lg">
+                    <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                    <h3 className="font-semibold mb-1">Auto Execution Blocks</h3>
+                    <p className="text-sm text-muted-foreground">Automatically populate signature blocks for directors</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Board Pack Manager</CardTitle>
+                    <CardDescription>Create and distribute board packs with e-signature</CardDescription>
+                  </div>
+                  <Button onClick={() => setActiveView('boardpacks')} variant="outline">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Manage Packs
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-center p-6 border rounded-lg">
+                    <FileText className="h-8 w-8 mx-auto mb-2 text-primary" />
+                    <h3 className="font-semibold mb-1">Document Upload</h3>
+                    <p className="text-sm text-muted-foreground">Upload agendas, reports, and resolutions</p>
+                  </div>
+                  <div className="text-center p-6 border rounded-lg">
+                    <CheckCircle className="h-8 w-8 mx-auto mb-2 text-primary" />
+                    <h3 className="font-semibold mb-1">E-Signature Workflow</h3>
+                    <p className="text-sm text-muted-foreground">Send board packs for director signatures</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Meeting Activity</CardTitle>
+              <CardDescription>Latest meetings and resolutions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-medium mb-3">Upcoming Meetings</h4>
+                  <div className="space-y-3">
+                    <div className="border-l-4 border-primary pl-4">
+                      <h5 className="font-semibold">Board Meeting - Q4 Review</h5>
+                      <p className="text-sm text-muted-foreground">Acme Corporation Ltd</p>
+                      <p className="text-xs text-muted-foreground">Dec 15, 2024 at 2:00 PM</p>
+                    </div>
+                    <div className="border-l-4 border-primary pl-4">
+                      <h5 className="font-semibold">AGM 2024</h5>
+                      <p className="text-sm text-muted-foreground">Global Tech Solutions Pte Ltd</p>
+                      <p className="text-xs text-muted-foreground">Dec 20, 2024 at 10:00 AM</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-3">Recent Resolutions</h4>
+                  <div className="space-y-3">
+                    <div className="border rounded p-3">
+                      <h5 className="font-semibold">Resolution #2024-015</h5>
+                      <p className="text-sm text-muted-foreground">Approval of new banking facilities</p>
+                      <Badge variant="secondary" className="mt-2">Approved</Badge>
+                    </div>
+                    <div className="border rounded p-3">
+                      <h5 className="font-semibold">Resolution #2024-014</h5>
+                      <p className="text-sm text-muted-foreground">Director appointment</p>
+                      <Badge variant="secondary" className="mt-2">Approved</Badge>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>

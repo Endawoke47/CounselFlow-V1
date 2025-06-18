@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -99,9 +98,8 @@ export function UserDirectory() {
     return matchesSearch && matchesStatus && matchesRole;
   });
 
-  const handleUserAction = (action: string, data?: any) => {
+  const handleUserAction = (action: string, data: any) => {
     console.log("User action:", action, data);
-    // Handle different user actions here
   };
 
   return (

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Filter, Plus, Shield, FileText, Eye, Calendar } from "lucide-react";
 import { AddIPAssetModal } from "./AddIPAssetModal";
 import { IPAssetDetailModal } from "./IPAssetDetailModal";
+import { CentralDataService } from "@/services/centralDataService";
 
 export function IPAssetRegister() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,78 +18,23 @@ export function IPAssetRegister() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const assets = [
-    {
-      id: "PAT-001",
-      title: "Machine Learning Data Processing Algorithm",
-      type: "Patent",
-      status: "Active",
-      jurisdiction: "US, EU, UK",
-      filingDate: "2023-03-15",
-      expiryDate: "2043-03-15",
-      inventor: "Dr. Sarah Chen",
-      assignee: "TechCorp Inc.",
-      renewalDue: "2024-03-15",
-      value: "$450,000",
-      maintenanceCost: "$12,500"
-    },
-    {
-      id: "TM-045",
-      title: "CounselFlow Brand Name",
-      type: "Trademark",
-      status: "Active",
-      jurisdiction: "Global",
-      filingDate: "2022-01-10",
-      expiryDate: "2032-01-10",
-      inventor: "Legal Team",
-      assignee: "CounselFlow Ltd.",
-      renewalDue: "2024-03-22",
-      value: "$125,000",
-      maintenanceCost: "$3,200"
-    },
-    {
-      id: "PAT-023",
-      title: "Automated Contract Analysis System",
-      type: "Patent",
-      status: "Pending",
-      jurisdiction: "US",
-      filingDate: "2023-11-20",
-      expiryDate: "2043-11-20",
-      inventor: "David Park",
-      assignee: "TechCorp Inc.",
-      renewalDue: "N/A",
-      value: "$320,000",
-      maintenanceCost: "$0"
-    },
-    {
-      id: "CR-089",
-      title: "Legal Documentation Templates",
-      type: "Copyright",
-      status: "Active",
-      jurisdiction: "US, EU",
-      filingDate: "2022-06-05",
-      expiryDate: "2092-06-05",
-      inventor: "Emily Rodriguez",
-      assignee: "CounselFlow Ltd.",
-      renewalDue: "N/A",
-      value: "$85,000",
-      maintenanceCost: "$0"
-    },
-    {
-      id: "TS-156",
-      title: "Proprietary Risk Assessment Formula",
-      type: "Trade Secret",
-      status: "Active",
-      jurisdiction: "Internal",
-      filingDate: "2021-09-12",
-      expiryDate: "Indefinite",
-      inventor: "Risk Analysis Team",
-      assignee: "TechCorp Inc.",
-      renewalDue: "N/A",
-      value: "$280,000",
-      maintenanceCost: "$500"
-    }
-  ];
+  const centralIPAssets = CentralDataService.getIPAssets();
+  
+  // Transform central data to match component interface
+  const assets = centralIPAssets.map(asset => ({
+    id: asset.applicationNumber || asset.id.toUpperCase(),
+    title: asset.title,
+    type: asset.type,
+    status: asset.status,
+    jurisdiction: asset.jurisdiction,
+    filingDate: asset.filingDate.toLocaleDateString(),
+    expiryDate: asset.expirationDate ? asset.expirationDate.toLocaleDateString() : 'N/A',
+    inventor: asset.inventorIds.map(id => CentralDataService.getPersonById(id)?.fullName).filter(Boolean).join(', ') || 'Unknown',
+    assignee: CentralDataService.getEntityById(asset.assigneeId)?.name || 'Unknown Entity',
+    renewalDue: asset.expirationDate ? asset.expirationDate.toLocaleDateString() : 'N/A',
+    value: `$${asset.estimatedValue.toLocaleString()}`,
+    maintenanceCost: `$${asset.maintenanceFees.toLocaleString()}`
+  }));
 
   const getTypeColor = (type: string) => {
     switch (type) {

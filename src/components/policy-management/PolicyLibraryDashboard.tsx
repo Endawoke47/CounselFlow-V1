@@ -9,45 +9,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Upload, FileText, Search, Filter } from "lucide-react";
 import { AddPolicyModal } from "./AddPolicyModal";
 import { PolicyDetailModal } from "./PolicyDetailModal";
+import { CentralDataService } from "@/services/centralDataService";
 
-const mockPolicies = [
-  {
-    id: "1",
-    title: "Data Protection Policy",
-    version: "2.1",
-    entity: "TechCorp UK Ltd",
-    jurisdiction: "United Kingdom",
-    type: "Data Privacy",
-    effectiveDate: "2024-01-15",
-    status: "Active",
-    lastUpdated: "2024-01-10",
-    owner: "Sarah Johnson"
-  },
-  {
-    id: "2", 
-    title: "Code of Conduct",
-    version: "1.5",
-    entity: "TechCorp GmbH",
-    jurisdiction: "Germany",
-    type: "Ethics & Compliance",
-    effectiveDate: "2024-02-01",
-    status: "Draft",
-    lastUpdated: "2024-01-28",
-    owner: "Michael Schmidt"
-  },
-  {
-    id: "3",
-    title: "Anti-Money Laundering Policy",
-    version: "3.0",
-    entity: "TechCorp Inc",
-    jurisdiction: "United States",
-    type: "Financial Compliance",
-    effectiveDate: "2024-03-01",
-    status: "In Review",
-    lastUpdated: "2024-02-15",
-    owner: "Jennifer Chen"
-  }
-];
+const centralPolicies = CentralDataService.getPolicies();
+
+// Transform central data to match component interface
+const mockPolicies = centralPolicies.map(policy => ({
+  id: policy.id,
+  title: policy.title,
+  version: policy.version,
+  entity: CentralDataService.getEntityById(policy.entityId)?.name || 'Unknown Entity',
+  jurisdiction: policy.applicableJurisdictions.join(', '),
+  type: policy.type,
+  effectiveDate: policy.effectiveDate.toLocaleDateString(),
+  status: policy.status,
+  lastUpdated: policy.lastUpdated.toLocaleDateString(),
+  owner: CentralDataService.getPersonById(policy.ownerId)?.fullName || 'Unknown'
+}));
 
 export function PolicyLibraryDashboard() {
   const [addModalOpen, setAddModalOpen] = useState(false);

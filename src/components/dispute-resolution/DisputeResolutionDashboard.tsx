@@ -6,7 +6,7 @@ import { DisputesOverview } from "./DisputesOverview";
 import { DisputesList } from "./DisputesList";
 import { ReportingDashboard } from "./ReportingDashboard";
 import { AddDisputeModal } from "./AddDisputeModal";
-import { ImportExcelModal } from "./ImportExcelModal";
+import { ExcelImportModal } from "@/components/shared/ExcelImportModal";
 import { Plus, Upload } from "lucide-react";
 
 export function DisputeResolutionDashboard() {
@@ -62,9 +62,32 @@ export function DisputeResolutionDashboard() {
         open={showAddDispute} 
         onOpenChange={setShowAddDispute} 
       />
-      <ImportExcelModal 
+      <ExcelImportModal 
         open={showImportExcel} 
-        onOpenChange={setShowImportExcel} 
+        onOpenChange={setShowImportExcel}
+        title="Import Disputes from Excel"
+        description="Upload an Excel file to bulk import dispute data"
+        templateColumns={[
+          'Dispute Title', 'Entity', 'Counterparty', 'Status', 'Priority',
+          'Exposure Amount', 'Currency', 'Initiated Date', 'Deadline', 'Owner', 'Case Type'
+        ]}
+        onImport={async (data) => {
+          console.log('Importing disputes:', data);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }}
+        sampleData={[{
+          'Dispute Title': 'Contract Breach - Vendor ABC',
+          'Entity': 'Acme Corporation Ltd',
+          'Counterparty': 'ABC Supplies Inc',
+          'Status': 'In Review',
+          'Priority': 'High',
+          'Exposure Amount': '250000',
+          'Currency': 'USD',
+          'Initiated Date': '2024-01-15',
+          'Deadline': '2024-03-15',
+          'Owner': 'Sarah Johnson',
+          'Case Type': 'Contract Dispute'
+        }]}
       />
     </div>
   );

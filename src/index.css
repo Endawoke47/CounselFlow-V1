@@ -1,89 +1,107 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/* Import Inter font for professional typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Desktop-First Legal Workflow Design System */
 
 @layer base {
   :root {
+    /* Light Mode - Professional Legal Theme */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --foreground: 210 11% 15%;
+    
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 210 11% 15%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
+    --popover-foreground: 210 11% 15%;
+    
+    /* Deep navy blue for primary elements */
+    --primary: 210 50% 25%;
+    --primary-foreground: 0 0% 98%;
+    
+    /* Slate blue for secondary elements */
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 210 50% 25%;
+    
+    --muted: 210 40% 98%;
+    --muted-foreground: 215 16% 47%;
+    
+    /* Emerald green for success states and CTAs */
+    --accent: 158 64% 52%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 210 50% 25%;
+    
     --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    
+    /* Sidebar colors for light mode */
+    --sidebar-background: 210 40% 98%;
+    --sidebar-foreground: 210 11% 15%;
+    --sidebar-primary: 210 50% 25%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 214 32% 91%;
+    --sidebar-accent-foreground: 210 50% 25%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 210 50% 25%;
+    
+    /* Desktop-specific spacing variables */
+    --desktop-sidebar-width: 240px;
+    --desktop-header-height: 64px;
+    --desktop-content-padding: 32px;
+    --desktop-card-gap: 24px;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    /* Dark Mode - Professional Legal Theme */
+    --background: 222 47% 11%;
     --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
     
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --card: 224 71% 4%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 224 71% 4%;
+    --popover-foreground: 210 40% 98%;
+    
+    /* Light blue for primary elements in dark mode */
+    --primary: 213 94% 68%;
+    --primary-foreground: 222 47% 11%;
+    
+    /* Sky blue for secondary elements */
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20% 65%;
+    
+    /* Emerald green for success states and CTAs */
+    --accent: 158 64% 52%;
+    --accent-foreground: 222 47% 11%;
+    
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 213 94% 68%;
+    
+    /* Sidebar colors for dark mode */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 213 94% 68%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 215 28% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 213 94% 68%;
   }
 }
 
@@ -93,14 +111,160 @@
   }
 
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.5;
+    font-size: 15px; /* Desktop-optimized base font size */
   }
   
-  /* Smooth transitions for theme changes */
+  /* Desktop-optimized typography scale */
+  h1 {
+    @apply text-4xl font-semibold leading-tight;
+    line-height: 1.3;
+  }
+  
+  h2 {
+    @apply text-3xl font-semibold leading-tight;
+    line-height: 1.3;
+  }
+  
+  h3 {
+    @apply text-xl font-semibold leading-tight;
+    line-height: 1.3;
+  }
+  
+  h4 {
+    @apply text-lg font-semibold leading-tight;
+    line-height: 1.3;
+  }
+  
+  /* Table text optimization for desktop density */
+  .table-text {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  /* Caption and secondary text */
+  .text-caption {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  
+  /* Smooth transitions for theme changes and interactions */
   * {
-    transition-property: background-color, border-color, color, fill, stroke;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 300ms;
+  }
+  
+  /* Desktop-specific hover effects */
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Professional focus styles for keyboard navigation */
+  .focus-ring:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  
+  /* Custom scrollbar for desktop */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+  
+  /* Desktop-optimized card shadows */
+  .card-shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  .card-shadow-hover:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Professional table styles */
+  .data-table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .data-table th {
+    height: 48px;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 1px solid hsl(var(--border));
+    background: hsl(var(--muted) / 0.5);
+  }
+  
+  .data-table td {
+    height: 48px;
+    padding: 12px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  
+  .data-table tr:hover {
+    background: hsl(var(--muted) / 0.5);
+  }
+}
+
+/* Desktop-specific utility classes */
+@layer utilities {
+  .desktop-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 var(--desktop-content-padding);
+  }
+  
+  .desktop-grid {
+    display: grid;
+    gap: var(--desktop-card-gap);
+  }
+  
+  .desktop-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .desktop-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  @media (min-width: 1920px) {
+    .desktop-grid-4-wide {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  .sidebar-width {
+    width: var(--desktop-sidebar-width);
+  }
+  
+  .header-height {
+    height: var(--desktop-header-height);
+  }
+  
+  .content-padding {
+    padding: var(--desktop-content-padding);
+  }
+  
+  .card-gap {
+    gap: var(--desktop-card-gap);
   }
 }

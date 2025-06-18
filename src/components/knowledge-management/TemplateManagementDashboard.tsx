@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,9 +5,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, FileText, GitBranch, Download, Eye, Edit } from "lucide-react";
+import { Plus, FileText, GitBranch, Download, Eye, Edit, Link } from "lucide-react";
 import { AddTemplateModal } from "./AddTemplateModal";
 import { TemplateDetailModal } from "./TemplateDetailModal";
+import { RelationshipsPanel } from "@/components/ui/relationships-panel";
+import { RelatedItem } from "@/services/relationshipService";
 
 const mockTemplates = [
   {
@@ -73,6 +74,7 @@ export function TemplateManagementDashboard() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [jurisdictionFilter, setJurisdictionFilter] = useState("all");
+  const [showRelationships, setShowRelationships] = useState(false);
 
   const handleViewTemplate = (template: any) => {
     setSelectedTemplate(template);
@@ -262,6 +264,18 @@ export function TemplateManagementDashboard() {
                       <Button variant="outline" size="sm">
                         <Download className="h-4 w-4" />
                       </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTemplate(template);
+                          setShowRelationships(true);
+                        }}
+                        title="View Related Items"
+                      >
+                        <Link className="h-4 w-4" />
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -270,6 +284,28 @@ export function TemplateManagementDashboard() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Relationships Panel */}
+      {showRelationships && selectedTemplate && (
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Related Items</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowRelationships(false)}
+            >
+              Close
+            </Button>
+          </div>
+          <RelationshipsPanel
+            itemId={`template-${selectedTemplate.id.padStart(3, '0')}`}
+            itemType="templates"
+            itemTitle={selectedTemplate.title}
+            onItemClick={(item) => console.log('Related item clicked:', item)}
+          />
+        </div>
+      )}
 
       <AddTemplateModal open={addModalOpen} onOpenChange={setAddModalOpen} />
       <TemplateDetailModal 

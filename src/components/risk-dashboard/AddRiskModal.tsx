@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -31,10 +30,18 @@ export function AddRiskModal({ open, onOpenChange }: AddRiskModalProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Handle form submission
-    console.log("Risk data:", formData);
-    onOpenChange(false);
-    // Reset form
+    
+    // 🔄 DUMMY DATA FLAG: This form submission needs to be connected to your backend API
+    // Replace this with actual API call to save risk data
+    try {
+      // await saveRiskData(formData);
+      // Show success message
+    } catch (error) {
+      // Handle error appropriately
+      console.error("Failed to save risk data:", error);
+    }
+    
+    // Reset form and close modal
     setFormData({
       title: "",
       description: "",
@@ -46,6 +53,7 @@ export function AddRiskModal({ open, onOpenChange }: AddRiskModalProps) {
       identifiedDate: new Date(),
       reviewDate: undefined
     });
+    onOpenChange(false);
   };
 
   return (

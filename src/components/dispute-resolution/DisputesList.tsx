@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,13 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Filter, Download, Eye, Edit, MoreHorizontal } from "lucide-react";
+import { Search, Filter, Download, Eye, Edit, MoreHorizontal, Link, Upload } from "lucide-react";
 import { DisputeDetailModal } from "./DisputeDetailModal";
+import { RelationshipsPanel } from "@/components/ui/relationships-panel";
+import { RelatedItem } from "@/services/relationshipService";
+import { ExcelImportModal } from "@/components/shared/ExcelImportModal";
+import { ExcelExportModal } from "@/components/shared/ExcelExportModal";
 
 export function DisputesList() {
   const [selectedDisputes, setSelectedDisputes] = useState<string[]>([]);
   const [showDisputeDetail, setShowDisputeDetail] = useState(false);
   const [selectedDisputeId, setSelectedDisputeId] = useState<string | null>(null);
+  const [selectedDispute, setSelectedDispute] = useState<any>(null);
+  const [showRelationships, setShowRelationships] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const disputes = [
     {
@@ -117,6 +124,35 @@ export function DisputesList() {
     setShowDisputeDetail(true);
   };
 
+  // Excel import/export configuration
+  const disputeColumns = [
+    { key: 'title', label: 'Dispute Title', type: 'text' as const },
+    { key: 'entity', label: 'Entity', type: 'text' as const },
+    { key: 'counterparty', label: 'Counterparty', type: 'text' as const },
+    { key: 'status', label: 'Status', type: 'text' as const },
+    { key: 'priority', label: 'Priority', type: 'text' as const },
+    { key: 'exposure', label: 'Exposure Amount', type: 'currency' as const },
+    { key: 'currency', label: 'Currency', type: 'text' as const },
+    { key: 'initiated', label: 'Initiated Date', type: 'date' as const },
+    { key: 'deadline', label: 'Deadline', type: 'date' as const },
+    { key: 'owner', label: 'Owner', type: 'text' as const },
+    { key: 'caseType', label: 'Case Type', type: 'text' as const }
+  ];
+
+  const handleImportDisputes = async (data: any[]) => {
+    // In a real implementation, this would call an API to import the disputes
+    console.log('Importing disputes:', data);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  };
+
+  const handleExportDisputes = async (config: any) => {
+    // In a real implementation, this would prepare the data for export
+    console.log('Exporting disputes with config:', config);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -132,7 +168,19 @@ export function DisputesList() {
                   Bulk Actions ({selectedDisputes.length})
                 </Button>
               )}
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowImportModal(true)}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Import
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowExportModal(true)}
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
@@ -239,13 +287,27 @@ export function DisputesList() {
                   </TableCell>
                   <TableCell className="text-muted-foreground">{dispute.deadline}</TableCell>
                   <TableCell>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => handleViewDispute(dispute.id)}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleViewDispute(dispute.id)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDispute(dispute);
+                          setShowRelationships(true);
+                        }}
+                        title="View Related Items"
+                      >
+                        <Link className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -254,10 +316,66 @@ export function DisputesList() {
         </CardContent>
       </Card>
 
+      {/* Relationships Panel */}
+      {showRelationships && selectedDispute && (
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Related Items</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowRelationships(false)}
+            >
+              Close
+            </Button>
+          </div>
+          <RelationshipsPanel
+            itemId={selectedDispute.id.toLowerCase().replace('dis-', 'dispute-')}
+            itemType="disputes"
+            itemTitle={selectedDispute.title}
+            onItemClick={(item) => console.log('Related item clicked:', item)}
+          />
+        </div>
+      )}
+
       <DisputeDetailModal 
         open={showDisputeDetail} 
         onOpenChange={setShowDisputeDetail}
         disputeId={selectedDisputeId}
+      />
+
+      {/* Import Modal */}
+      <ExcelImportModal
+        open={showImportModal}
+        onOpenChange={setShowImportModal}
+        title="Import Disputes from Excel"
+        description="Upload an Excel file to bulk import dispute data"
+        templateColumns={disputeColumns.map(col => col.label)}
+        onImport={handleImportDisputes}
+        sampleData={[{
+          'Dispute Title': 'Contract Breach - Vendor ABC',
+          'Entity': 'Acme Corporation Ltd',
+          'Counterparty': 'ABC Supplies Inc',
+          'Status': 'In Review',
+          'Priority': 'High',
+          'Exposure Amount': '250000',
+          'Currency': 'USD',
+          'Initiated Date': '2024-01-15',
+          'Deadline': '2024-03-15',
+          'Owner': 'Sarah Johnson',
+          'Case Type': 'Contract Dispute'
+        }]}
+      />
+
+      {/* Export Modal */}
+      <ExcelExportModal
+        open={showExportModal}
+        onOpenChange={setShowExportModal}
+        title="Export Disputes to Excel"
+        description="Export dispute data to Excel or CSV format"
+        data={disputes}
+        columns={disputeColumns}
+        onExport={handleExportDisputes}
       />
     </div>
   );

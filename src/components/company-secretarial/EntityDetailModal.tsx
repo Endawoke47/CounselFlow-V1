@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, MapPin, Users, FileText, Calendar, Edit, Trash2, Download } from "lucide-react";
+import { Building2, MapPin, Users, FileText, Calendar, Edit, Trash2, Download, Upload, Search, BookOpen } from "lucide-react";
+import { EntityDocumentManagement } from "./EntityDocumentManagement";
+import { EntityStatutoryRegisters } from "./EntityStatutoryRegisters";
 
 interface EntityDetailModalProps {
   entity: any;
@@ -30,10 +32,12 @@ export function EntityDetailModal({ entity, isOpen, onClose }: EntityDetailModal
         </DialogHeader>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="directors">Directors</TabsTrigger>
             <TabsTrigger value="shares">Shares</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="registers">Registers</TabsTrigger>
             <TabsTrigger value="filings">Filings</TabsTrigger>
             <TabsTrigger value="meetings">Meetings</TabsTrigger>
           </TabsList>
@@ -166,6 +170,20 @@ export function EntityDetailModal({ entity, isOpen, onClose }: EntityDetailModal
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <EntityDocumentManagement 
+              entityId={entity.id} 
+              entityName={entity.name} 
+            />
+          </TabsContent>
+
+          <TabsContent value="registers">
+            <EntityStatutoryRegisters 
+              entityId={entity.id} 
+              entityName={entity.name} 
+            />
           </TabsContent>
 
           <TabsContent value="filings" className="space-y-4">

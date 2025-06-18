@@ -1,77 +1,38 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, AlertTriangle, Clock, CheckCircle, User, Calendar } from "lucide-react";
+import { Search, AlertTriangle, Clock, CheckCircle, User, Calendar, Link } from "lucide-react";
+import { RelationshipsPanel } from "@/components/ui/relationships-panel";
+import { RelatedItem } from "@/services/relationshipService";
+import { CentralDataService } from "@/services/centralDataService";
 
-export function TaskListView() {
+interface TaskListViewProps {
+  onRelatedItemClick?: (item: RelatedItem) => void;
+}
+
+export function TaskListView({ onRelatedItemClick }: TaskListViewProps = {}) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+  const [showRelationships, setShowRelationships] = useState(false);
 
-  const tasks = [
-    {
-      id: "TASK-001",
-      title: "Review supplier contract renewal",
-      module: "Contracts",
-      assignee: "Sarah Chen",
-      priority: "High",
-      status: "In Progress",
-      dueDate: "2024-01-25",
-      entity: "Global Holdings",
-      description: "Annual renewal review for critical supplier agreement",
-      overdue: false
-    },
-    {
-      id: "TASK-002",
-      title: "File patent opposition response",
-      module: "IP Management",
-      assignee: "David Park",
-      priority: "Critical",
-      status: "Not Started",
-      dueDate: "2024-01-20",
-      entity: "Technology Division",
-      description: "Respond to patent opposition within statutory deadline",
-      overdue: true
-    },
-    {
-      id: "TASK-003",
-      title: "Complete GDPR compliance audit",
-      module: "Compliance",
-      assignee: "Emily Rodriguez",
-      priority: "Medium",
-      status: "Completed",
-      dueDate: "2024-01-15",
-      entity: "EU Operations",
-      description: "Quarterly GDPR compliance review and documentation",
-      overdue: false
-    },
-    {
-      id: "TASK-004",
-      title: "Prepare board resolution for AGM",
-      module: "Company Secretarial",
-      assignee: "Michael Kim",
-      priority: "High",
-      status: "In Progress",
-      dueDate: "2024-01-30",
-      entity: "Corporate",
-      description: "Draft resolutions for annual general meeting",
-      overdue: false
-    },
-    {
-      id: "TASK-005",
-      title: "Review litigation settlement proposal",
-      module: "Disputes",
-      assignee: "Lisa Wang",
-      priority: "High",
-      status: "Blocked",
-      dueDate: "2024-01-28",
-      entity: "APAC Operations",
-      description: "Evaluate settlement terms and commercial impact",
-      overdue: false
-    }
-  ];
+  const centralTasks = CentralDataService.getTasks();
+  
+  // Transform central data to match component interface
+  const tasks = centralTasks.map(task => ({
+    id: task.id.toUpperCase(),
+    title: task.title,
+    module: task.type,
+    assignee: CentralDataService.getPersonById(task.assigneeId)?.fullName || 'Unassigned',
+    priority: task.priority,
+    status: task.status,
+    dueDate: task.dueDate.toLocaleDateString(),
+    entity: CentralDataService.getEntityById(task.entityId)?.name || 'Unknown Entity',
+    description: task.description,
+    overdue: task.dueDate < new Date() && task.status !== 'Completed'
+  }));
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -237,9 +198,23 @@ export function TaskListView() {
                   </TableCell>
                   <TableCell>{task.entity}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm">
-                      View
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTask(task);
+                          setShowRelationships(true);
+                        }}
+                        title="View Related Items"
+                      >
+                        <Link className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -247,6 +222,28 @@ export function TaskListView() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Relationships Panel */}
+      {showRelationships && selectedTask && (
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Related Items</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowRelationships(false)}
+            >
+              Close
+            </Button>
+          </div>
+          <RelationshipsPanel
+            itemId={selectedTask.id.toLowerCase().replace('task-', 'task-')}
+            itemType="tasks"
+            itemTitle={selectedTask.title}
+            onItemClick={onRelatedItemClick}
+          />
+        </div>
+      )}
     </div>
   );
 }
