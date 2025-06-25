@@ -9,13 +9,13 @@
   :root {
     /* Light Mode - Professional Legal Theme */
     --background: 0 0% 100%;
-    --foreground: 210 11% 15%;
+    --foreground: #101622; /* 10% darker and bluer */
     
     --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
+    --card-foreground: #101622;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
+    --popover-foreground: #101622;
     
     /* Deep navy blue for primary elements */
     --primary: 210 50% 25%;
@@ -62,10 +62,10 @@
     --accent-blue-hover: #A9C6EA;
     --accent-blue-light: #EAF3FB;
     --accent-blue-subtle: #F5F8FC;
-    --text-primary: #1A1D29;
-    --text-secondary: #4A5568;
+    --text-primary: #101622;
+    --text-secondary: #22304a;
     --text-light: #FFFFFF;
-    --text-muted: #718096;
+    --text-muted: #3a4a66;
     --glass-white: rgba(230, 237, 245, 0.55); /* lighter, more gray */
     --glass-white-strong: rgba(230, 237, 245, 0.75);
     --glass-dark: rgba(26, 29, 41, 0.10);
@@ -85,21 +85,21 @@
     --ral-7004: rgba(156, 156, 156, 0.75); /* Signal grey */
     --ral-5009: rgba(47, 91, 120, 0.75);   /* Azure blue (for highlight) */
     --glass-gradient: linear-gradient(135deg, var(--ral-1013), var(--ral-7004) 60%, var(--ral-5008));
-    --glassmorph-bg: linear-gradient(120deg, var(--ral-1013) 0%, var(--ral-7004) 60%, var(--ral-5008) 100%);
+    --glassmorph-bg: linear-gradient(120deg, rgba(210,220,240,0.96) 0%, rgba(136,156,186,0.88) 60%, rgba(44,69,109,0.85) 100%);
     --glassmorph-blur: blur(32px);
-    --glassmorph-opacity: 0.5;
-    --glassmorph-border: 1.5px solid rgba(47, 91, 120, 0.18);
+    --glassmorph-opacity: 0.88; /* more solid glass for text clarity */
+    --glassmorph-border: 1.5px solid rgba(44, 69, 109, 0.22);
     --glassmorph-hover: var(--ral-5009);
   }
 
   .dark {
     /* Upscaled Dark Mode - Vibrant Legal Theme (now lighter blue-glass) */
     --background: 220 100% 97%; /* very light blue */
-    --foreground: 210 40% 18%;
+    --foreground: #eaf2ff;
     --card: 220 100% 99% / 0.85; /* glassmorphism base, lighter */
-    --card-foreground: 210 40% 18%;
+    --card-foreground: #eaf2ff;
     --popover: 220 100% 99% / 0.85;
-    --popover-foreground: 210 40% 18%;
+    --popover-foreground: #eaf2ff;
     --primary: 210 80% 80%; /* much lighter blue */
     --primary-foreground: 210 40% 18%;
     --secondary: 210 60% 92%;
@@ -127,6 +127,10 @@
     --glass-dark: rgba(26, 29, 41, 0.10);
     --glass-blue: rgba(195, 216, 242, 0.5);
     --glass-blue-strong: rgba(195, 216, 242, 0.7);
+    
+    --glassmorph-opacity: 0.94;
+    --glassmorph-bg: linear-gradient(120deg, rgba(210,220,240,0.22) 0%, rgba(136,156,186,0.22) 60%, rgba(44,69,109,0.28) 100%);
+    --glassmorph-border: 1.5px solid rgba(210,220,240,0.18);
   }
 }
 
@@ -357,5 +361,14 @@
     border-radius: 9999px;
     box-shadow: 0 0 0 4px rgba(47, 91, 120, 0.12);
     transition: background 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  
+  .tab-highlight, .clickable-highlight:hover, .clickable-highlight:focus {
+    background: var(--highlight-blue) !important;
+    opacity: 0.95;
+    border-radius: 9999px;
+    box-shadow: 0 0 0 4px rgba(24, 44, 88, 0.18);
+    color: #fff !important;
+    transition: background 0.2s cubic-bezier(0.4,0,0.2,1), box-shadow 0.2s cubic-bezier(0.4,0,0.2,1), color 0.2s;
   }
 }
