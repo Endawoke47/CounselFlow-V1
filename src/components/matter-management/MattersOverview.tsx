@@ -1,59 +1,87 @@
-
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Clock, AlertTriangle, TrendingUp, Users, Target } from "lucide-react";
 
 export function MattersOverview() {
-  const stats = [
-    {
-      title: "Open Matters",
-      value: "47",
-      change: "+3 this week",
-      icon: FileText,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50"
-    },
-    {
-      title: "SLA Breaches",
-      value: "5",
-      change: "-2 from last week",
-      icon: AlertTriangle,
-      color: "text-red-600",
-      bgColor: "bg-red-50"
-    },
-    {
-      title: "Advice Requests",
-      value: "23",
-      change: "+8 this week",
-      icon: Clock,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50"
-    },
-    {
-      title: "Avg Resolution Time",
-      value: "12.5 days",
-      change: "-1.2 days",
-      icon: TrendingUp,
-      color: "text-green-600",
-      bgColor: "bg-green-50"
-    },
-    {
-      title: "Active Risks",
-      value: "8",
-      change: "2 high priority",
-      icon: Target,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50"
-    },
-    {
-      title: "Team Workload",
-      value: "85%",
-      change: "Capacity utilization",
-      icon: Users,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-50"
+  const [stats, setStats] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchStats() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch stats from Supabase
+        const [matters, advice, risks] = await Promise.all([
+          supabase.from("matters").select("id, status, sla_breached, resolution_time"),
+          supabase.from("advice_requests").select("id, created_at"),
+          supabase.from("risks").select("id, priority, status")
+        ]);
+        setStats([
+          {
+            title: "Open Matters",
+            value: matters.data?.filter((m: any) => m.status === "open").length || 0,
+            change: "", // Optionally calculate change
+            icon: FileText,
+            color: "text-blue-600",
+            bgColor: "bg-blue-50"
+          },
+          {
+            title: "SLA Breaches",
+            value: matters.data?.filter((m: any) => m.sla_breached).length || 0,
+            change: "",
+            icon: AlertTriangle,
+            color: "text-red-600",
+            bgColor: "bg-red-50"
+          },
+          {
+            title: "Advice Requests",
+            value: advice.data?.length || 0,
+            change: "",
+            icon: Clock,
+            color: "text-orange-600",
+            bgColor: "bg-orange-50"
+          },
+          {
+            title: "Avg Resolution Time",
+            value: matters.data && matters.data.length > 0 ? `${(
+              matters.data.reduce((sum: number, m: any) => sum + (m.resolution_time || 0), 0) / matters.data.length
+            ).toFixed(1)} days` : "-",
+            change: "",
+            icon: TrendingUp,
+            color: "text-green-600",
+            bgColor: "bg-green-50"
+          },
+          {
+            title: "Active Risks",
+            value: risks.data?.filter((r: any) => r.status === "active").length || 0,
+            change: risks.data?.filter((r: any) => r.priority === "high").length + " high priority" || "",
+            icon: Target,
+            color: "text-purple-600",
+            bgColor: "bg-purple-50"
+          },
+          {
+            title: "Team Workload",
+            value: "-",
+            change: "Capacity utilization",
+            icon: Users,
+            color: "text-indigo-600",
+            bgColor: "bg-indigo-50"
+          }
+        ]);
+      } catch (e) {
+        setError("Failed to load matter stats.");
+      }
+      setLoading(false);
     }
-  ];
+    fetchStats();
+  }, []);
+
+  if (loading) return <div className="p-6">Loading matter stats...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">

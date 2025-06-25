@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,56 +6,32 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, AlertTriangle, Clock, Shield, Search, Eye, Edit } from "lucide-react";
-
-const mockBreaches = [
-  {
-    id: "BR-001",
-    title: "Email Server Security Incident",
-    discoveryDate: "2024-01-15",
-    severity: "High",
-    status: "Investigation",
-    dataTypes: "Employee Email, Contact Lists",
-    affectedCount: "1,250",
-    regulatorNotified: "Yes",
-    subjectNotification: "Pending",
-    assignee: "Security Team",
-    containmentStatus: "Contained",
-    lastUpdated: "2024-01-16"
-  },
-  {
-    id: "BR-002",
-    title: "Customer Database Access",
-    discoveryDate: "2024-01-10",
-    severity: "Medium",
-    status: "Remediation",
-    dataTypes: "Customer Names, Phone Numbers",
-    affectedCount: "450",
-    regulatorNotified: "No",
-    subjectNotification: "Complete",
-    assignee: "Legal Team",
-    containmentStatus: "Contained",
-    lastUpdated: "2024-01-12"
-  },
-  {
-    id: "BR-003",
-    title: "Laptop Theft - HR Department",
-    discoveryDate: "2024-01-05",
-    severity: "Low",
-    status: "Closed",
-    dataTypes: "Employee HR Records",
-    affectedCount: "85",
-    regulatorNotified: "No",
-    subjectNotification: "Complete",
-    assignee: "HR Team",
-    containmentStatus: "Resolved",
-    lastUpdated: "2024-01-08"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export function BreachManagement() {
+  const [breaches, setBreaches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSeverity, setSelectedSeverity] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+
+  useEffect(() => {
+    async function fetchBreaches() {
+      setLoading(true);
+      setError(null);
+      // @ts-expect-error: Supabase client is not typed with DB schema
+      const { data, error } = await (supabase as any).from("breaches").select("*");
+      if (error) {
+        setError("Failed to load breaches");
+        setBreaches([]);
+      } else {
+        setBreaches(data || []);
+      }
+      setLoading(false);
+    }
+    fetchBreaches();
+  }, []);
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
@@ -98,6 +73,17 @@ export function BreachManagement() {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  // Filter logic
+  const filteredBreaches = breaches.filter((breach) => {
+    const matchesSearch =
+      breach.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      breach.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      breach.dataTypes?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSeverity = selectedSeverity === "all" || breach.severity?.toLowerCase() === selectedSeverity;
+    const matchesStatus = selectedStatus === "all" || breach.status?.toLowerCase().replace(/ /g, "-") === selectedStatus;
+    return matchesSearch && matchesSeverity && matchesStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -255,60 +241,66 @@ export function BreachManagement() {
       {/* Incidents Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Security Incidents ({mockBreaches.length})</CardTitle>
+          <CardTitle>Security Incidents ({breaches.length})</CardTitle>
           <CardDescription>Active and historical data breach incidents</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Incident ID</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Discovery Date</TableHead>
-                <TableHead>Severity</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Affected Count</TableHead>
-                <TableHead>Regulator Notified</TableHead>
-                <TableHead>Containment</TableHead>
-                <TableHead>Assignee</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockBreaches.map((breach) => (
-                <TableRow key={breach.id}>
-                  <TableCell className="font-medium">{breach.id}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{breach.title}</div>
-                      <div className="text-sm text-muted-foreground">{breach.dataTypes}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm">{breach.discoveryDate}</TableCell>
-                  <TableCell>{getSeverityBadge(breach.severity)}</TableCell>
-                  <TableCell>{getStatusBadge(breach.status)}</TableCell>
-                  <TableCell className="font-medium">{breach.affectedCount}</TableCell>
-                  <TableCell>
-                    <Badge variant={breach.regulatorNotified === "Yes" ? "default" : "secondary"}>
-                      {breach.regulatorNotified}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{getContainmentBadge(breach.containmentStatus)}</TableCell>
-                  <TableCell className="text-sm">{breach.assignee}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          {loading ? (
+            <div className="text-center py-8">Loading breaches...</div>
+          ) : error ? (
+            <div className="text-center text-destructive py-8">{error}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Incident ID</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Discovery Date</TableHead>
+                  <TableHead>Severity</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Affected Count</TableHead>
+                  <TableHead>Regulator Notified</TableHead>
+                  <TableHead>Containment</TableHead>
+                  <TableHead>Assignee</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredBreaches.map((breach) => (
+                  <TableRow key={breach.id}>
+                    <TableCell className="font-medium">{breach.id}</TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{breach.title}</div>
+                        <div className="text-sm text-muted-foreground">{breach.dataTypes}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">{breach.discoveryDate}</TableCell>
+                    <TableCell>{getSeverityBadge(breach.severity)}</TableCell>
+                    <TableCell>{getStatusBadge(breach.status)}</TableCell>
+                    <TableCell className="font-medium">{breach.affectedCount}</TableCell>
+                    <TableCell>
+                      <Badge variant={breach.regulatorNotified === "Yes" ? "default" : "secondary"}>
+                        {breach.regulatorNotified}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{getContainmentBadge(breach.containmentStatus)}</TableCell>
+                    <TableCell className="text-sm">{breach.assignee}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -154,9 +154,7 @@ export function Sidebar() {
   );
 
   const groupedModules = filteredModules.reduce((acc, module) => {
-    if (!acc[module.category]) {
-      acc[module.category] = [];
-    }
+    if (!acc[module.category]) acc[module.category] = [];
     acc[module.category].push(module);
     return acc;
   }, {} as Record<string, typeof modules>);
@@ -172,139 +170,97 @@ export function Sidebar() {
   };
 
   const isActiveRoute = (url: string) => {
-    if (url === "/") {
-      return location.pathname === "/";
-    }
+    if (url === "/") return location.pathname === "/";
     return location.pathname.startsWith(url);
   };
 
   return (
-    <SidebarPrimitive className="sidebar-width border-r border-sidebar-border bg-sidebar-background">
+    <aside className="glass fixed lg:relative inset-y-0 left-0 z-50 w-72 bg-transparent border-r border-sidebar-border/60 tab-transition flex flex-col shadow-xl backdrop-blur-xl">
       {/* Header */}
-      <SidebarHeader className="border-b border-sidebar-border p-6">
+      <div className="flex items-center justify-between p-6 border-b border-sidebar-border/60 bg-sidebar-background/80 glass">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
-            <Scale className="h-6 w-6 text-primary-foreground" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-blue-900/80 flex items-center justify-center shadow-md">
+            <Scale size={20} className="text-primary-foreground" />
           </div>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-sidebar-foreground">CounselFlow</h1>
-            <p className="text-xs text-sidebar-foreground/60">Legal Operations Platform</p>
-          </div>
-        </div>
-      </SidebarHeader>
-      
-      <SidebarContent className="flex flex-col h-full">
-        {/* Quick Search */}
-        <div className="p-4 border-b border-sidebar-border">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-sidebar-foreground/50" />
-            <input
-              type="text"
-              placeholder="Search modules..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-9 pl-10 pr-3 bg-sidebar-accent/50 border border-sidebar-border rounded-md text-sm text-sidebar-foreground placeholder:text-sidebar-foreground/50 focus:outline-none focus:ring-2 focus:ring-sidebar-ring focus:border-transparent transition-all"
-            />
+          <div>
+            <h1 className="text-lg font-semibold text-sidebar-foreground">CounselFlow</h1>
+            <p className="text-xs text-sidebar-foreground/70">Legal Suite</p>
           </div>
         </div>
-
-        {/* Navigation Modules */}
-        <div className="flex-1 overflow-y-auto">
+      </div>
+      {/* Search */}
+      <div className="p-4 border-b border-sidebar-border/40 bg-sidebar-background/80 glass">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-sidebar-foreground/60" />
+          <input
+            type="text"
+            placeholder="Search modules..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="input pl-10 bg-sidebar-background/60 text-sidebar-foreground rounded-lg border border-sidebar-border/30 focus:ring-2 focus:ring-primary/40 tab-transition"
+          />
+        </div>
+      </div>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-4">
+        <div className="space-y-1">
           {Object.entries(groupedModules).map(([category, categoryModules]) => (
-            <SidebarGroup key={category} className="px-4 py-2">
-              {category !== 'main' && (
-                <SidebarGroupLabel 
-                  className="flex items-center justify-between cursor-pointer hover:text-sidebar-foreground transition-colors group"
-                  onClick={() => toggleCategory(category)}
-                >
-                  <span className="text-xs font-medium text-sidebar-foreground/70 uppercase tracking-wider">
-                    {moduleCategories[category as keyof typeof moduleCategories]}
-                  </span>
-                  <ChevronDown 
-                    className={`h-3 w-3 text-sidebar-foreground/50 transition-transform group-hover:text-sidebar-foreground/70 ${
-                      collapsedCategories.has(category) ? '-rotate-90' : ''
-                    }`} 
-                  />
-                </SidebarGroupLabel>
-              )}
-              
-              {!collapsedCategories.has(category) && (
-                <SidebarGroupContent>
-                  <SidebarMenu className="space-y-1">
-                    {categoryModules.map((module) => (
-                      <SidebarMenuItem key={module.title}>
-                        <SidebarMenuButton 
-                          asChild
-                          className={`group relative transition-all duration-200 hover:bg-sidebar-accent ${
-                            isActiveRoute(module.url) 
-                              ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' 
-                              : 'text-sidebar-foreground hover:text-sidebar-accent-foreground'
-                          }`}
-                        >
-                          <a href={module.url} className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-md">
-                            <module.icon className={`h-4 w-4 transition-colors ${
-                              isActiveRoute(module.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground'
-                            }`} />
-                            <span className="flex-1">{module.title}</span>
-                            {isActiveRoute(module.url) && (
-                              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-sidebar-primary rounded-r-full"></div>
-                            )}
-                          </a>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              )}
-            </SidebarGroup>
+            <div key={category} className="px-4">
+              <button
+                onClick={() => toggleCategory(category)}
+                className="w-full flex items-center justify-between py-2 px-2 text-sm font-medium text-sidebar-foreground/80 hover:text-primary tab-transition group bg-transparent"
+              >
+                <span>{moduleCategories[category]}</span>
+                {collapsedCategories.has(category) ? (
+                  <ChevronDown size={16} className="tab-transition group-hover:scale-110" />
+                ) : (
+                  <ChevronDown size={16} className="rotate-180 tab-transition group-hover:scale-110" />
+                )}
+              </button>
+              <div className={`overflow-hidden tab-transition ${collapsedCategories.has(category) ? 'max-h-0' : 'max-h-96'}`}>
+                <div className="space-y-1 ml-2">
+                  {categoryModules.map((module) => {
+                    const Icon = module.icon;
+                    const isActive = isActiveRoute(module.url);
+                    return (
+                      <a
+                        key={module.url}
+                        href={module.url}
+                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium tab-transition group relative overflow-hidden glass ${isActive ? 'bg-primary/20 text-primary border-l-4 border-primary' : 'text-sidebar-foreground/80 hover:bg-primary/10 hover:text-primary'}`}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        <Icon size={20} className={`tab-transition relative z-10 ${isActive ? 'text-primary' : 'text-sidebar-foreground/60 group-hover:text-primary'}`} />
+                        <span className="relative z-10 truncate">{module.title}</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 translate-x-[-100%] group-hover:translate-x-[100%] tab-transition" />
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           ))}
         </div>
-      </SidebarContent>
-      
-      {/* Footer - User Profile & Settings */}
-      <SidebarFooter className="border-t border-sidebar-border p-4 space-y-2">
-        {/* User Profile */}
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-sidebar-accent/50 hover:bg-sidebar-accent transition-colors cursor-pointer group">
-          <div className="flex items-center justify-center w-8 h-8 bg-sidebar-primary rounded-full">
-            <User className="h-4 w-4 text-sidebar-primary-foreground" />
+      </nav>
+      {/* User Profile */}
+      <div className="p-4 border-t border-sidebar-border/60 bg-sidebar-background/80 glass">
+        <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-primary/10 tab-transition cursor-pointer group">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-900/80 flex items-center justify-center shadow-md">
+            <User size={16} className="text-primary-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">John Doe</p>
-            <p className="text-xs text-sidebar-foreground/60 truncate">Legal Operations Manager</p>
+            <p className="text-sm font-medium text-sidebar-foreground truncate">Legal Admin</p>
+            <p className="text-xs text-sidebar-foreground/70 truncate">admin@company.com</p>
           </div>
-          <div className="relative">
-            <Bell className="h-4 w-4 text-sidebar-foreground/50 group-hover:text-sidebar-foreground transition-colors" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full"></span>
+          <div className="flex items-center gap-1">
+            <button className="p-1 rounded hover:bg-primary/10 tab-transition">
+              <Bell size={16} className="text-sidebar-foreground/60" />
+            </button>
+            <button className="p-1 rounded hover:bg-primary/10 tab-transition">
+              <Settings size={16} className="text-sidebar-foreground/60" />
+            </button>
           </div>
         </div>
-
-        {/* Settings */}
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              asChild
-              className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all"
-            >
-              <a href="/settings" className="flex items-center gap-3 px-3 py-2 text-sm rounded-md">
-                <Settings className="h-4 w-4 text-sidebar-foreground/70" />
-                <span>Settings</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-
-        {/* Quick Actions */}
-        <div className="flex gap-2 pt-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="flex-1 text-xs text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
-          >
-            <LogOut className="h-3 w-3 mr-1" />
-            Sign Out
-          </Button>
-        </div>
-      </SidebarFooter>
-    </SidebarPrimitive>
+      </div>
+    </aside>
   );
 }

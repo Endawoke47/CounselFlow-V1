@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { DrillDownSlideOver } from "@/components/ui/slide-over";
 import { useDrillDown } from "@/hooks/useDrillDown";
+import { ApiServiceFactory } from '@/services/api/index';
 import { 
   Shield, 
   TrendingUp, 
@@ -17,91 +19,119 @@ import {
 
 export function IPDashboardOverview() {
   const { drillDownData, isSlideOverOpen, openDrillDown, closeDrillDown } = useDrillDown();
+  const [stats, setStats] = useState<any[]>([]);
+  const [upcomingRenewals, setUpcomingRenewals] = useState<any[]>([]);
+  const [portfolioBreakdown, setPortfolioBreakdown] = useState<any[]>([]);
+  const [jurisdictionData, setJurisdictionData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const stats = [
-    {
-      title: "Total IP Assets",
-      value: "156",
-      change: "+12 this quarter",
-      icon: Shield,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      dataType: "compliance",
-      filters: { type: "ip_assets" }
-    },
-    {
-      title: "Active Patents",
-      value: "34",
-      change: "8 pending approval",
-      icon: FileText,
-      color: "text-green-600",
-      bgColor: "bg-green-50",
-      dataType: "compliance",
-      filters: { type: "patents", status: "active" }
-    },
-    {
-      title: "Renewals Due",
-      value: "7",
-      change: "Next 30 days",
-      icon: Calendar,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      dataType: "tasks",
-      filters: { type: "renewals", status: "due" }
-    },
-    {
-      title: "IP Revenue",
-      value: "$2.3M",
-      change: "+18% YoY",
-      icon: DollarSign,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-      dataType: "matters",
-      filters: { type: "ip_revenue" }
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch all IP assets using the API service
+        const assets = await ApiServiceFactory.getIPAssetService().getIPAssets();
+        if (!assets) throw new Error('No IP assets found');
+        // Stats
+        const totalAssets = assets.length;
+        const activePatents = assets.filter(a => a.type === "Patent" && a.status === "registered").length;
+        const renewalsDue = assets.filter(a => a.expiration_date && new Date(a.expiration_date) < new Date(Date.now() + 30*24*60*60*1000)).length;
+        // Revenue: TODO - replace with real revenue data if available
+        const ipRevenue = assets.reduce((sum, a) => sum + (a.estimated_value || 0), 0);
+        setStats([
+          {
+            title: "Total IP Assets",
+            value: totalAssets,
+            change: "",
+            icon: Shield,
+            color: "text-blue-600",
+            bgColor: "bg-blue-50",
+            dataType: "compliance",
+            filters: { type: "ip_assets" }
+          },
+          {
+            title: "Active Patents",
+            value: activePatents,
+            change: "",
+            icon: FileText,
+            color: "text-green-600",
+            bgColor: "bg-green-50",
+            dataType: "compliance",
+            filters: { type: "patents", status: "active" }
+          },
+          {
+            title: "Renewals Due",
+            value: renewalsDue,
+            change: "Next 30 days",
+            icon: Calendar,
+            color: "text-orange-600",
+            bgColor: "bg-orange-50",
+            dataType: "tasks",
+            filters: { type: "renewals", status: "due" }
+          },
+          {
+            title: "IP Revenue",
+            value: `$${ipRevenue.toLocaleString()}`,
+            change: "",
+            icon: DollarSign,
+            color: "text-purple-600",
+            bgColor: "bg-purple-50",
+            dataType: "matters",
+            filters: { type: "ip_revenue" }
+          }
+        ]);
+        // Upcoming Renewals
+        setUpcomingRenewals(
+          assets.filter(a => a.expiration_date && new Date(a.expiration_date) < new Date(Date.now() + 60*24*60*60*1000))
+            .map(a => ({
+              id: a.id,
+              title: a.title,
+              type: a.type,
+              renewalDate: a.expiration_date,
+              jurisdiction: a.jurisdiction,
+              cost: a.maintenance_fees ? `$${a.maintenance_fees.toLocaleString()}` : "N/A"
+            }))
+        );
+        // Portfolio Breakdown
+        const typeCounts: Record<string, number> = {};
+        assets.forEach(a => { typeCounts[a.type] = (typeCounts[a.type] || 0) + 1; });
+        const total = assets.length;
+        setPortfolioBreakdown(
+          Object.entries(typeCounts).map(([type, count]) => ({
+            type,
+            count,
+            percentage: Math.round((count / total) * 100)
+          }))
+        );
+        // Jurisdiction Data
+        const jurisdictionCounts: Record<string, { assets: number, renewals: number }> = {};
+        assets.forEach(a => {
+          const j = a.jurisdiction || "Unknown";
+          if (!jurisdictionCounts[j]) jurisdictionCounts[j] = { assets: 0, renewals: 0 };
+          jurisdictionCounts[j].assets++;
+          if (a.expiration_date && new Date(a.expiration_date) < new Date(Date.now() + 60*24*60*60*1000)) {
+            jurisdictionCounts[j].renewals++;
+          }
+        });
+        setJurisdictionData(
+          Object.entries(jurisdictionCounts).map(([jurisdiction, data]) => ({
+            jurisdiction,
+            ...data
+          }))
+        );
+      } catch (err) {
+        setError((err as Error).message || "Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchData();
+  }, []);
 
-  const upcomingRenewals = [
-    {
-      id: "PAT-001",
-      title: "Machine Learning Algorithm Patent",
-      type: "Patent",
-      renewalDate: "2024-03-15",
-      jurisdiction: "US",
-      cost: "$12,500"
-    },
-    {
-      id: "TM-045",
-      title: "CounselFlow Trademark",
-      type: "Trademark",
-      renewalDate: "2024-03-22",
-      jurisdiction: "EU",
-      cost: "$3,200"
-    },
-    {
-      id: "PAT-023",
-      title: "Data Processing System",
-      type: "Patent",
-      renewalDate: "2024-04-01",
-      jurisdiction: "UK",
-      cost: "$8,900"
-    }
-  ];
-
-  const portfolioBreakdown = [
-    { type: "Patents", count: 34, percentage: 22 },
-    { type: "Trademarks", count: 67, percentage: 43 },
-    { type: "Copyrights", count: 28, percentage: 18 },
-    { type: "Trade Secrets", count: 27, percentage: 17 }
-  ];
-
-  const jurisdictionData = [
-    { jurisdiction: "United States", assets: 45, renewals: 3 },
-    { jurisdiction: "European Union", assets: 38, renewals: 2 },
-    { jurisdiction: "United Kingdom", assets: 29, renewals: 1 },
-    { jurisdiction: "Canada", assets: 22, renewals: 1 },
-    { jurisdiction: "Australia", assets: 22, renewals: 0 }
-  ];
+  if (loading) return <div className="p-8 text-center">Loading IP dashboard...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
 
   return (
     <div className="space-y-6">
@@ -124,18 +154,16 @@ export function IPDashboardOverview() {
         {stats.map((stat, index) => (
           <Card 
             key={index}
-            className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105"
+            className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-105 glass"
             onClick={() => openDrillDown(stat.dataType, stat.title, "IP Management", stat.filters)}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
+              <stat.icon className={`h-6 w-6 ${stat.color}`} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
+              <div className="text-xs text-muted-foreground">{stat.change}</div>
             </CardContent>
           </Card>
         ))}

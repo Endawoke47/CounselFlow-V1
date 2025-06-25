@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,90 +6,59 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Brain, FileText, Filter, BookOpen, Lightbulb, TrendingUp } from "lucide-react";
-
-const mockSearchResults = [
-  {
-    id: "1",
-    title: "GDPR Data Processing Guidelines",
-    type: "Playbook",
-    excerpt: "Comprehensive guide for processing personal data under GDPR regulations, including consent management and data subject rights...",
-    relevanceScore: 95,
-    jurisdiction: "EU",
-    lastUpdated: "2024-01-15",
-    tags: ["GDPR", "Data Processing", "Privacy"]
-  },
-  {
-    id: "2",
-    title: "Employment Contract Termination FAQ",
-    type: "FAQ",
-    excerpt: "Frequently asked questions about employment contract termination procedures, notice periods, and legal requirements...",
-    relevanceScore: 89,
-    jurisdiction: "UK",
-    lastUpdated: "2024-01-20",
-    tags: ["Employment", "Termination", "Contracts"]
-  },
-  {
-    id: "3",
-    title: "IP Assignment Risk Assessment",
-    type: "Risk Note",
-    excerpt: "Risk assessment framework for intellectual property assignment clauses in employment and service agreements...",
-    relevanceScore: 84,
-    jurisdiction: "Multiple",
-    lastUpdated: "2024-01-18",
-    tags: ["IP", "Risk", "Assignment"]
-  }
-];
-
-const mockSuggestions = [
-  "GDPR compliance procedures",
-  "Employment contract templates",
-  "Data retention policies",
-  "IP assignment clauses",
-  "Termination notice requirements"
-];
-
-const mockTrendingTopics = [
-  { topic: "AI governance", searches: 156, trend: "+23%" },
-  { topic: "Remote work policies", searches: 134, trend: "+18%" },
-  { topic: "Data localization", searches: 98, trend: "+45%" },
-  { topic: "ESG compliance", searches: 87, trend: "+12%" }
-];
-
-const mockInsights = [
-  {
-    title: "Knowledge Gap Identified",
-    description: "Limited guidance on AI governance across all jurisdictions",
-    type: "warning",
-    category: "Gap Analysis"
-  },
-  {
-    title: "Popular Resource",
-    description: "GDPR compliance guide is the most accessed resource this month",
-    type: "info",
-    category: "Usage Analytics"
-  },
-  {
-    title: "Update Recommended",
-    description: "Employment law guidance needs review due to recent regulatory changes",
-    type: "suggestion",
-    category: "Content Review"
-  }
-];
+import { ApiServiceFactory } from '@/services/api/index';
 
 export function KnowledgeSearchHub() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [trending, setTrending] = useState<any[]>([]);
+  const [insights, setInsights] = useState<any[]>([]);
   const [searchType, setSearchType] = useState("semantic");
   const [entityFilter, setEntityFilter] = useState("all");
-  const [isSearching, setIsSearching] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = async () => {
-    setIsSearching(true);
-    // Simulate AI search delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSearching(false);
+  useEffect(() => {
+    async function fetchInitial() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch trending topics, suggestions, and insights from API service
+        const [trendingRes, suggestionsRes, insightsRes] = await Promise.all([
+          ApiServiceFactory.getKnowledgeService().getTrendingTopics(),
+          ApiServiceFactory.getKnowledgeService().getSearchSuggestions(),
+          ApiServiceFactory.getKnowledgeService().getKnowledgeInsights(),
+        ]);
+        setTrending(trendingRes || []);
+        setSuggestions((suggestionsRes || []).map((s: { text: string }) => s.text));
+        setInsights(insightsRes || []);
+      } catch (e) {
+        setError("Failed to load knowledge search data.");
+      }
+      setLoading(false);
+    }
+    fetchInitial();
+  }, []);
+
+  async function handleSearch() {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from("knowledge_entries")
+        .select("*")
+        .ilike("title", `%${searchQuery}%`);
+      if (error) throw error;
+      setResults(data || []);
+    } catch (e) {
+      setError("Failed to search knowledge base.");
+      setResults([]);
+    }
+    setLoading(false);
     setHasSearched(true);
-  };
+  }
 
   const getInsightIcon = (type: string) => {
     switch (type) {
@@ -135,8 +103,8 @@ export function KnowledgeSearchHub() {
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
-            <Button onClick={handleSearch} disabled={isSearching || !searchQuery.trim()}>
-              {isSearching ? (
+            <Button onClick={handleSearch} disabled={loading || !searchQuery.trim()}>
+              {loading ? (
                 <>
                   <Brain className="h-4 w-4 mr-2 animate-spin" />
                   Searching...
@@ -186,7 +154,7 @@ export function KnowledgeSearchHub() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Try these suggestions:</label>
               <div className="flex flex-wrap gap-2">
-                {mockSuggestions.map((suggestion, index) => (
+                {suggestions.map((suggestion, index) => (
                   <Badge
                     key={index}
                     variant="outline"
@@ -214,7 +182,7 @@ export function KnowledgeSearchHub() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockTrendingTopics.map((topic, index) => (
+              {trending.map((topic, index) => (
                 <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <h4 className="font-medium">{topic.topic}</h4>
@@ -242,7 +210,7 @@ export function KnowledgeSearchHub() {
           <TabsContent value="results" className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">
-                Found {mockSearchResults.length} results for "{searchQuery}"
+                Found {results.length} results for "{searchQuery}"
               </h3>
               <div className="flex items-center space-x-2">
                 <Filter className="h-4 w-4" />
@@ -250,7 +218,7 @@ export function KnowledgeSearchHub() {
               </div>
             </div>
 
-            {mockSearchResults.map((result) => (
+            {results.map((result) => (
               <Card key={result.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
@@ -294,7 +262,7 @@ export function KnowledgeSearchHub() {
                 Based on your search and knowledge usage patterns, here are some insights:
               </p>
 
-              {mockInsights.map((insight, index) => (
+              {insights.map((insight, index) => (
                 <Card key={index} className={`border-l-4 ${getInsightColor(insight.type)}`}>
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
@@ -360,6 +328,18 @@ export function KnowledgeSearchHub() {
             </Card>
           </TabsContent>
         </Tabs>
+      )}
+
+      {/* Loading and Error States */}
+      {loading && (
+        <div className="flex items-center justify-center py-4">
+          <span className="text-sm text-muted-foreground">Loading...</span>
+        </div>
+      )}
+      {error && (
+        <div className="flex items-center justify-center py-4">
+          <span className="text-sm text-red-600">{error}</span>
+        </div>
       )}
     </div>
   );

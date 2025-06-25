@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,99 +9,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Plus, FileText, Users, GraduationCap, CheckCircle, Search, Eye, Edit, Download } from "lucide-react";
 
-const mockPolicies = [
-  {
-    id: "POL-001",
-    title: "Global Privacy Policy",
-    type: "Privacy Notice",
-    audience: "External",
-    version: "3.2",
-    status: "Active",
-    lastUpdated: "2024-01-10",
-    owner: "Legal Team",
-    acknowledgments: 156,
-    totalUsers: 200,
-    nextReview: "2024-07-10"
-  },
-  {
-    id: "POL-002",
-    title: "Data Handling Standards",
-    type: "Internal Standard",
-    audience: "Internal",
-    version: "2.1",
-    status: "Under Review",
-    lastUpdated: "2024-01-08",
-    owner: "DPO Office",
-    acknowledgments: 89,
-    totalUsers: 150,
-    nextReview: "2024-06-08"
-  },
-  {
-    id: "POL-003",
-    title: "Employee Privacy Notice",
-    type: "Privacy Notice",
-    audience: "Employees",
-    version: "1.5",
-    status: "Active",
-    lastUpdated: "2024-01-05",
-    owner: "HR Department",
-    acknowledgments: 143,
-    totalUsers: 180,
-    nextReview: "2024-12-05"
-  }
-];
-
-const mockTrainingModules = [
-  {
-    id: "TRN-001",
-    title: "GDPR Fundamentals",
-    type: "Mandatory",
-    target: "All Employees",
-    duration: "45 mins",
-    assigned: 200,
-    completed: 186,
-    completionRate: 93,
-    deadline: "2024-03-01"
-  },
-  {
-    id: "TRN-002",
-    title: "Data Subject Rights",
-    type: "Role-Based",
-    target: "Customer Service",
-    duration: "30 mins",
-    assigned: 45,
-    completed: 42,
-    completionRate: 93,
-    deadline: "2024-02-15"
-  },
-  {
-    id: "TRN-003",
-    title: "Privacy by Design",
-    type: "Specialist",
-    target: "IT & Engineering",
-    duration: "60 mins",
-    assigned: 35,
-    completed: 28,
-    completionRate: 80,
-    deadline: "2024-02-28"
-  }
-];
-
 export function PolicyGovernance() {
+  const [policies, setPolicies] = useState<any[]>([]);
+  const [trainingModules, setTrainingModules] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [activeTab, setActiveTab] = useState("policies");
 
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      const { data: policiesData, error: policiesError } = await supabase.from("policies").select("*");
+      const { data: trainingData, error: trainingError } = await supabase.from("training_modules").select("*");
+      if (policiesError || trainingError) {
+        setError("Failed to load policy or training data");
+        setPolicies([]);
+        setTrainingModules([]);
+      } else {
+        setPolicies(policiesData || []);
+        setTrainingModules(trainingData || []);
+      }
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Active":
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+        return <Badge variant="default">Active</Badge>;
       case "Under Review":
-        return <Badge className="bg-yellow-100 text-yellow-800">Under Review</Badge>;
+        return <Badge variant="secondary">Under Review</Badge>;
       case "Draft":
-        return <Badge className="bg-blue-100 text-blue-800">Draft</Badge>;
+        return <Badge variant="secondary">Draft</Badge>;
       case "Archived":
-        return <Badge className="bg-gray-100 text-gray-800">Archived</Badge>;
+        return <Badge variant="outline">Archived</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -109,13 +54,16 @@ export function PolicyGovernance() {
 
   const getCompletionBadge = (rate: number) => {
     if (rate >= 90) {
-      return <Badge className="bg-green-100 text-green-800">Excellent</Badge>;
+      return <Badge variant="default">Excellent</Badge>;
     } else if (rate >= 75) {
-      return <Badge className="bg-yellow-100 text-yellow-800">Good</Badge>;
+      return <Badge variant="secondary">Good</Badge>;
     } else {
-      return <Badge className="bg-red-100 text-red-800">Needs Attention</Badge>;
+      return <Badge variant="destructive">Needs Attention</Badge>;
     }
   };
+
+  if (loading) return <div className="p-8 text-center">Loading policy and training data...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">Error: {error}</div>;
 
   return (
     <div className="space-y-6">
@@ -146,7 +94,7 @@ export function PolicyGovernance() {
             <FileText className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">42</div>
+            <div className="text-2xl font-bold">{policies.filter(policy => policy.status === "Active").length}</div>
             <p className="text-xs text-muted-foreground">
               Across all categories
             </p>
@@ -159,7 +107,9 @@ export function PolicyGovernance() {
             <Users className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">91%</div>
+            <div className="text-2xl font-bold">
+              {Math.round((policies.reduce((acc, policy) => acc + policy.acknowledgments, 0) / policies.reduce((acc, policy) => acc + policy.totalUsers, 0)) * 100)}%
+            </div>
             <p className="text-xs text-muted-foreground">
               User acknowledgments
             </p>
@@ -172,7 +122,9 @@ export function PolicyGovernance() {
             <GraduationCap className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89%</div>
+            <div className="text-2xl font-bold">
+              {Math.round((trainingModules.reduce((acc, module) => acc + module.completed, 0) / trainingModules.reduce((acc, module) => acc + module.assigned, 0)) * 100)}%
+            </div>
             <p className="text-xs text-muted-foreground">
               Overall completion rate
             </p>
@@ -185,7 +137,9 @@ export function PolicyGovernance() {
             <CheckCircle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
+            <div className="text-2xl font-bold">
+              {policies.filter(policy => new Date(policy.nextReview) <= new Date(new Date().setDate(new Date().getDate() + 90))).length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Next 90 days
             </p>
@@ -239,7 +193,7 @@ export function PolicyGovernance() {
           {/* Policies Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Privacy Policies ({mockPolicies.length})</CardTitle>
+              <CardTitle>Privacy Policies ({policies.length})</CardTitle>
               <CardDescription>Active policies and governance documents</CardDescription>
             </CardHeader>
             <CardContent>
@@ -258,7 +212,11 @@ export function PolicyGovernance() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockPolicies.map((policy) => (
+                  {policies.filter(policy => {
+                    if (selectedType !== "all" && policy.type !== selectedType) return false;
+                    if (searchTerm && !policy.title.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+                    return true;
+                  }).map((policy) => (
                     <TableRow key={policy.id}>
                       <TableCell className="font-medium">{policy.id}</TableCell>
                       <TableCell>
@@ -323,21 +281,27 @@ export function PolicyGovernance() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Mandatory Training</span>
-                  <span className="text-sm font-medium">93% complete</span>
+                  <span className="text-sm font-medium">
+                    {Math.round((trainingModules.filter(module => module.type === "Mandatory").reduce((acc, module) => acc + module.completed, 0) / trainingModules.filter(module => module.type === "Mandatory").reduce((acc, module) => acc + module.assigned, 0)) * 100)}% complete
+                  </span>
                 </div>
                 <Progress value={93} className="h-2" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Role-Based Training</span>
-                  <span className="text-sm font-medium">87% complete</span>
+                  <span className="text-sm font-medium">
+                    {Math.round((trainingModules.filter(module => module.type === "Role-Based").reduce((acc, module) => acc + module.completed, 0) / trainingModules.filter(module => module.type === "Role-Based").reduce((acc, module) => acc + module.assigned, 0)) * 100)}% complete
+                  </span>
                 </div>
                 <Progress value={87} className="h-2" />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Specialist Training</span>
-                  <span className="text-sm font-medium">80% complete</span>
+                  <span className="text-sm font-medium">
+                    {Math.round((trainingModules.filter(module => module.type === "Specialist").reduce((acc, module) => acc + module.completed, 0) / trainingModules.filter(module => module.type === "Specialist").reduce((acc, module) => acc + module.assigned, 0)) * 100)}% complete
+                  </span>
                 </div>
                 <Progress value={80} className="h-2" />
               </div>
@@ -347,7 +311,7 @@ export function PolicyGovernance() {
           {/* Training Modules Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Training Modules ({mockTrainingModules.length})</CardTitle>
+              <CardTitle>Training Modules ({trainingModules.length})</CardTitle>
               <CardDescription>Privacy training programs and completion tracking</CardDescription>
             </CardHeader>
             <CardContent>
@@ -366,7 +330,7 @@ export function PolicyGovernance() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {mockTrainingModules.map((module) => (
+                  {trainingModules.map((module) => (
                     <TableRow key={module.id}>
                       <TableCell className="font-medium">{module.id}</TableCell>
                       <TableCell className="font-medium">{module.title}</TableCell>

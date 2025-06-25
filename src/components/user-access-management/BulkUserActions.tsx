@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,24 +11,36 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, Shield, UserX, Download, Upload, AlertTriangle } from "lucide-react";
 
-const mockUsers = [
-  { id: "1", name: "Sarah Johnson", email: "sarah.johnson@company.com", role: "Legal Officer", status: "Active" },
-  { id: "2", name: "Michael Chen", email: "michael.chen@company.com", role: "General Counsel", status: "Active" },
-  { id: "3", name: "Emily Rodriguez", email: "emily.rodriguez@company.com", role: "Compliance Manager", status: "Active" },
-  { id: "4", name: "David Kim", email: "david.kim@external-law.com", role: "External Counsel", status: "Temporary" },
-  { id: "5", name: "Alex Thompson", email: "alex.thompson@company.com", role: "Viewer", status: "Inactive" }
-];
-
 export function BulkUserActions() {
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [showBulkDialog, setShowBulkDialog] = useState(false);
   const [bulkAction, setBulkAction] = useState("");
   const [bulkValue, setBulkValue] = useState("");
   const [bulkReason, setBulkReason] = useState("");
 
+  useEffect(() => {
+    async function fetchUsers() {
+      setLoading(true);
+      setError(null);
+      // @ts-expect-error: Supabase client is not typed with DB schema
+      const { data, error } = await (supabase as any).from("users").select("*");
+      if (error) {
+        setError("Failed to load users");
+        setUsers([]);
+      } else {
+        setUsers(data || []);
+      }
+      setLoading(false);
+    }
+    fetchUsers();
+  }, []);
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedUsers(mockUsers.map(user => user.id));
+      setSelectedUsers(users.map(user => user.id));
     } else {
       setSelectedUsers([]);
     }
@@ -48,12 +60,7 @@ export function BulkUserActions() {
   };
 
   const executeBulkAction = () => {
-    console.log("Executing bulk action:", {
-      action: bulkAction,
-      users: selectedUsers,
-      value: bulkValue,
-      reason: bulkReason
-    });
+    // TODO: Implement real bulk user actions (API call)
     setShowBulkDialog(false);
     setBulkAction("");
     setBulkValue("");
@@ -120,11 +127,11 @@ export function BulkUserActions() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Checkbox
-                    checked={selectedUsers.length === mockUsers.length}
+                    checked={selectedUsers.length === users.length && users.length > 0}
                     onCheckedChange={handleSelectAll}
                   />
                   <span className="text-sm font-medium">
-                    Select All ({selectedUsers.length} of {mockUsers.length} selected)
+                    Select All ({selectedUsers.length} of {users.length} selected)
                   </span>
                 </div>
                 {selectedUsers.length > 0 && (
@@ -168,52 +175,58 @@ export function BulkUserActions() {
               )}
             </div>
 
-            <div className="border rounded-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <Checkbox
-                        checked={selectedUsers.length === mockUsers.length}
-                        onCheckedChange={handleSelectAll}
-                      />
-                    </TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
+            {loading ? (
+              <div className="text-center py-8">Loading users...</div>
+            ) : error ? (
+              <div className="text-center text-destructive py-8">{error}</div>
+            ) : (
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">
                         <Checkbox
-                          checked={selectedUsers.includes(user.id)}
-                          onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
+                          checked={selectedUsers.length === users.length && users.length > 0}
+                          onCheckedChange={handleSelectAll}
                         />
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{user.name}</div>
-                          <div className="text-sm text-muted-foreground">{user.email}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{user.role}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={
-                          user.status === "Active" ? "default" :
-                          user.status === "Temporary" ? "secondary" : "destructive"
-                        }>
-                          {user.status}
-                        </Badge>
-                      </TableCell>
+                      </TableHead>
+                      <TableHead>User</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedUsers.includes(user.id)}
+                            onCheckedChange={(checked) => handleSelectUser(user.id, checked as boolean)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{user.name}</div>
+                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{user.role}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={
+                            user.status === "Active" ? "default" :
+                            user.status === "Temporary" ? "secondary" : "destructive"
+                          }>
+                            {user.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
 
             <div className="flex gap-2 pt-4 border-t">
               <Button variant="outline" size="sm">
@@ -276,7 +289,7 @@ export function BulkUserActions() {
               <h4 className="font-medium mb-2">Selected Users ({selectedUsers.length}):</h4>
               <div className="flex flex-wrap gap-1">
                 {selectedUsers.map((userId) => {
-                  const user = mockUsers.find(u => u.id === userId);
+                  const user = users.find(u => u.id === userId);
                   return user ? (
                     <Badge key={userId} variant="secondary" className="text-xs">
                       {user.name}

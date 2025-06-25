@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,81 +6,53 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Brain, FileText, Filter, BookOpen, Lightbulb } from "lucide-react";
-
-const mockSearchResults = [
-  {
-    id: "1",
-    title: "Data Protection Policy",
-    entity: "TechCorp UK Ltd",
-    excerpt: "This policy outlines the organization's approach to data protection and privacy compliance, ensuring adherence to GDPR and other applicable data protection regulations...",
-    relevanceScore: 95,
-    type: "Data Privacy",
-    lastUpdated: "2024-01-10",
-    tags: ["GDPR", "Data Protection", "Privacy"]
-  },
-  {
-    id: "2",
-    title: "Employee Code of Conduct",
-    entity: "TechCorp GmbH",
-    excerpt: "All employees must maintain the highest standards of professional conduct and ethical behavior in all business dealings...",
-    relevanceScore: 87,
-    type: "Ethics & Compliance",
-    lastUpdated: "2024-01-28",
-    tags: ["Ethics", "Conduct", "Compliance"]
-  },
-  {
-    id: "3",
-    title: "Information Security Policy",
-    entity: "TechCorp Inc",
-    excerpt: "This policy establishes guidelines for protecting company information assets and maintaining information security across all systems...",
-    relevanceScore: 82,
-    type: "Security",
-    lastUpdated: "2024-02-05",
-    tags: ["Security", "Information", "Assets"]
-  }
-];
-
-const mockSuggestions = [
-  "GDPR compliance requirements",
-  "Data retention policies",
-  "Employee harassment procedures",
-  "Information security protocols",
-  "Anti-money laundering guidelines"
-];
-
-const mockInsights = [
-  {
-    title: "Policy Gap Identified",
-    description: "No remote work policy found across entities",
-    type: "warning",
-    entity: "All Entities"
-  },
-  {
-    title: "Regulatory Update",
-    description: "New data protection requirements may affect existing policies",
-    type: "info",
-    entity: "EU Entities"
-  },
-  {
-    title: "Best Practice",
-    description: "Consider standardizing privacy policies across all entities",
-    type: "suggestion",
-    entity: "All Entities"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export function SearchHub() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [insights, setInsights] = useState<any[]>([]);
   const [searchType, setSearchType] = useState("semantic");
   const [entityFilter, setEntityFilter] = useState("all");
-  const [isSearching, setIsSearching] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
+  useEffect(() => {
+    async function fetchInitial() {
+      setLoading(true);
+      setError(null);
+      try {
+        const [suggestionsRes, insightsRes] = await Promise.all([
+          supabase.from("policy_search_suggestions").select("*"),
+          supabase.from("policy_insights").select("*"),
+        ]);
+        setSuggestions((suggestionsRes.data || []).map((s: any) => s.text));
+        setInsights(insightsRes.data || []);
+      } catch (e) {
+        setError("Failed to load policy search data.");
+      }
+      setLoading(false);
+    }
+    fetchInitial();
+  }, []);
+
   const handleSearch = async () => {
-    setIsSearching(true);
-    // Simulate AI search delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSearching(false);
+    setLoading(true);
+    setError(null);
+    try {
+      const { data, error } = await supabase
+        .from("policies")
+        .select("*")
+        .ilike("title", `%${searchQuery}%`);
+      if (error) throw error;
+      setResults(data || []);
+    } catch (e) {
+      setError("Failed to search policies.");
+      setResults([]);
+    }
+    setLoading(false);
     setHasSearched(true);
   };
 
@@ -128,8 +99,8 @@ export function SearchHub() {
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
-            <Button onClick={handleSearch} disabled={isSearching || !searchQuery.trim()}>
-              {isSearching ? (
+            <Button onClick={handleSearch} disabled={loading || !searchQuery.trim()}>
+              {loading ? (
                 <>
                   <Brain className="h-4 w-4 mr-2 animate-spin" />
                   Searching...
@@ -179,7 +150,7 @@ export function SearchHub() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Try these suggestions:</label>
               <div className="flex flex-wrap gap-2">
-                {mockSuggestions.map((suggestion, index) => (
+                {suggestions.map((suggestion, index) => (
                   <Badge
                     key={index}
                     variant="outline"
@@ -207,7 +178,7 @@ export function SearchHub() {
           <TabsContent value="results" className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">
-                Found {mockSearchResults.length} results for "{searchQuery}"
+                Found {results.length} results for "{searchQuery}"
               </h3>
               <div className="flex items-center space-x-2">
                 <Filter className="h-4 w-4" />
@@ -215,38 +186,47 @@ export function SearchHub() {
               </div>
             </div>
 
-            {mockSearchResults.map((result) => (
-              <Card key={result.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h4 className="font-semibold text-lg">{result.title}</h4>
-                        <Badge variant="outline">{result.type}</Badge>
-                        <Badge className="bg-green-100 text-green-800">
-                          {result.relevanceScore}% match
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {result.entity} • Last updated: {result.lastUpdated}
-                      </p>
-                      <p className="text-sm mb-3">{result.excerpt}</p>
-                      <div className="flex items-center space-x-2">
-                        {result.tags.map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {tag}
+            {results.length === 0 ? (
+              <div className="text-center py-6">
+                <p className="text-sm text-muted-foreground">
+                  No results found. Try adjusting your search query or check back later.
+                </p>
+              </div>
+            ) : (
+              results.map((result) => (
+                <Card key={result.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h4 className="font-semibold text-lg">{result.title}</h4>
+                          <Badge variant="outline">{result.type}</Badge>
+                          <Badge className="bg-green-100 text-green-800">
+                            {/* Assuming relevanceScore is available in result */}
+                            {result.relevanceScore}% match
                           </Badge>
-                        ))}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {result.entity} • Last updated: {result.lastUpdated}
+                        </p>
+                        <p className="text-sm mb-3">{result.excerpt}</p>
+                        <div className="flex items-center space-x-2">
+                          {result.tags.map((tag, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
+                      <Button variant="outline" size="sm">
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Policy
+                      </Button>
                     </div>
-                    <Button variant="outline" size="sm">
-                      <FileText className="h-4 w-4 mr-2" />
-                      View Policy
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-4">
@@ -259,22 +239,30 @@ export function SearchHub() {
                 Based on your search and current policy landscape, here are some insights:
               </p>
 
-              {mockInsights.map((insight, index) => (
-                <Card key={index} className={`border-l-4 ${getInsightColor(insight.type)}`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-3">
-                      <span className="text-lg">{getInsightIcon(insight.type)}</span>
-                      <div className="flex-1">
-                        <h4 className="font-medium">{insight.title}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">{insight.description}</p>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Applies to: {insight.entity}
-                        </p>
+              {insights.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-sm text-muted-foreground">
+                    No insights available for the current search. Try a different query or check back later.
+                  </p>
+                </div>
+              ) : (
+                insights.map((insight, index) => (
+                  <Card key={index} className={`border-l-4 ${getInsightColor(insight.type)}`}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3">
+                        <span className="text-lg">{getInsightIcon(insight.type)}</span>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{insight.title}</h4>
+                          <p className="text-sm text-muted-foreground mt-1">{insight.description}</p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Applies to: {insight.entity}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
 

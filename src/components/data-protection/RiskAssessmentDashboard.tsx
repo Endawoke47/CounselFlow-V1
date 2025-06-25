@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,50 +7,31 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Plus, Shield, AlertTriangle, Eye, Edit, Search, Clock } from "lucide-react";
-
-const mockAssessments = [
-  {
-    id: "DPIA-001",
-    title: "Employee Monitoring System",
-    type: "DPIA",
-    riskScore: 85,
-    status: "In Progress",
-    assignee: "Sarah Johnson",
-    dueDate: "2024-02-15",
-    entity: "HQ Entity",
-    jurisdiction: "EU",
-    lastUpdated: "2024-01-10"
-  },
-  {
-    id: "LIA-002",
-    title: "Customer Profiling for Marketing",
-    type: "LIA",
-    riskScore: 65,
-    status: "Under Review",
-    assignee: "Michael Chen",
-    dueDate: "2024-01-30",
-    entity: "Marketing Entity",
-    jurisdiction: "UK",
-    lastUpdated: "2024-01-08"
-  },
-  {
-    id: "TIA-003",
-    title: "Data Transfer to US Vendor",
-    type: "TIA",
-    riskScore: 75,
-    status: "Complete",
-    assignee: "Emma Davis",
-    dueDate: "2024-01-20",
-    entity: "Operations Entity",
-    jurisdiction: "EU",
-    lastUpdated: "2024-01-05"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export function RiskAssessmentDashboard() {
+  const [assessments, setAssessments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+
+  useEffect(() => {
+    async function fetchAssessments() {
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase.from("risks").select("*");
+      if (error) {
+        setError("Failed to load risk assessments.");
+        setAssessments([]);
+      } else {
+        setAssessments(data || []);
+      }
+      setLoading(false);
+    }
+    fetchAssessments();
+  }, []);
 
   const getRiskBadge = (score: number) => {
     if (score >= 75) {
@@ -77,6 +57,29 @@ export function RiskAssessmentDashboard() {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  // Filtering logic (type/status)
+  const filtered = assessments.filter((a) => {
+    const matchesSearch = a.title?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === "all" || a.severity?.toLowerCase() === selectedType;
+    const matchesStatus = selectedStatus === "all" || a.status?.toLowerCase().replace(/ /g, "-") === selectedStatus;
+    return matchesSearch && matchesType && matchesStatus;
+  });
+
+  // In summary cards and risk distribution, use assessments data for counts
+  const totalAssessments = assessments.length;
+  const highRiskCount = assessments.filter(a => a.riskScore >= 75).length;
+  const overdueCount = assessments.filter(a => a.status === "Overdue").length;
+  const completionRate = totalAssessments > 0 ? ((assessments.filter(a => a.status === "Complete").length) / totalAssessments * 100).toFixed(0) : 0;
+
+  const riskScoreDistribution = [
+    { range: "High Risk (75-100)", count: assessments.filter(a => a.riskScore >= 75).length, value: (highRiskCount / totalAssessments) * 100 },
+    { range: "Medium Risk (50-74)", count: assessments.filter(a => a.riskScore < 75 && a.riskScore >= 50).length, value: ((assessments.filter(a => a.riskScore < 75 && a.riskScore >= 50).length) / totalAssessments) * 100 },
+    { range: "Low Risk (0-49)", count: assessments.filter(a => a.riskScore < 50).length, value: ((assessments.filter(a => a.riskScore < 50).length) / totalAssessments) * 100 },
+  ];
+
+  if (loading) return <div className="p-6">Loading risk assessments...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
     <div className="space-y-6">
@@ -111,7 +114,7 @@ export function RiskAssessmentDashboard() {
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">67</div>
+            <div className="text-2xl font-bold">{totalAssessments}</div>
             <p className="text-xs text-muted-foreground">
               Across all entities
             </p>
@@ -124,7 +127,7 @@ export function RiskAssessmentDashboard() {
             <AlertTriangle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{highRiskCount}</div>
             <p className="text-xs text-muted-foreground">
               Require immediate attention
             </p>
@@ -137,7 +140,7 @@ export function RiskAssessmentDashboard() {
             <Clock className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
+            <div className="text-2xl font-bold">{overdueCount}</div>
             <p className="text-xs text-muted-foreground">
               Past due date
             </p>
@@ -150,7 +153,7 @@ export function RiskAssessmentDashboard() {
             <Shield className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">78%</div>
+            <div className="text-2xl font-bold">{completionRate}%</div>
             <p className="text-xs text-muted-foreground">
               On-time completion
             </p>
@@ -165,27 +168,15 @@ export function RiskAssessmentDashboard() {
           <CardDescription>Assessment risk levels across all entities</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">High Risk (75-100)</span>
-              <span className="text-sm font-medium">12 assessments</span>
+          {riskScoreDistribution.map((risk, idx) => (
+            <div key={idx} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">{risk.range}</span>
+                <span className="text-sm font-medium">{risk.count} assessments</span>
+              </div>
+              <Progress value={risk.value} className="h-2" />
             </div>
-            <Progress value={18} className="h-2" />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Medium Risk (50-74)</span>
-              <span className="text-sm font-medium">28 assessments</span>
-            </div>
-            <Progress value={42} className="h-2" />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Low Risk (0-49)</span>
-              <span className="text-sm font-medium">27 assessments</span>
-            </div>
-            <Progress value={40} className="h-2" />
-          </div>
+          ))}
         </CardContent>
       </Card>
 
@@ -213,7 +204,7 @@ export function RiskAssessmentDashboard() {
                 <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="dpia">DPIA</SelectItem>
                 <SelectItem value="lia">LIA</SelectItem>
-                <SelectItem value="lia">TIA</SelectItem>
+                <SelectItem value="tia">TIA</SelectItem>
               </SelectContent>
             </Select>
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
@@ -235,7 +226,7 @@ export function RiskAssessmentDashboard() {
       {/* Assessments Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Risk Assessments ({mockAssessments.length})</CardTitle>
+          <CardTitle>Risk Assessments ({filtered.length})</CardTitle>
           <CardDescription>Data Protection and Transfer Impact Assessments</CardDescription>
         </CardHeader>
         <CardContent>
@@ -254,7 +245,7 @@ export function RiskAssessmentDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockAssessments.map((assessment) => (
+              {filtered.map((assessment) => (
                 <TableRow key={assessment.id}>
                   <TableCell className="font-medium">{assessment.id}</TableCell>
                   <TableCell>

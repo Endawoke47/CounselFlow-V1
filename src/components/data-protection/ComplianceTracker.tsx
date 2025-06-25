@@ -1,4 +1,5 @@
-
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -6,86 +7,41 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, AlertTriangle, Clock, Globe, FileText, Bell } from "lucide-react";
 
-const mockComplianceData = [
-  {
-    regulation: "GDPR",
-    jurisdiction: "European Union",
-    overallScore: 92,
-    requirements: [
-      { name: "Lawful Basis Documentation", status: "Complete", score: 100 },
-      { name: "Data Subject Rights", status: "Complete", score: 95 },
-      { name: "Data Protection by Design", status: "In Progress", score: 85 },
-      { name: "Breach Notification", status: "Complete", score: 90 }
-    ],
-    lastReview: "2024-01-10",
-    nextReview: "2024-04-10"
-  },
-  {
-    regulation: "CCPA/CPRA",
-    jurisdiction: "California, USA",
-    overallScore: 88,
-    requirements: [
-      { name: "Consumer Rights Notice", status: "Complete", score: 95 },
-      { name: "Opt-Out Mechanisms", status: "Complete", score: 90 },
-      { name: "Third-Party Disclosures", status: "In Progress", score: 80 },
-      { name: "Data Minimization", status: "Complete", score: 85 }
-    ],
-    lastReview: "2024-01-08",
-    nextReview: "2024-04-08"
-  },
-  {
-    regulation: "POPIA",
-    jurisdiction: "South Africa",
-    overallScore: 85,
-    requirements: [
-      { name: "Information Officer", status: "Complete", score: 100 },
-      { name: "Processing Records", status: "In Progress", score: 80 },
-      { name: "Data Subject Consent", status: "Complete", score: 90 },
-      { name: "Security Safeguards", status: "In Progress", score: 75 }
-    ],
-    lastReview: "2024-01-05",
-    nextReview: "2024-04-05"
-  }
-];
-
-const mockAlerts = [
-  {
-    id: "1",
-    type: "Law Update",
-    title: "GDPR Article 30 Guidelines Updated",
-    description: "EDPB released new guidance on ROPA requirements",
-    severity: "Medium",
-    date: "2024-01-12"
-  },
-  {
-    id: "2",
-    type: "Compliance Gap",
-    title: "Kenya DPA Implementation Delay",
-    description: "3 entities missing data localization requirements",
-    severity: "High",
-    date: "2024-01-10"
-  },
-  {
-    id: "3",
-    type: "Review Due",
-    title: "Annual CCPA Compliance Review",
-    description: "California compliance review due in 30 days",
-    severity: "Medium",
-    date: "2024-01-08"
-  }
-];
-
 export function ComplianceTracker() {
+  const [frameworks, setFrameworks] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchCompliance() {
+      setLoading(true);
+      setError(null);
+      const { data: frameworksData, error: frameworksError } = await supabase.from("compliance_frameworks").select("*");
+      const { data: alertsData, error: alertsError } = await supabase.from("compliance_alerts").select("*");
+      if (frameworksError || alertsError) {
+        setError("Failed to load compliance data");
+        setFrameworks([]);
+        setAlerts([]);
+      } else {
+        setFrameworks(frameworksData || []);
+        setAlerts(alertsData || []);
+      }
+      setLoading(false);
+    }
+    fetchCompliance();
+  }, []);
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Complete":
-        return <Badge className="bg-green-100 text-green-800">Complete</Badge>;
+        return <Badge variant="default">Complete</Badge>;
       case "In Progress":
-        return <Badge className="bg-blue-100 text-blue-800">In Progress</Badge>;
+        return <Badge variant="secondary">In Progress</Badge>;
       case "Pending":
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+        return <Badge variant="secondary">Pending</Badge>;
       case "Overdue":
-        return <Badge className="bg-red-100 text-red-800">Overdue</Badge>;
+        return <Badge variant="destructive">Overdue</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -94,15 +50,18 @@ export function ComplianceTracker() {
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case "High":
-        return <Badge className="bg-red-100 text-red-800">High</Badge>;
+        return <Badge variant="destructive">High</Badge>;
       case "Medium":
-        return <Badge className="bg-yellow-100 text-yellow-800">Medium</Badge>;
+        return <Badge variant="secondary">Medium</Badge>;
       case "Low":
-        return <Badge className="bg-blue-100 text-blue-800">Low</Badge>;
+        return <Badge variant="default">Low</Badge>;
       default:
         return <Badge variant="outline">{severity}</Badge>;
     }
   };
+
+  if (loading) return <div className="p-8 text-center">Loading compliance data...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">Error: {error}</div>;
 
   return (
     <div className="space-y-6">
@@ -141,7 +100,9 @@ export function ComplianceTracker() {
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">88%</div>
+            <div className="text-2xl font-bold">
+              {Math.round(frameworks.reduce((sum, f) => sum + f.overallScore, 0) / frameworks.length)}%
+            </div>
             <p className="text-xs text-muted-foreground">
               Across all regulations
             </p>
@@ -154,7 +115,7 @@ export function ComplianceTracker() {
             <Globe className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
+            <div className="text-2xl font-bold">{frameworks.length}</div>
             <p className="text-xs text-muted-foreground">
               Active compliance programs
             </p>
@@ -167,7 +128,7 @@ export function ComplianceTracker() {
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{alerts.length}</div>
             <p className="text-xs text-muted-foreground">
               Require attention
             </p>
@@ -180,7 +141,9 @@ export function ComplianceTracker() {
             <Clock className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3</div>
+            <div className="text-2xl font-bold">
+              {frameworks.filter(f => new Date(f.nextReview) <= new Date(new Date().setDate(new Date().getDate() + 30))).length}
+            </div>
             <p className="text-xs text-muted-foreground">
               In next 30 days
             </p>
@@ -190,7 +153,7 @@ export function ComplianceTracker() {
 
       {/* Compliance by Regulation */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {mockComplianceData.map((regulation) => (
+        {frameworks.map((regulation) => (
           <Card key={regulation.regulation}>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -243,7 +206,7 @@ export function ComplianceTracker() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockAlerts.map((alert) => (
+            {alerts.map((alert) => (
               <div key={alert.id} className="flex items-start justify-between p-4 border rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">

@@ -1,3 +1,4 @@
+import { StatCard } from "./StatCard";
 import { EnhancedDashboard } from "./EnhancedDashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,10 +23,37 @@ import {
   Filter,
   Download
 } from "lucide-react";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 
 export function DashboardOverview() {
-  // Use the enhanced dashboard for a more comprehensive experience
-  return <EnhancedDashboard />;
+  const { stats, loading, error } = useDashboardStats();
+
+  const isEmpty = !loading && !error && (!stats || stats.length === 0);
+
+  return (
+    <div className="space-y-8">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
+        {loading && Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="animate-pulse glass bg-gradient-to-br from-gray-800/80 to-gray-700/80 border border-gray-400/40 rounded-xl p-6 h-32" />
+        ))}
+        {error && (
+          <div className="col-span-4 text-red-500 text-center font-semibold bg-white/80 rounded-xl p-6 shadow-lg">
+            {error}
+          </div>
+        )}
+        {isEmpty && (
+          <div className="col-span-4 text-blue-700 text-center font-semibold bg-white/80 rounded-xl p-6 shadow-lg">
+            No dashboard data found. Please check your database or API connection.
+          </div>
+        )}
+        {stats && stats.map((stat, index) => (
+          <StatCard key={stat.label} stat={stat} index={index} />
+        ))}
+      </div>
+      <EnhancedDashboard />
+    </div>
+  );
 }
 
 export function LegacyDashboardOverview() {

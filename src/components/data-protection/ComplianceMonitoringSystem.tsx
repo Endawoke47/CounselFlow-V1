@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import {
   Download,
   Filter,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ComplianceFramework {
   id: string;
@@ -78,155 +79,30 @@ interface RegulatoryUpdate {
 }
 
 export function ComplianceMonitoringSystem() {
+  const [frameworks, setFrameworks] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedFramework, setSelectedFramework] = useState<string>("all");
   const [activeTab, setActiveTab] = useState("overview");
   const [timeRange, setTimeRange] = useState("30d");
 
-  // Mock data for demonstration
-  const frameworks: ComplianceFramework[] = [
-    {
-      id: "gdpr",
-      name: "GDPR",
-      description: "General Data Protection Regulation",
-      status: "partial",
-      score: 85,
-      lastAssessment: "2024-06-01",
-      nextReview: "2024-09-01",
-      jurisdiction: "EU",
-      category: "Data Protection",
-      requirements: [
-        {
-          id: "gdpr-1",
-          title: "Data Processing Records",
-          description: "Maintain comprehensive records of all data processing activities",
-          status: "met",
-          priority: "high",
-          assignee: "Data Protection Officer",
-          evidence: ["Processing register", "Data flow diagrams"],
-          lastUpdated: "2024-06-15",
-        },
-        {
-          id: "gdpr-2",
-          title: "Consent Management",
-          description: "Implement proper consent collection and management mechanisms",
-          status: "partial",
-          priority: "critical",
-          dueDate: "2024-07-15",
-          assignee: "Legal Team",
-          evidence: ["Consent forms", "Cookie policy"],
-          lastUpdated: "2024-06-10",
-        },
-      ],
-    },
-    {
-      id: "ccpa",
-      name: "CCPA",
-      description: "California Consumer Privacy Act",
-      status: "compliant",
-      score: 92,
-      lastAssessment: "2024-05-15",
-      nextReview: "2024-08-15",
-      jurisdiction: "California",
-      category: "Data Protection",
-      requirements: [
-        {
-          id: "ccpa-1",
-          title: "Consumer Rights Implementation",
-          description: "Implement mechanisms for consumer data rights requests",
-          status: "met",
-          priority: "high",
-          assignee: "Privacy Team",
-          evidence: ["Rights request portal", "Process documentation"],
-          lastUpdated: "2024-05-20",
-        },
-      ],
-    },
-    {
-      id: "sox",
-      name: "SOX",
-      description: "Sarbanes-Oxley Act",
-      status: "compliant",
-      score: 94,
-      lastAssessment: "2024-04-01",
-      nextReview: "2024-10-01",
-      jurisdiction: "US Federal",
-      category: "Financial Compliance",
-      requirements: [
-        {
-          id: "sox-1",
-          title: "Internal Controls Documentation",
-          description: "Document and test internal controls over financial reporting",
-          status: "met",
-          priority: "critical",
-          assignee: "Finance Team",
-          evidence: ["Control documentation", "Testing results"],
-          lastUpdated: "2024-04-15",
-        },
-      ],
-    },
-  ];
-
-  const alerts: ComplianceAlert[] = [
-    {
-      id: "alert-1",
-      type: "deadline",
-      title: "GDPR Consent Management Due",
-      description: "Consent management implementation deadline approaching in 15 days",
-      severity: "high",
-      framework: "GDPR",
-      dueDate: "2024-07-15",
-      createdAt: "2024-06-30",
-      acknowledged: false,
-    },
-    {
-      id: "alert-2",
-      type: "regulatory_change",
-      title: "New EU AI Act Requirements",
-      description: "New AI governance requirements effective August 2024",
-      severity: "medium",
-      framework: "EU AI Act",
-      createdAt: "2024-06-25",
-      acknowledged: false,
-    },
-    {
-      id: "alert-3",
-      type: "review_required",
-      title: "SOX Controls Review Due",
-      description: "Quarterly review of SOX controls scheduled for next week",
-      severity: "medium",
-      framework: "SOX",
-      dueDate: "2024-07-08",
-      createdAt: "2024-06-28",
-      acknowledged: true,
-    },
-  ];
-
-  const regulatoryUpdates: RegulatoryUpdate[] = [
-    {
-      id: "update-1",
-      title: "EU AI Act Implementation Guidelines",
-      description: "European Commission publishes detailed implementation guidelines for the AI Act",
-      regulation: "EU AI Act",
-      jurisdiction: "EU",
-      effectiveDate: "2024-08-01",
-      impact: "high",
-      category: "Artificial Intelligence",
-      actionRequired: true,
-      source: "European Commission",
-    },
-    {
-      id: "update-2",
-      title: "CCPA Amendment - Sensitive Personal Information",
-      description: "New regulations on handling sensitive personal information under CCPA",
-      regulation: "CCPA",
-      jurisdiction: "California",
-      effectiveDate: "2024-09-15",
-      impact: "medium",
-      category: "Data Protection",
-      actionRequired: true,
-      source: "California Attorney General",
-    },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      const [fwRes, alertRes] = await Promise.all([
+        supabase.from("compliance_frameworks").select("*"),
+        supabase.from("compliance_alerts").select("*")
+      ]);
+      if (fwRes.error) setError("Failed to load compliance frameworks.");
+      if (alertRes.error) setError("Failed to load compliance alerts.");
+      setFrameworks(fwRes.data || []);
+      setAlerts(alertRes.data || []);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -300,6 +176,9 @@ export function ComplianceMonitoringSystem() {
   const pendingRequirements = frameworks.reduce((sum, f) => 
     sum + f.requirements.filter(r => r.status === "pending" || r.status === "not-met").length, 0
   );
+
+  if (loading) return <div className="p-6">Loading compliance data...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
     <div className="space-y-6">
@@ -746,4 +625,4 @@ export function ComplianceMonitoringSystem() {
       </Tabs>
     </div>
   );
-} 
+}

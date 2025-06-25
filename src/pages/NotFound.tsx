@@ -20,6 +20,9 @@ const NotFound = () => {
           Return to Home
         </a>
       </div>
+      <main className="flex-1 overflow-auto glass transition-all duration-700 ease-in-out animate-fade-in">
+        {/* Main content can go here if needed */}
+      </main>
     </div>
   );
 };

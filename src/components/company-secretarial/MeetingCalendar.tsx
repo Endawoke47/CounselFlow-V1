@@ -20,32 +20,18 @@ import {
   Bell,
   BellOff
 } from "lucide-react";
-import { MeetingCalendarEvent, BoardMeeting } from "@/types/company-secretarial";
-import { companySecretarialService } from "@/services/companySecretarialService";
+import { useCalendarEvents } from '@/hooks/useCalendarEvents';
+import type { Database } from '@/types/database';
 
 export function MeetingCalendar() {
-  const [calendarEvents, setCalendarEvents] = useState<MeetingCalendarEvent[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<MeetingCalendarEvent | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'month' | 'week' | 'list'>('month');
   const [filterStatus, setFilterStatus] = useState<'all' | 'tentative' | 'confirmed'>('all');
   const [filterType, setFilterType] = useState<'all' | 'board' | 'agm' | 'egm' | 'committee'>('all');
-
-  useEffect(() => {
-    loadCalendarEvents();
-  }, [currentDate]);
-
-  const loadCalendarEvents = async () => {
-    try {
-      const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-      const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-      
-      const events = await companySecretarialService.getCalendarEvents(startDate, endDate);
-      setCalendarEvents(events);
-    } catch (error) {
-      console.error("Failed to load calendar events:", error);
-    }
-  };
+  const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString().split('T')[0];
+  const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0];
+  const { events: calendarEvents, loading, error } = useCalendarEvents(startDate, endDate);
+  const [selectedEvent, setSelectedEvent] = useState<Database['public']['Tables']['calendar_events']['Row'] | null>(null);
 
   const filteredEvents = calendarEvents.filter(event => {
     if (filterStatus !== 'all' && event.status !== filterStatus) return false;
@@ -95,9 +81,9 @@ export function MeetingCalendar() {
     return labels[type] || type;
   };
 
-  const isNoticeOverdue = (event: MeetingCalendarEvent) => {
+  const isNoticeOverdue = (event: Database['public']['Tables']['calendar_events']['Row']) => {
     if (!event.hasNoticeRequirement || !event.noticeDeadline || event.noticeSent) return false;
-    return new Date() > event.noticeDeadline;
+    return new Date() > new Date(event.noticeDeadline);
   };
 
   const getDaysUntilMeeting = (date: Date) => {
@@ -131,7 +117,7 @@ export function MeetingCalendar() {
     
     for (let i = 0; i < 42; i++) {
       const dayEvents = filteredEvents.filter(event => 
-        event.date.toDateString() === currentDateObj.toDateString()
+        new Date(event.date).toDateString() === currentDateObj.toDateString()
       );
       
       days.push({
@@ -189,7 +175,7 @@ export function MeetingCalendar() {
   };
 
   const renderListView = () => {
-    const sortedEvents = [...filteredEvents].sort((a, b) => a.date.getTime() - b.date.getTime());
+    const sortedEvents = [...filteredEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
     return (
       <div className="space-y-4">
@@ -213,7 +199,7 @@ export function MeetingCalendar() {
                   <div className="space-y-1 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="h-4 w-4" />
-                      {event.date.toLocaleDateString()} at {event.time}
+                      {new Date(event.date).toLocaleDateString()} at {event.time}
                     </div>
                     <div className="flex items-center gap-2">
                       {event.isVirtual ? (
@@ -231,7 +217,7 @@ export function MeetingCalendar() {
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-medium">
-                    {getDaysUntilMeeting(event.date)} days
+                    {getDaysUntilMeeting(new Date(event.date))} days
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {getMeetingTypeLabel(event.type)}
@@ -301,7 +287,7 @@ export function MeetingCalendar() {
                 Today
               </Button>
             </div>
-            <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)}>
+            <Tabs value={viewMode} onValueChange={(value: typeof viewMode) => setViewMode(value)}>
               <TabsList>
                 <TabsTrigger value="month">Month</TabsTrigger>
                 <TabsTrigger value="list">List</TabsTrigger>
@@ -314,7 +300,7 @@ export function MeetingCalendar() {
           <div className="flex gap-4 mb-6">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Status:</span>
-              <Tabs value={filterStatus} onValueChange={(value) => setFilterStatus(value as any)}>
+              <Tabs value={filterStatus} onValueChange={(value: typeof filterStatus) => setFilterStatus(value)}>
                 <TabsList>
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="tentative">Tentative</TabsTrigger>
@@ -324,7 +310,7 @@ export function MeetingCalendar() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Type:</span>
-              <Tabs value={filterType} onValueChange={(value) => setFilterType(value as any)}>
+              <Tabs value={filterType} onValueChange={(value: typeof filterType) => setFilterType(value)}>
                 <TabsList>
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="board">Board</TabsTrigger>
@@ -359,7 +345,7 @@ export function MeetingCalendar() {
                 <div>
                   <Label className="text-sm font-medium">Date & Time</Label>
                   <p className="text-sm text-muted-foreground">
-                    {selectedEvent.date.toLocaleDateString()} at {selectedEvent.time}
+                    {new Date(selectedEvent.date).toLocaleDateString()} at {selectedEvent.time}
                   </p>
                 </div>
                 <div>
@@ -368,9 +354,9 @@ export function MeetingCalendar() {
                     <Badge variant={getStatusBadgeVariant(selectedEvent.status)}>
                       {selectedEvent.status}
                     </Badge>
-                    {getDaysUntilMeeting(selectedEvent.date) >= 0 && (
+                    {getDaysUntilMeeting(new Date(selectedEvent.date)) >= 0 && (
                       <span className="text-sm text-muted-foreground">
-                        in {getDaysUntilMeeting(selectedEvent.date)} days
+                        in {getDaysUntilMeeting(new Date(selectedEvent.date))} days
                       </span>
                     )}
                   </div>
@@ -407,7 +393,7 @@ export function MeetingCalendar() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Notice Deadline:</span>
                         <span className="text-sm font-medium">
-                          {selectedEvent.noticeDeadline?.toLocaleDateString()}
+                          {selectedEvent.noticeDeadline ? new Date(selectedEvent.noticeDeadline).toLocaleDateString() : ''}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -463,4 +449,4 @@ export function MeetingCalendar() {
       )}
     </div>
   );
-} 
+}

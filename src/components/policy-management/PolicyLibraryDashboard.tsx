@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,28 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, FileText, Search, Filter } from "lucide-react";
+import { Upload, FileText, Search } from "lucide-react";
 import { AddPolicyModal } from "./AddPolicyModal";
 import { PolicyDetailModal } from "./PolicyDetailModal";
-import { CentralDataService } from "@/services/centralDataService";
-
-const centralPolicies = CentralDataService.getPolicies();
-
-// Transform central data to match component interface
-const mockPolicies = centralPolicies.map(policy => ({
-  id: policy.id,
-  title: policy.title,
-  version: policy.version,
-  entity: CentralDataService.getEntityById(policy.entityId)?.name || 'Unknown Entity',
-  jurisdiction: policy.applicableJurisdictions.join(', '),
-  type: policy.type,
-  effectiveDate: policy.effectiveDate.toLocaleDateString(),
-  status: policy.status,
-  lastUpdated: policy.lastUpdated.toLocaleDateString(),
-  owner: CentralDataService.getPersonById(policy.ownerId)?.fullName || 'Unknown'
-}));
+import { usePolicies } from "../../hooks/usePolicies";
 
 export function PolicyLibraryDashboard() {
+  const { policies, loading, error } = usePolicies();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<any>(null);
@@ -50,99 +34,43 @@ export function PolicyLibraryDashboard() {
     }
   };
 
+  if (loading) return <div className="p-6">Loading policies...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
+
   return (
     <div className="space-y-6">
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Policies</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">247</div>
-            <p className="text-xs text-muted-foreground">+12 from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Policies</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">186</div>
-            <p className="text-xs text-muted-foreground">75% of total</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">Requires attention</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">Next 30 days</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
+      <Card className="glass tab-fade-in">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Policy Library</CardTitle>
-              <CardDescription>Manage and organize all organizational policies</CardDescription>
-            </div>
-            <div className="flex space-x-2">
-              <Button onClick={() => setAddModalOpen(true)}>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Policy
-              </Button>
-              <Button variant="outline" onClick={() => setAddModalOpen(true)}>
-                <FileText className="h-4 w-4 mr-2" />
-                Create Draft
-              </Button>
-            </div>
+            <CardTitle>Policy Library</CardTitle>
+            <Button onClick={() => setAddModalOpen(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Add Policy
+            </Button>
           </div>
+          <CardDescription>Manage and track all policies across your organization</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-4 mb-6">
-            <div className="flex-1 min-w-[200px]">
-              <Input
-                placeholder="Search policies..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
+          <div className="flex gap-4 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search policies..." className="pl-9" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
             <Select value={entityFilter} onValueChange={setEntityFilter}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filter by Entity" />
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Entity" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Entities</SelectItem>
-                <SelectItem value="uk">TechCorp UK Ltd</SelectItem>
-                <SelectItem value="de">TechCorp GmbH</SelectItem>
-                <SelectItem value="us">TechCorp Inc</SelectItem>
+                {/* Add dynamic entity options here */}
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Filter by Status" />
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Draft">Draft</SelectItem>
                 <SelectItem value="In Review">In Review</SelectItem>
@@ -150,44 +78,32 @@ export function PolicyLibraryDashboard() {
               </SelectContent>
             </Select>
           </div>
-
-          {/* Policies Table */}
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Policy Title</TableHead>
-                <TableHead>Version</TableHead>
-                <TableHead>Entity</TableHead>
-                <TableHead>Jurisdiction</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Effective Date</TableHead>
+                <TableHead>Title</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Owner</TableHead>
+                <TableHead>Last Updated</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockPolicies.map((policy) => (
-                <TableRow key={policy.id}>
+              {policies.filter((policy: any) =>
+                (entityFilter === "all" || policy.entity === entityFilter) &&
+                (statusFilter === "all" || policy.status === statusFilter) &&
+                (policy.title.toLowerCase().includes(searchTerm.toLowerCase()))
+              ).map((policy: any) => (
+                <TableRow key={policy.id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">{policy.title}</TableCell>
-                  <TableCell>{policy.version}</TableCell>
-                  <TableCell>{policy.entity}</TableCell>
-                  <TableCell>{policy.jurisdiction}</TableCell>
-                  <TableCell>{policy.type}</TableCell>
-                  <TableCell>{policy.effectiveDate}</TableCell>
                   <TableCell>
-                    <Badge className={getStatusColor(policy.status)}>
-                      {policy.status}
-                    </Badge>
+                    <Badge className={getStatusColor(policy.status)}>{policy.status}</Badge>
                   </TableCell>
                   <TableCell>{policy.owner}</TableCell>
+                  <TableCell>{policy.updated_at ? new Date(policy.updated_at).toLocaleDateString() : ''}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewPolicy(policy)}
-                    >
-                      View
+                    <Button variant="ghost" size="sm" onClick={() => handleViewPolicy(policy)}>
+                      <FileText className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -196,13 +112,8 @@ export function PolicyLibraryDashboard() {
           </Table>
         </CardContent>
       </Card>
-
       <AddPolicyModal open={addModalOpen} onOpenChange={setAddModalOpen} />
-      <PolicyDetailModal 
-        open={detailModalOpen} 
-        onOpenChange={setDetailModalOpen}
-        policy={selectedPolicy}
-      />
+      <PolicyDetailModal open={detailModalOpen} onOpenChange={setDetailModalOpen} policy={selectedPolicy} />
     </div>
   );
 }

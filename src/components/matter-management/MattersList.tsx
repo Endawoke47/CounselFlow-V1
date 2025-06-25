@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,20 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, Filter, AlertTriangle, Clock, User, Link } from "lucide-react";
 import { RelationshipsPanel } from "@/components/ui/relationships-panel";
-import { RelatedItem } from "@/services/relationshipService";
-import { CentralDataService } from "@/services/centralDataService";
+import { useMatters } from "../../hooks/useMatters";
 
-interface MattersListProps {
-  onMatterSelect: (matter: any) => void;
-  onRelatedItemClick?: (item: RelatedItem) => void;
-}
-
-export function MattersList({ onMatterSelect, onRelatedItemClick }: MattersListProps) {
+export function MattersList() {
+  const { matters, loading, error } = useMatters();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMatter, setSelectedMatter] = useState<any>(null);
   const [showRelationships, setShowRelationships] = useState(false);
-
-  const matters = CentralDataService.getMatters();
 
   const getStatusBadge = (status: string) => {
     const colors = {
@@ -46,9 +39,31 @@ export function MattersList({ onMatterSelect, onRelatedItemClick }: MattersListP
     return <Clock className="h-4 w-4 text-gray-500" />;
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Clock className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="glass tab-fade-in">
+        <CardContent className="p-6 text-center text-red-600">
+          Error loading matters: {error}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const filteredMatters = matters.filter((matter: any) =>
+    matter.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="glass tab-fade-in">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -88,11 +103,11 @@ export function MattersList({ onMatterSelect, onRelatedItemClick }: MattersListP
               </TableRow>
             </TableHeader>
             <TableBody>
-              {matters.map((matter) => (
+              {filteredMatters.map((matter: any) => (
                 <TableRow 
                   key={matter.id} 
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => onMatterSelect(matter)}
+                  onClick={() => setSelectedMatter(matter)}
                 >
                   <TableCell className="font-medium">{matter.matterNumber}</TableCell>
                   <TableCell>
@@ -119,7 +134,7 @@ export function MattersList({ onMatterSelect, onRelatedItemClick }: MattersListP
                       <span className="text-sm">{matter.slaStatus}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{matter.dueDate.toLocaleDateString()}</TableCell>
+                  <TableCell>{matter.dueDate ? new Date(matter.dueDate).toLocaleDateString() : ''}</TableCell>
                   <TableCell>
                     <Button 
                       variant="ghost" 
@@ -155,10 +170,9 @@ export function MattersList({ onMatterSelect, onRelatedItemClick }: MattersListP
             </Button>
           </div>
           <RelationshipsPanel
-            itemId={selectedMatter.id.replace('MAT-2024-', 'matter-')}
+            itemId={selectedMatter.id}
             itemType="matters"
             itemTitle={selectedMatter.title}
-            onItemClick={onRelatedItemClick}
           />
         </div>
       )}

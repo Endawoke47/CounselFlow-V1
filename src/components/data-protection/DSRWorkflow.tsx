@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,64 +7,32 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Plus, Users, Clock, CheckCircle, AlertCircle, Search, Eye, Edit } from "lucide-react";
-
-const mockDSRs = [
-  {
-    id: "DSR-001",
-    type: "Access",
-    requestDate: "2024-01-15",
-    requester: "john.doe@email.com",
-    subject: "Personal Data Access Request",
-    status: "In Progress",
-    assignee: "Legal Team",
-    dueDate: "2024-02-14",
-    priority: "Normal",
-    jurisdiction: "EU",
-    dataSource: "CRM, HR System",
-    lastUpdated: "2024-01-16"
-  },
-  {
-    id: "DSR-002",
-    type: "Deletion",
-    requestDate: "2024-01-12",
-    requester: "jane.smith@email.com",
-    subject: "Delete All Personal Data",
-    status: "Pending Review",
-    assignee: "IT Team",
-    dueDate: "2024-02-11",
-    priority: "High",
-    jurisdiction: "US",
-    dataSource: "Customer Database",
-    lastUpdated: "2024-01-14"
-  },
-  {
-    id: "DSR-003",
-    type: "Rectification",
-    requestDate: "2024-01-10",
-    requester: "bob.wilson@email.com",
-    subject: "Correct Personal Information",
-    status: "Complete",
-    assignee: "Customer Service",
-    dueDate: "2024-02-09",
-    priority: "Normal",
-    jurisdiction: "UK",
-    dataSource: "Account Management",
-    lastUpdated: "2024-01-12"
-  }
-];
-
-const mockSLATargets = {
-  "Access": 30,
-  "Deletion": 30,
-  "Rectification": 15,
-  "Portability": 30,
-  "Objection": 15
-};
+import { supabase } from "@/integrations/supabase/client";
 
 export function DSRWorkflow() {
+  const [dsrs, setDSRs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+
+  useEffect(() => {
+    async function fetchDSRs() {
+      setLoading(true);
+      setError(null);
+      // @ts-expect-error: Supabase client is not typed with DB schema
+      const { data, error } = await (supabase as any).from("dsr_requests").select("*");
+      if (error) {
+        setError("Failed to load DSRs");
+        setDSRs([]);
+      } else {
+        setDSRs(data || []);
+      }
+      setLoading(false);
+    }
+    fetchDSRs();
+  }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -94,6 +61,17 @@ export function DSRWorkflow() {
         return <Badge variant="outline">{priority}</Badge>;
     }
   };
+
+  // Filter logic
+  const filteredDSRs = dsrs.filter((dsr) => {
+    const matchesSearch =
+      dsr.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dsr.requester?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dsr.subject?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === "all" || dsr.type?.toLowerCase() === selectedType;
+    const matchesStatus = selectedStatus === "all" || dsr.status?.toLowerCase().replace(/ /g, "-") === selectedStatus;
+    return matchesSearch && matchesType && matchesStatus;
+  });
 
   return (
     <div className="space-y-6">
@@ -211,7 +189,7 @@ export function DSRWorkflow() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Object.entries(mockSLATargets).map(([type, days]) => (
+              {/* {Object.entries(mockSLATargets).map(([type, days]) => (
                 <div key={type} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <div className="font-medium">{type} Request</div>
@@ -221,7 +199,7 @@ export function DSRWorkflow() {
                   </div>
                   <Badge variant="outline">{days} days</Badge>
                 </div>
-              ))}
+              ))} */}
             </div>
           </CardContent>
         </Card>
@@ -275,58 +253,64 @@ export function DSRWorkflow() {
       {/* DSR Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Data Subject Requests ({mockDSRs.length})</CardTitle>
+          <CardTitle>Data Subject Requests ({dsrs.length})</CardTitle>
           <CardDescription>Active and completed DSRs with SLA tracking</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Request ID</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Requester</TableHead>
-                <TableHead>Request Date</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Assignee</TableHead>
-                <TableHead>Data Source</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockDSRs.map((dsr) => (
-                <TableRow key={dsr.id}>
-                  <TableCell className="font-medium">{dsr.id}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{dsr.type}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{dsr.requester}</div>
-                      <div className="text-sm text-muted-foreground">{dsr.jurisdiction}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm">{dsr.requestDate}</TableCell>
-                  <TableCell className="text-sm">{dsr.dueDate}</TableCell>
-                  <TableCell>{getStatusBadge(dsr.status)}</TableCell>
-                  <TableCell>{getPriorityBadge(dsr.priority)}</TableCell>
-                  <TableCell className="text-sm">{dsr.assignee}</TableCell>
-                  <TableCell className="text-sm">{dsr.dataSource}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+          {loading ? (
+            <div className="text-center py-8">Loading DSRs...</div>
+          ) : error ? (
+            <div className="text-center text-destructive py-8">{error}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Request ID</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Requester</TableHead>
+                  <TableHead>Request Date</TableHead>
+                  <TableHead>Due Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Priority</TableHead>
+                  <TableHead>Assignee</TableHead>
+                  <TableHead>Data Source</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredDSRs.map((dsr) => (
+                  <TableRow key={dsr.id}>
+                    <TableCell className="font-medium">{dsr.id}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{dsr.type}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{dsr.requester}</div>
+                        <div className="text-sm text-muted-foreground">{dsr.jurisdiction}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">{dsr.requestDate}</TableCell>
+                    <TableCell className="text-sm">{dsr.dueDate}</TableCell>
+                    <TableCell>{getStatusBadge(dsr.status)}</TableCell>
+                    <TableCell>{getPriorityBadge(dsr.priority)}</TableCell>
+                    <TableCell className="text-sm">{dsr.assignee}</TableCell>
+                    <TableCell className="text-sm">{dsr.dataSource}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

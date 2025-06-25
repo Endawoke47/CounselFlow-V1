@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,54 +9,21 @@ import { Plus, FileText, Search, BarChart3, GitCompare } from "lucide-react";
 import { AddClauseModal } from "./AddClauseModal";
 import { ClauseDetailModal } from "./ClauseDetailModal";
 import { ClauseComparisonModal } from "./ClauseComparisonModal";
-
-const mockClauses = [
-  {
-    id: "1",
-    title: "Data Protection Clause - Standard",
-    type: "Data Protection",
-    useCase: "General Contracts",
-    jurisdiction: "EU",
-    riskProfile: "Low",
-    lastUpdated: "2024-01-15",
-    linkedTemplates: 12,
-    usageCount: 45
-  },
-  {
-    id: "2",
-    title: "Limitation of Liability - Tech Services",
-    type: "Liability",
-    useCase: "Technology Services",
-    jurisdiction: "US",
-    riskProfile: "Medium",
-    lastUpdated: "2024-01-20",
-    linkedTemplates: 8,
-    usageCount: 32
-  },
-  {
-    id: "3",
-    title: "Termination Rights - Employment",
-    type: "Termination",
-    useCase: "Employment Contracts",
-    jurisdiction: "UK",
-    riskProfile: "High",
-    lastUpdated: "2024-01-18",
-    linkedTemplates: 5,
-    usageCount: 28
-  }
-];
+import { useClauses } from '@/hooks/useClauses';
+import type { Database } from '@/types/database';
 
 export function ClauseLibraryDashboard() {
+  const { clauses, loading, error } = useClauses();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
-  const [selectedClause, setSelectedClause] = useState<any>(null);
+  const [selectedClause, setSelectedClause] = useState<Database['public']['Tables']['clauses']['Row'] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [riskFilter, setRiskFilter] = useState("all");
   const [jurisdictionFilter, setJurisdictionFilter] = useState("all");
 
-  const handleViewClause = (clause: any) => {
+  const handleViewClause = (clause: Database['public']['Tables']['clauses']['Row']) => {
     setSelectedClause(clause);
     setDetailModalOpen(true);
   };
@@ -71,48 +37,51 @@ export function ClauseLibraryDashboard() {
     }
   };
 
+  if (loading) return <div className="p-6">Loading clauses...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
+
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Clauses</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">847</div>
-            <p className="text-xs text-muted-foreground">+15 this month</p>
+            <div className="text-2xl font-bold">{clauses.length}</div>
+            <p className="text-xs text-muted-foreground">{clauses.length > 0 ? `+${clauses.length} loaded` : 'No clauses'}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">High Usage</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">156</div>
-            <p className="text-xs text-muted-foreground">Used 10+ times</p>
-          </CardContent>
-        </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">High Risk</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <BarChart3 className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
-            <p className="text-xs text-muted-foreground">Requires review</p>
+            <div className="text-2xl font-bold">{clauses.filter(c => c.risk === 'High').length}</div>
+            <p className="text-xs text-muted-foreground">High risk clauses</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Recently Updated</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Jurisdictions</CardTitle>
+            <GitCompare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">Last 7 days</p>
+            <div className="text-2xl font-bold">{[...new Set(clauses.map(c => c.jurisdiction))].length}</div>
+            <p className="text-xs text-muted-foreground">Unique jurisdictions</p>
+          </CardContent>
+        </Card>
+        <Card className="glass">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Types</CardTitle>
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{[...new Set(clauses.map(c => c.type))].length}</div>
+            <p className="text-xs text-muted-foreground">Clause types</p>
           </CardContent>
         </Card>
       </div>
@@ -191,29 +160,17 @@ export function ClauseLibraryDashboard() {
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Use Case</TableHead>
                 <TableHead>Jurisdiction</TableHead>
-                <TableHead>Risk Profile</TableHead>
-                <TableHead>Usage Count</TableHead>
-                <TableHead>Linked Templates</TableHead>
                 <TableHead>Last Updated</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockClauses.map((clause) => (
+              {clauses.map((clause) => (
                 <TableRow key={clause.id}>
                   <TableCell className="font-medium">{clause.title}</TableCell>
                   <TableCell>{clause.type}</TableCell>
-                  <TableCell>{clause.useCase}</TableCell>
                   <TableCell>{clause.jurisdiction}</TableCell>
-                  <TableCell>
-                    <Badge className={getRiskColor(clause.riskProfile)}>
-                      {clause.riskProfile}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{clause.usageCount}</TableCell>
-                  <TableCell>{clause.linkedTemplates}</TableCell>
                   <TableCell>{clause.lastUpdated}</TableCell>
                   <TableCell>
                     <Button

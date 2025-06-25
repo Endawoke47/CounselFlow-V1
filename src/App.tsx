@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,41 +26,43 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/company-secretarial" element={<CompanySecretarial />} />
-            <Route path="/contracts" element={<Contracts />} />
-            <Route path="/dispute-resolution" element={<DisputeResolution />} />
-            <Route path="/matters" element={<MatterManagement />} />
-            <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
-            <Route path="/policy-management" element={<PolicyManagement />} />
-            <Route path="/knowledge-management" element={<KnowledgeManagement />} />
-            <Route path="/ip-management" element={<IPManagement />} />
-            <Route path="/data-protection" element={<DataProtection />} />
-            <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
-            <Route path="/risk-dashboard" element={<RiskDashboard />} />
-            <Route path="/task-management" element={<TaskManagement />} />
-            <Route path="/user-access-management" element={<UserAccessManagement />} />
-            <Route path="/dealflow" element={<Dealflow />} />
-            {/* Redirect from old paths to new paths */}
-            <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
-            <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
-            <Route path="/policies" element={<Navigate to="/policy-management" replace />} />
-            <Route path="/knowledge" element={<Navigate to="/knowledge-management" replace />} />
-            <Route path="/ip" element={<Navigate to="/ip-management" replace />} />
-            <Route path="/legal-spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
-            <Route path="/spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
-            <Route path="/risk" element={<Navigate to="/risk-dashboard" replace />} />
-            <Route path="/tasks" element={<Navigate to="/task-management" replace />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <div className="min-h-screen w-full bg-gradient-to-br from-[#F1F3F4] via-[#D6E6F7] to-[#A9C6EA] glass-container">
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/company-secretarial" element={<CompanySecretarial />} />
+              <Route path="/contracts" element={<Contracts />} />
+              <Route path="/dispute-resolution" element={<DisputeResolution />} />
+              <Route path="/matters" element={<MatterManagement />} />
+              <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
+              <Route path="/policy-management" element={<PolicyManagement />} />
+              <Route path="/knowledge-management" element={<KnowledgeManagement />} />
+              <Route path="/ip-management" element={<IPManagement />} />
+              <Route path="/data-protection" element={<DataProtection />} />
+              <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
+              <Route path="/risk-dashboard" element={<RiskDashboard />} />
+              <Route path="/task-management" element={<TaskManagement />} />
+              <Route path="/user-access-management" element={<UserAccessManagement />} />
+              <Route path="/dealflow" element={<Dealflow />} />
+              {/* Redirect from old paths to new paths */}
+              <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
+              <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
+              <Route path="/policies" element={<Navigate to="/policy-management" replace />} />
+              <Route path="/knowledge" element={<Navigate to="/knowledge-management" replace />} />
+              <Route path="/ip" element={<Navigate to="/ip-management" replace />} />
+              <Route path="/legal-spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
+              <Route path="/spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
+              <Route path="/risk" element={<Navigate to="/risk-dashboard" replace />} />
+              <Route path="/tasks" element={<Navigate to="/task-management" replace />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </div>
     </ThemeProvider>
   </QueryClientProvider>
 );

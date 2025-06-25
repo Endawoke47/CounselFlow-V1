@@ -8,6 +8,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DrillDownSlideOver } from "@/components/ui/slide-over";
 import { useDrillDown } from "@/hooks/useDrillDown";
+import { useToast } from "@/hooks/use-toast";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 import {
   BarChart,
   Bar,
@@ -97,64 +99,34 @@ export function EnhancedDashboard() {
   const [timeRange, setTimeRange] = useState("30d");
   const [selectedModule, setSelectedModule] = useState("all");
   const { drillDownData, isSlideOverOpen, openDrillDown, closeDrillDown } = useDrillDown();
+  const { toast } = useToast();
+  const { stats, loading, error } = useDashboardStats();
 
-  // Mock data for demonstration
-  const metrics: DashboardMetric[] = [
-    {
-      id: "contracts",
-      title: "Active Contracts",
-      value: "247",
-      change: { value: "+12% from last month", type: "increase" },
-      icon: FileText,
-      color: "text-primary",
-      description: "Total active contracts across all entities",
-    },
-    {
-      id: "compliance",
-      title: "Compliance Score",
-      value: "94%",
-      change: { value: "+3% from last quarter", type: "increase" },
-      icon: Shield,
-      color: "text-success-600",
-      description: "Overall compliance across all frameworks",
-    },
-    {
-      id: "matters",
-      title: "Active Matters",
-      value: "89",
-      change: { value: "+7% from last month", type: "increase" },
-      icon: Users,
-      color: "text-info-600",
-      description: "Legal matters currently being handled",
-    },
-    {
-      id: "spend",
-      title: "Legal Spend",
-      value: "$2.4M",
-      change: { value: "-5% from last quarter", type: "decrease" },
-      icon: DollarSign,
-      color: "text-warning-600",
-      description: "Total legal spend this quarter",
-    },
-    {
-      id: "risks",
-      title: "High Risks",
-      value: "23",
-      change: { value: "-2 from last week", type: "decrease" },
-      icon: AlertTriangle,
-      color: "text-destructive",
-      description: "High priority risks requiring attention",
-    },
-    {
-      id: "automation",
-      title: "Time Saved",
-      value: "156h",
-      change: { value: "+24h this month", type: "increase" },
-      icon: Zap,
-      color: "text-purple-600",
-      description: "Time saved through automation",
-    },
-  ];
+  // Example: Robust API error handling for dashboard stats
+  // Replace this with your real API call if needed
+  const fetchDashboardStats = async () => {
+    try {
+      // Example fetch (replace with real endpoint)
+      const response = await fetch("/api/v1/dashboard/stats");
+      if (!response.ok) {
+        throw new Error("Failed to fetch dashboard stats");
+      }
+      // const data = await response.json();
+      // ... handle data ...
+    } catch (error) {
+      const err = error as Error;
+      toast({
+        title: "Dashboard Error",
+        description: err.message || "Could not load dashboard stats.",
+      });
+    }
+  };
+
+  // Optionally, call fetchDashboardStats in useEffect if you want to fetch real data
+  // useEffect(() => { fetchDashboardStats(); }, []);
+
+  // Replace mock metrics with real stats
+  const metrics = stats || [];
 
   const aiInsights: AIInsight[] = [
     {
@@ -394,7 +366,7 @@ export function EnhancedDashboard() {
   const criticalDeadlines = upcomingDeadlines.filter(d => d.priority === "critical" || d.priority === "high");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Legal Operations Dashboard</h1>
@@ -436,41 +408,32 @@ export function EnhancedDashboard() {
       )}
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-        {metrics.map((metric) => (
-          <Card 
-            key={metric.id} 
-            className="card-shadow hover:card-shadow-hover hover-lift transition-all duration-300 cursor-pointer"
-            onClick={() => {
-              const dataType = metric.id === "contracts" ? "contracts" : 
-                              metric.id === "matters" ? "matters" :
-                              metric.id === "compliance" ? "compliance" :
-                              metric.id === "risks" ? "risks" :
-                              metric.id === "spend" ? "matters" : "tasks";
-              openDrillDown(dataType, `${metric.title} Details`, metric.title);
-            }}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger-children">
+        {loading && Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="animate-pulse glass bg-gradient-to-br from-gray-800/80 to-gray-700/80 border border-gray-400/40 rounded-xl p-6 h-32" />
+        ))}
+        {error && (
+          <div className="col-span-4 text-red-500 text-center font-semibold">{error}</div>
+        )}
+        {stats && stats.map((stat, index) => (
+          <div
+            key={stat.label}
+            className={`glass bg-gradient-to-br border rounded-xl p-6 transform tab-transition hover:scale-105 hover:shadow-lg cursor-pointer group opacity-0 tab-fade-in ${
+              stat.color === 'blue' ? 'from-blue-900/80 to-blue-800/80 border-blue-400/40 text-blue-100' :
+              stat.color === 'green' ? 'from-green-900/80 to-green-800/80 border-green-400/40 text-green-100' :
+              stat.color === 'red' ? 'from-red-900/80 to-red-800/80 border-red-400/40 text-red-100' :
+              'from-purple-900/80 to-purple-800/80 border-purple-400/40 text-purple-100'
+            }`}
+            style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {metric.title}
-              </CardTitle>
-              <div className="p-2 rounded-lg bg-primary/10">
-                <metric.icon className={`h-4 w-4 ${metric.color}`} />
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium opacity-80">{stat.label}</p>
+                <p className="text-3xl font-bold mt-2 group-hover:scale-110 tab-transition">{stat.value}</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{metric.value}</div>
-              {metric.change && (
-                <div className={`flex items-center gap-1 text-sm ${getChangeColor(metric.change.type)}`}>
-                  {getChangeIcon(metric.change.type)}
-                  <span>{metric.change.value}</span>
-                </div>
-              )}
-              {metric.description && (
-                <p className="text-xs text-muted-foreground mt-1">{metric.description}</p>
-              )}
-            </CardContent>
-          </Card>
+              <div className={`text-sm font-medium px-2 py-1 rounded-full ${stat.trend === 'up' ? 'bg-green-700/20 text-green-200' : 'bg-red-700/20 text-red-200'}`}>{stat.change}</div>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -822,4 +785,4 @@ export function EnhancedDashboard() {
       />
     </div>
   );
-} 
+}

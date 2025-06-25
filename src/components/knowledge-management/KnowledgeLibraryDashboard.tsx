@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,59 +8,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, FileText, Search, Filter, BookOpen, Users, Clock } from "lucide-react";
 import { AddKnowledgeModal } from "./AddKnowledgeModal";
 import { KnowledgeDetailModal } from "./KnowledgeDetailModal";
-
-const mockKnowledgeEntries = [
-  {
-    id: "1",
-    title: "GDPR Compliance Guide",
-    type: "Playbook",
-    author: "Sarah Wilson",
-    jurisdiction: "EU",
-    entity: "TechCorp UK Ltd",
-    lastUpdated: "2024-01-15",
-    accessLevel: "Team",
-    tags: ["GDPR", "Privacy", "Compliance"],
-    views: 245,
-    status: "Published"
-  },
-  {
-    id: "2",
-    title: "Employment Contract FAQ",
-    type: "FAQ",
-    author: "Michael Chen",
-    jurisdiction: "UK",
-    entity: "TechCorp UK Ltd",
-    lastUpdated: "2024-01-20",
-    accessLevel: "Org-wide",
-    tags: ["Employment", "Contracts", "HR"],
-    views: 189,
-    status: "Published"
-  },
-  {
-    id: "3",
-    title: "Data Retention Risk Assessment",
-    type: "Risk Note",
-    author: "Emily Davis",
-    jurisdiction: "Multiple",
-    entity: "All Entities",
-    lastUpdated: "2024-01-18",
-    accessLevel: "Private",
-    tags: ["Data", "Risk", "Retention"],
-    views: 67,
-    status: "Draft"
-  }
-];
+import { useKnowledgeEntries } from '@/hooks/useKnowledgeEntries';
+import type { Database } from '@/types/database';
 
 export function KnowledgeLibraryDashboard() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [selectedEntry, setSelectedEntry] = useState<any>(null);
+  const [selectedEntry, setSelectedEntry] = useState<Database['public']['Tables']['knowledge_entries']['Row'] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [jurisdictionFilter, setJurisdictionFilter] = useState("all");
+  const { entries, loading, error } = useKnowledgeEntries();
 
-  const handleViewEntry = (entry: any) => {
+  const handleViewEntry = (entry: Database['public']['Tables']['knowledge_entries']['Row']) => {
     setSelectedEntry(entry);
     setDetailModalOpen(true);
   };
@@ -84,47 +44,55 @@ export function KnowledgeLibraryDashboard() {
     }
   };
 
+  if (loading) return <div className="p-6">Loading knowledge entries...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
+
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Entries</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,247</div>
-            <p className="text-xs text-muted-foreground">+23 this month</p>
+            <div className="text-2xl font-bold">{entries.length}</div>
+            <p className="text-xs text-muted-foreground">{entries.length > 0 ? `+${entries.length} loaded` : 'No entries'}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Published</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,089</div>
-            <p className="text-xs text-muted-foreground">87% of total</p>
+            <div className="text-2xl font-bold">{entries.filter(e => e.status === 'Published').length}</div>
+            <p className="text-xs text-muted-foreground">{entries.length > 0 ? `${Math.round((entries.filter(e => e.status === 'Published').length / entries.length) * 100)}% of total` : '0%'}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Contributors</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">34</div>
+            <div className="text-2xl font-bold">{[...new Set(entries.map(e => e.author))].length}</div>
             <p className="text-xs text-muted-foreground">Active authors</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{entries.filter(e => {
+              const updated = new Date(e.lastUpdated);
+              const weekAgo = new Date();
+              weekAgo.setDate(weekAgo.getDate() - 7);
+              return updated > weekAgo;
+            }).length}</div>
             <p className="text-xs text-muted-foreground">Updates this week</p>
           </CardContent>
         </Card>
@@ -210,7 +178,7 @@ export function KnowledgeLibraryDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockKnowledgeEntries.map((entry) => (
+              {entries.map((entry) => (
                 <TableRow key={entry.id}>
                   <TableCell className="font-medium">{entry.title}</TableCell>
                   <TableCell>{entry.type}</TableCell>

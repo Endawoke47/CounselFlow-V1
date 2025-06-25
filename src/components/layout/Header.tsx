@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Bell, Search, User, ChevronRight, Command, HelpCircle } from "lucide-react";
+import { Bell, Search, User, ChevronRight, ChevronDown, Command, HelpCircle, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -73,113 +73,65 @@ export function Header() {
   }, [showShortcuts]);
 
   return (
-    <header className="header-height border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 transition-all">
-      <div className="desktop-container h-full flex items-center justify-between">
-        {/* Left Section - Navigation & Search */}
-        <div className="flex items-center gap-6 flex-1">
-          <SidebarTrigger className="lg:hidden" />
-          
-          {/* Breadcrumbs - Desktop Only */}
-          <nav className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
-            {breadcrumbs.map((crumb, index) => (
-              <div key={crumb.path} className="flex items-center gap-2">
-                {index > 0 && <ChevronRight className="h-3 w-3" />}
-                <a 
-                  href={crumb.path}
-                  className={`hover:text-foreground transition-colors ${
-                    index === breadcrumbs.length - 1 
-                      ? 'text-foreground font-medium' 
-                      : 'hover:underline'
-                  }`}
-                >
-                  {crumb.label}
-                </a>
-              </div>
-            ))}
+    <header className="glass sticky top-0 z-30 w-full bg-background/80 backdrop-blur-xl border-b border-border/60 tab-transition shadow-lg">
+      <div className="flex items-center justify-between px-6 py-4">
+        {/* Left Section */}
+        <div className="flex items-center gap-4">
+          <SidebarTrigger
+            className="lg:hidden p-2 rounded-lg hover:bg-primary/10 tab-transition group"
+            aria-label="Open sidebar"
+          />
+          <nav className="hidden md:flex items-center space-x-2">
+            <span className="text-sm text-muted-foreground">Dashboard</span>
+            <ChevronRight size={16} className="text-muted-foreground/70" />
+            <span className="text-sm font-medium text-foreground">{breadcrumbs[breadcrumbs.length-1]?.label}</span>
           </nav>
-
-          {/* Global Search - Enhanced for Desktop */}
-          <div className="relative flex-1 max-w-md">
-            <div className="relative flex items-center">
-              <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-              <input
-                id="global-search"
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search entities, contracts, matters..."
-                className="w-full h-10 pl-10 pr-20 bg-muted/50 border border-input rounded-md text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-              <div className="absolute right-2 flex items-center gap-1 text-xs text-muted-foreground pointer-events-none">
-                <Command className="h-3 w-3" />
-                <span>K</span>
-              </div>
-            </div>
-            
-            {/* Search Results Dropdown - Would be implemented with actual search logic */}
-            {searchQuery && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50 animate-slide-down">
-                <div className="p-2 text-sm text-muted-foreground">
-                  Search results for "{searchQuery}" would appear here...
-                </div>
-              </div>
-            )}
+        </div>
+        {/* Center Section - Search */}
+        <div className="flex-1 max-w-md mx-8">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary tab-transition" />
+            <input
+              type="text"
+              placeholder="Search contracts, matters, documents..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-background/70 border border-border/40 rounded-xl focus:ring-2 focus:ring-primary/40 focus:border-transparent focus:bg-background tab-transition text-sm text-foreground shadow-sm"
+            />
           </div>
         </div>
-        
-        {/* Right Section - Actions & User */}
+        {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Keyboard Shortcuts Help */}
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => setShowShortcuts(!showShortcuts)}
-            className="hover:bg-accent/10 focus-ring"
-            title="Keyboard shortcuts (?)"
+          <button
+            className="relative p-2 rounded-lg hover:bg-primary/10 tab-transition group"
+            aria-label="Notifications"
           >
-            <HelpCircle className="h-4 w-4" />
-          </Button>
-
-          {/* Notifications */}
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="relative hover:bg-accent/10 focus-ring"
-            title="Notifications"
-          >
-            <Bell className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full"></span>
-          </Button>
-
-          {/* Theme Toggle */}
-          <ThemeToggle />
-
-          {/* User Profile */}
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="hover:bg-accent/10 focus-ring"
-            title="User profile"
-          >
-            <User className="h-4 w-4" />
-          </Button>
+            <Bell size={20} className="text-muted-foreground group-hover:text-primary tab-transition" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full">
+              <span className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></span>
+            </span>
+          </button>
+          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-primary/10 tab-transition group cursor-pointer">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-900/80 flex items-center justify-center shadow-md">
+              <User size={16} className="text-primary-foreground" />
+            </div>
+            <div className="hidden md:block text-left">
+              <p className="text-sm font-medium text-foreground">Legal Admin</p>
+              <p className="text-xs text-muted-foreground">admin@company.com</p>
+            </div>
+            <ChevronDown size={16} className="text-muted-foreground tab-transition" />
+          </div>
         </div>
       </div>
-
       {/* Keyboard Shortcuts Modal */}
       {showShortcuts && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="bg-card border border-border rounded-lg shadow-desktop p-6 max-w-md w-full mx-4 animate-slide-down">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-xl z-50 flex items-center justify-center">
+          <div className="glass border border-border rounded-lg shadow-xl p-6 max-w-md w-full mx-4 tab-fade-in">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Keyboard Shortcuts</h3>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowShortcuts(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                ×
-              </Button>
+              <h3 className="text-lg font-semibold text-foreground">Keyboard Shortcuts</h3>
+              <button onClick={() => setShowShortcuts(false)} className="text-muted-foreground hover:text-foreground tab-transition">
+                <X size={20} />
+              </button>
             </div>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">

@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -6,47 +8,56 @@ import { DrillDownSlideOver } from "@/components/ui/slide-over";
 import { useDrillDown } from "@/hooks/useDrillDown";
 import { Shield, AlertTriangle, FileText, Users, Clock, CheckCircle, Plus, TrendingUp } from "lucide-react";
 
-const mockOverviewData = {
-  ropaRecords: 142,
-  activeDPIAs: 23,
-  openDSRs: 8,
-  complianceScore: 87,
-  activeBreach: false,
-  vendorsTracked: 56,
-  trainingCompletion: 94
-};
-
-const mockRecentActivity = [
-  {
-    id: "1",
-    type: "DPIA",
-    description: "New employee data processing DPIA created",
-    status: "In Review",
-    date: "2024-01-15"
-  },
-  {
-    id: "2",
-    type: "DSR",
-    description: "Data access request from customer",
-    status: "Pending",
-    date: "2024-01-14"
-  },
-  {
-    id: "3",
-    type: "Compliance",
-    description: "GDPR compliance review completed",
-    status: "Complete",
-    date: "2024-01-13"
-  }
-];
-
 export function DataProtectionOverview() {
+  const [overview, setOverview] = useState<any>(null);
+  const [recent, setRecent] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { drillDownData, isSlideOverOpen, openDrillDown, closeDrillDown } = useDrillDown();
+
+  useEffect(() => {
+    async function fetchOverview() {
+      setLoading(true);
+      setError(null);
+      try {
+        // Aggregate stats from multiple tables
+        const [ropa, dpias, dsrs, vendors, training] = await Promise.all([
+          supabase.from("ropa_entries").select("id"),
+          supabase.from("risks").select("id, status, severity"),
+          supabase.from("dsr_requests").select("id, status"),
+          supabase.from("vendor_assessments").select("id"),
+          supabase.from("training_modules").select("id, completion_rate")
+        ]);
+        setOverview({
+          ropaRecords: ropa.data?.length || 0,
+          activeDPIAs: dpias.data?.filter((d: any) => d.status === "active").length || 0,
+          openDSRs: dsrs.data?.filter((d: any) => d.status === "open").length || 0,
+          complianceScore: 87, // Placeholder, replace with real calculation if available
+          activeBreach: false, // Placeholder, replace with real breach status if available
+          vendorsTracked: vendors.data?.length || 0,
+          trainingCompletion: training.data?.[0]?.completion_rate || 0
+        });
+        // Recent activity: combine latest from each table
+        setRecent([
+          ...(dpias.data?.slice(0, 1).map((d: any) => ({ id: d.id, type: "DPIA", description: "New DPIA created", status: d.status, date: d.created_at })) || []),
+          ...(dsrs.data?.slice(0, 1).map((d: any) => ({ id: d.id, type: "DSR", description: "New DSR request", status: d.status, date: d.created_at })) || []),
+        ]);
+      } catch (e) {
+        setError("Failed to load data protection overview.");
+      }
+      setLoading(false);
+    }
+    fetchOverview();
+  }, []);
+
+  if (loading) return <div className="p-6">Loading data protection overview...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
+  if (!overview) return null;
 
   const overviewStats = [
     {
       title: "ROPA Records",
-      value: mockOverviewData.ropaRecords,
+      value: overview.ropaRecords,
       icon: FileText,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
@@ -55,7 +66,7 @@ export function DataProtectionOverview() {
     },
     {
       title: "Active DPIAs",
-      value: mockOverviewData.activeDPIAs,
+      value: overview.activeDPIAs,
       icon: Shield,
       color: "text-green-600",
       bgColor: "bg-green-50",
@@ -64,7 +75,7 @@ export function DataProtectionOverview() {
     },
     {
       title: "Open DSRs",
-      value: mockOverviewData.openDSRs,
+      value: overview.openDSRs,
       icon: Users,
       color: "text-orange-600",
       bgColor: "bg-orange-50",
@@ -73,7 +84,7 @@ export function DataProtectionOverview() {
     },
     {
       title: "Compliance Score",
-      value: `${mockOverviewData.complianceScore}%`,
+      value: `${overview.complianceScore}%`,
       icon: CheckCircle,
       color: "text-purple-600",
       bgColor: "bg-purple-50",
@@ -191,7 +202,7 @@ export function DataProtectionOverview() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {mockRecentActivity.map((activity) => (
+              {recent.map((activity) => (
                 <div 
                   key={activity.id} 
                   className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
@@ -242,7 +253,7 @@ export function DataProtectionOverview() {
               className="text-center cursor-pointer hover:bg-accent p-4 rounded transition-colors"
               onClick={() => openDrillDown("compliance", "Vendor Data Processing", "Data Protection", { type: "vendor" })}
             >
-              <div className="text-2xl font-bold">{mockOverviewData.vendorsTracked}</div>
+              <div className="text-2xl font-bold">{overview.vendorsTracked}</div>
               <div className="text-sm text-muted-foreground">Vendors Tracked</div>
             </div>
           </CardContent>
@@ -262,9 +273,9 @@ export function DataProtectionOverview() {
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Completion Rate</span>
-                <span className="text-sm">{mockOverviewData.trainingCompletion}%</span>
+                <span className="text-sm">{overview.trainingCompletion}%</span>
               </div>
-              <Progress value={mockOverviewData.trainingCompletion} className="h-2" />
+              <Progress value={overview.trainingCompletion} className="h-2" />
             </div>
           </CardContent>
         </Card>

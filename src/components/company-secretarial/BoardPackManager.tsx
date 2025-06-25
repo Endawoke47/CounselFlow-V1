@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useBoardPacks } from '@/hooks/useBoardPacks';
+import { useBoardMeetings } from '@/hooks/useBoardMeetings';
+import type { Database } from '@/types/database';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,110 +26,29 @@ import {
   Users,
   Mail
 } from "lucide-react";
-import { BoardPack, BoardPackDocument, BoardMeeting } from "@/types/company-secretarial";
-import { companySecretarialService } from "@/services/companySecretarialService";
 
 export function BoardPackManager() {
-  const [boardPacks, setBoardPacks] = useState<BoardPack[]>([]);
-  const [meetings, setMeetings] = useState<BoardMeeting[]>([]);
-  const [selectedPack, setSelectedPack] = useState<BoardPack | null>(null);
+  const { boardPacks, loading: packsLoading, error: packsError } = useBoardPacks();
+  const { boardMeetings, loading: meetingsLoading, error: meetingsError } = useBoardMeetings();
+  const [selectedPack, setSelectedPack] = useState<Database['public']['Tables']['board_packs']['Row'] | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [createPackForm, setCreatePackForm] = useState({
-    meetingId: "",
-    title: "",
-    files: [] as File[]
+  const [createPackForm, setCreatePackForm] = useState<Database['public']['Tables']['board_packs']['Insert']>({
+    meetingId: '',
+    title: '',
+    files: [],
+    status: 'draft',
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadBoardPacks();
-    loadMeetings();
+    // No need to fetch, hooks handle the data
   }, []);
 
-  const loadBoardPacks = async () => {
-    // Mock data for board packs
-    const mockPacks: BoardPack[] = [
-      {
-        id: 'pack-1',
-        meetingId: 'meeting-1',
-        title: 'Q4 2024 Board Meeting Pack',
-        documents: [
-          {
-            id: 'doc-1',
-            title: 'Board Meeting Agenda',
-            fileName: 'agenda_q4_2024.pdf',
-            fileUrl: '/board-packs/agenda_q4_2024.pdf',
-            order: 1,
-            requiresSignature: false,
-            signatureStatus: 'not_required'
-          },
-          {
-            id: 'doc-2',
-            title: 'Financial Report Q4',
-            fileName: 'financial_report_q4.pdf',
-            fileUrl: '/board-packs/financial_report_q4.pdf',
-            order: 2,
-            requiresSignature: false,
-            signatureStatus: 'not_required'
-          },
-          {
-            id: 'doc-3',
-            title: 'Board Resolution - Budget Approval',
-            fileName: 'resolution_budget_2025.pdf',
-            fileUrl: '/board-packs/resolution_budget_2025.pdf',
-            order: 3,
-            requiresSignature: true,
-            signatureStatus: 'pending'
-          }
-        ],
-        createdDate: new Date('2024-12-01'),
-        sentDate: new Date('2024-12-08'),
-        status: 'sent',
-        eSignatureWorkflowId: 'workflow-123'
-      },
-      {
-        id: 'pack-2',
-        meetingId: 'meeting-2',
-        title: 'AGM 2024 Board Pack',
-        documents: [
-          {
-            id: 'doc-4',
-            title: 'AGM Notice',
-            fileName: 'agm_notice_2024.pdf',
-            fileUrl: '/board-packs/agm_notice_2024.pdf',
-            order: 1,
-            requiresSignature: false,
-            signatureStatus: 'not_required'
-          },
-          {
-            id: 'doc-5',
-            title: 'Annual Accounts',
-            fileName: 'annual_accounts_2024.pdf',
-            fileUrl: '/board-packs/annual_accounts_2024.pdf',
-            order: 2,
-            requiresSignature: true,
-            signatureStatus: 'pending'
-          }
-        ],
-        createdDate: new Date('2024-11-15'),
-        status: 'draft'
-      }
-    ];
-    setBoardPacks(mockPacks);
-  };
-
-  const loadMeetings = async () => {
-    try {
-      const meetingData = await companySecretarialService.getMeetings();
-      setMeetings(meetingData);
-    } catch (error) {
-      console.error("Failed to load meetings:", error);
-    }
-  };
-
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
+    const files = Array.from(event.target.files || []).map(file => file.name);
     setCreatePackForm(prev => ({
       ...prev,
       files: [...prev.files, ...files]
@@ -158,14 +80,19 @@ export function BoardPackManager() {
         });
       }, 300);
 
-      const boardPack = await companySecretarialService.createBoardPack(
-        createPackForm.meetingId,
-        createPackForm.files
-      );
+      // Mock board pack creation
+      const boardPack = {
+        id: Math.random().toString(36).substr(2, 9),
+        meetingId: createPackForm.meetingId,
+        title: createPackForm.title,
+        files: createPackForm.files,
+        status: 'draft',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
 
       setUploadProgress(100);
-      setBoardPacks(prev => [...prev, boardPack]);
-      setCreatePackForm({ meetingId: "", title: "", files: [] });
+      setCreatePackForm({ meetingId: "", title: "", files: [], status: 'draft' });
 
     } catch (error) {
       console.error("Board pack creation failed:", error);
@@ -179,20 +106,10 @@ export function BoardPackManager() {
     setIsSending(true);
 
     try {
-      const result = await companySecretarialService.sendBoardPackForSignature(packId);
-      
-      setBoardPacks(prev => 
-        prev.map(pack => 
-          pack.id === packId 
-            ? { 
-                ...pack, 
-                status: 'sent', 
-                sentDate: new Date(),
-                eSignatureWorkflowId: result.workflowId 
-              }
-            : pack
-        )
-      );
+      // Mock sending for signature
+      const result = {
+        workflowId: Math.random().toString(36).substr(2, 9),
+      };
 
     } catch (error) {
       console.error("Failed to send board pack:", error);
@@ -214,21 +131,8 @@ export function BoardPackManager() {
     }
   };
 
-  const getSignatureStatusIcon = (status: string) => {
-    switch (status) {
-      case 'signed':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'pending':
-        return <Clock className="h-4 w-4 text-orange-600" />;
-      case 'not_required':
-        return <FileText className="h-4 w-4 text-muted-foreground" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
-    }
-  };
-
   const getMeetingTitle = (meetingId: string) => {
-    const meeting = meetings.find(m => m.id === meetingId);
+    const meeting = boardMeetings.find(m => m.id === meetingId);
     return meeting ? meeting.title : 'Unknown Meeting';
   };
 
@@ -266,9 +170,9 @@ export function BoardPackManager() {
                   className="w-full p-2 border border-input rounded-md"
                 >
                   <option value="">Select a meeting</option>
-                  {meetings.map(meeting => (
+                  {boardMeetings.map(meeting => (
                     <option key={meeting.id} value={meeting.id}>
-                      {meeting.title} - {meeting.scheduledDate.toLocaleDateString()}
+                      {meeting.title} - {new Date(meeting.date).toLocaleDateString()}
                     </option>
                   ))}
                 </select>
@@ -300,9 +204,9 @@ export function BoardPackManager() {
                       <div key={index} className="flex items-center justify-between p-2 border rounded">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          <span className="text-sm">{file.name}</span>
+                          <span className="text-sm">{file}</span>
                           <Badge variant="outline" className="text-xs">
-                            {(file.size / 1024 / 1024).toFixed(1)} MB
+                            {/* {(file.size / 1024 / 1024).toFixed(1)} MB */}
                           </Badge>
                         </div>
                         <Button
@@ -342,83 +246,61 @@ export function BoardPackManager() {
 
       {/* Board Packs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {boardPacks.map((pack) => (
-          <Card key={pack.id} className="cursor-pointer hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-lg">{pack.title}</CardTitle>
-                  <CardDescription className="text-sm">
-                    {getMeetingTitle(pack.meetingId)}
-                  </CardDescription>
+        {packsLoading ? (
+          <div className="p-6">Loading board packs...</div>
+        ) : packsError ? (
+          <div className="p-6 text-red-600">{packsError}</div>
+        ) : (
+          boardPacks.map((pack) => (
+            <Card key={pack.id} className="cursor-pointer hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">{pack.title}</CardTitle>
+                    <CardDescription className="text-sm">
+                      {getMeetingTitle(pack.meetingId)}
+                    </CardDescription>
+                  </div>
+                  <Badge variant={getStatusColor(pack.status)}>
+                    {pack.status}
+                  </Badge>
                 </div>
-                <Badge variant={getStatusColor(pack.status)}>
-                  {pack.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground">
-                  <div className="flex items-center justify-between">
-                    <span>Documents:</span>
-                    <span>{pack.documents.length}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Created:</span>
-                    <span>{pack.createdDate.toLocaleDateString()}</span>
-                  </div>
-                  {pack.sentDate && (
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="text-sm text-muted-foreground">
                     <div className="flex items-center justify-between">
-                      <span>Sent:</span>
-                      <span>{pack.sentDate.toLocaleDateString()}</span>
+                      <span>Documents:</span>
+                      <span>{pack.files.length}</span>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Signature Status:</div>
-                  <div className="space-y-1">
-                    {pack.documents.filter(doc => doc.requiresSignature).map(doc => (
-                      <div key={doc.id} className="flex items-center justify-between text-xs">
-                        <span className="truncate">{doc.title}</span>
-                        <div className="flex items-center gap-1">
-                          {getSignatureStatusIcon(doc.signatureStatus)}
-                          <span>{doc.signatureStatus}</span>
-                        </div>
-                      </div>
-                    ))}
-                    {pack.documents.filter(doc => doc.requiresSignature).length === 0 && (
-                      <div className="text-xs text-muted-foreground">No signatures required</div>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setSelectedPack(pack)}
+                      className="flex-1"
+                    >
+                      <Eye className="h-3 w-3 mr-1" />
+                      View
+                    </Button>
+                    {pack.status === 'draft' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleSendForSignature(pack.id)}
+                        disabled={isSending}
+                      >
+                        <Send className="h-3 w-3 mr-1" />
+                        Send
+                      </Button>
                     )}
                   </div>
                 </div>
-
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={() => setSelectedPack(pack)}
-                    className="flex-1"
-                  >
-                    <Eye className="h-3 w-3 mr-1" />
-                    View
-                  </Button>
-                  {pack.status === 'draft' && (
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleSendForSignature(pack.id)}
-                      disabled={isSending}
-                    >
-                      <Send className="h-3 w-3 mr-1" />
-                      Send
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
 
       {/* Board Pack Detail Modal */}
@@ -431,7 +313,7 @@ export function BoardPackManager() {
                 {selectedPack.title}
               </DialogTitle>
               <DialogDescription>
-                {getMeetingTitle(selectedPack.meetingId)} • {selectedPack.documents.length} documents
+                {getMeetingTitle(selectedPack.meetingId)} • {selectedPack.files.length} documents
               </DialogDescription>
             </DialogHeader>
 
@@ -444,74 +326,14 @@ export function BoardPackManager() {
 
               <TabsContent value="documents" className="space-y-4">
                 <div className="space-y-3">
-                  {selectedPack.documents.map((document) => (
-                    <Card key={document.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-primary" />
-                            <div>
-                              <h4 className="font-medium">{document.title}</h4>
-                              <p className="text-sm text-muted-foreground">{document.fileName}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {document.requiresSignature && (
-                              <Badge variant={document.signatureStatus === 'signed' ? 'default' : 'secondary'}>
-                                <PenTool className="h-3 w-3 mr-1" />
-                                {document.signatureStatus}
-                              </Badge>
-                            )}
-                            <Button variant="outline" size="sm">
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-2" />
-                              Preview
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                  {selectedPack.files.map((file, idx) => (
+                    <div key={idx} className="truncate text-xs">{file}</div>
                   ))}
                 </div>
               </TabsContent>
 
               <TabsContent value="signatures" className="space-y-4">
                 <div className="space-y-4">
-                  {selectedPack.documents.filter(doc => doc.requiresSignature).length > 0 ? (
-                    selectedPack.documents.filter(doc => doc.requiresSignature).map(document => (
-                      <Card key={document.id}>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-sm">{document.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              {getSignatureStatusIcon(document.signatureStatus)}
-                              <span className="text-sm font-medium">
-                                {document.signatureStatus === 'signed' ? 'Signed' : 
-                                 document.signatureStatus === 'pending' ? 'Awaiting Signature' : 
-                                 'Not Required'}
-                              </span>
-                            </div>
-                            {document.signatureStatus === 'pending' && (
-                              <Button size="sm" variant="outline">
-                                <Mail className="h-4 w-4 mr-2" />
-                                Send Reminder
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  ) : (
-                    <div className="text-center py-8">
-                      <PenTool className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground">No documents require signatures</p>
-                    </div>
-                  )}
                 </div>
               </TabsContent>
 
@@ -524,28 +346,6 @@ export function BoardPackManager() {
                         {selectedPack.status}
                       </Badge>
                     </div>
-                    <div>
-                      <Label className="text-sm font-medium">Created Date</Label>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedPack.createdDate.toLocaleDateString()}
-                      </p>
-                    </div>
-                    {selectedPack.sentDate && (
-                      <div>
-                        <Label className="text-sm font-medium">Sent Date</Label>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedPack.sentDate.toLocaleDateString()}
-                        </p>
-                      </div>
-                    )}
-                    {selectedPack.eSignatureWorkflowId && (
-                      <div>
-                        <Label className="text-sm font-medium">Workflow ID</Label>
-                        <p className="text-sm text-muted-foreground font-mono">
-                          {selectedPack.eSignatureWorkflowId}
-                        </p>
-                      </div>
-                    )}
                   </div>
 
                   {selectedPack.status === 'sent' && (
@@ -596,4 +396,4 @@ export function BoardPackManager() {
       )}
     </div>
   );
-} 
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,73 +10,22 @@ import { AddTemplateModal } from "./AddTemplateModal";
 import { TemplateDetailModal } from "./TemplateDetailModal";
 import { RelationshipsPanel } from "@/components/ui/relationships-panel";
 import { RelatedItem } from "@/services/relationshipService";
-
-const mockTemplates = [
-  {
-    id: "1",
-    title: "Software License Agreement",
-    type: "License Agreement",
-    version: "v2.1",
-    jurisdiction: "UK",
-    entity: "TechCorp UK Ltd",
-    status: "Active",
-    lastUpdated: "2024-01-15",
-    author: "Sarah Wilson",
-    usageCount: 45,
-    accessLevel: "Org-wide"
-  },
-  {
-    id: "2",
-    title: "Employment Contract - Standard",
-    type: "Employment Contract",
-    version: "v3.0",
-    jurisdiction: "EU",
-    entity: "TechCorp GmbH",
-    status: "Active",
-    lastUpdated: "2024-01-20",
-    author: "Michael Chen",
-    usageCount: 78,
-    accessLevel: "Legal Team"
-  },
-  {
-    id: "3",
-    title: "Non-Disclosure Agreement",
-    type: "Non-Disclosure Agreement",
-    version: "v1.5",
-    jurisdiction: "US",
-    entity: "TechCorp Inc",
-    status: "Under Review",
-    lastUpdated: "2024-01-18",
-    author: "Emily Davis",
-    usageCount: 32,
-    accessLevel: "Team"
-  },
-  {
-    id: "4",
-    title: "Service Agreement Template",
-    type: "Service Agreement",
-    version: "v2.0",
-    jurisdiction: "Multiple",
-    entity: "All Entities",
-    status: "Draft",
-    lastUpdated: "2024-01-22",
-    author: "David Kim",
-    usageCount: 12,
-    accessLevel: "Private"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useTemplates } from '@/hooks/useTemplates';
+import type { Database } from '@/types/database';
 
 export function TemplateManagementDashboard() {
+  const { templates, loading, error } = useTemplates();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<Database['public']['Tables']['templates']['Row'] | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [jurisdictionFilter, setJurisdictionFilter] = useState("all");
   const [showRelationships, setShowRelationships] = useState(false);
 
-  const handleViewTemplate = (template: any) => {
+  const handleViewTemplate = (template: Database['public']['Tables']['templates']['Row']) => {
     setSelectedTemplate(template);
     setDetailModalOpen(true);
   };
@@ -101,48 +50,51 @@ export function TemplateManagementDashboard() {
     }
   };
 
+  if (loading) return <div className="p-6">Loading templates...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
+
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Templates</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">156</div>
-            <p className="text-xs text-muted-foreground">+8 this month</p>
+            <div className="text-2xl font-bold">{templates.length}</div>
+            <p className="text-xs text-muted-foreground">{templates.length > 0 ? `+${templates.length} loaded` : 'No templates'}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Templates</CardTitle>
-            <GitBranch className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Active</CardTitle>
+            <GitBranch className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">134</div>
-            <p className="text-xs text-muted-foreground">86% of total</p>
+            <div className="text-2xl font-bold">{templates.filter(t => t.status === 'Active').length}</div>
+            <p className="text-xs text-muted-foreground">Active templates</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Most Used</CardTitle>
+            <CardTitle className="text-sm font-medium">Jurisdictions</CardTitle>
             <Download className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Employment</div>
-            <p className="text-xs text-muted-foreground">78 uses</p>
+            <div className="text-2xl font-bold">{[...new Set(templates.map(t => t.jurisdiction))].length}</div>
+            <p className="text-xs text-muted-foreground">Unique jurisdictions</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="glass">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Recent Updates</CardTitle>
-            <Edit className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Types</CardTitle>
+            <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">Last 7 days</p>
+            <div className="text-2xl font-bold">{[...new Set(templates.map(t => t.type))].length}</div>
+            <p className="text-xs text-muted-foreground">Template types</p>
           </CardContent>
         </Card>
       </div>
@@ -218,25 +170,20 @@ export function TemplateManagementDashboard() {
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Version</TableHead>
                 <TableHead>Jurisdiction</TableHead>
                 <TableHead>Entity</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Access Level</TableHead>
-                <TableHead>Usage Count</TableHead>
                 <TableHead>Author</TableHead>
                 <TableHead>Last Updated</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockTemplates.map((template) => (
+              {templates.map((template) => (
                 <TableRow key={template.id}>
                   <TableCell className="font-medium">{template.title}</TableCell>
                   <TableCell>{template.type}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{template.version}</Badge>
-                  </TableCell>
                   <TableCell>{template.jurisdiction}</TableCell>
                   <TableCell>{template.entity}</TableCell>
                   <TableCell>
@@ -249,7 +196,6 @@ export function TemplateManagementDashboard() {
                       {template.accessLevel}
                     </Badge>
                   </TableCell>
-                  <TableCell>{template.usageCount}</TableCell>
                   <TableCell>{template.author}</TableCell>
                   <TableCell>{template.lastUpdated}</TableCell>
                   <TableCell>

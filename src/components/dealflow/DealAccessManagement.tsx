@@ -1,65 +1,33 @@
-
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Users, Shield, Clock, Building } from "lucide-react";
 
-const mockAccessUsers = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    email: "sarah.johnson@company.com",
-    role: "Investment Manager",
-    type: "Internal",
-    access: "Full Access",
-    sections: ["All"],
-    expiry: "N/A",
-    lastActive: "2024-01-15"
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    email: "michael.chen@lawfirm.com",
-    role: "External Counsel",
-    type: "External",
-    access: "Limited",
-    sections: ["Legal", "Compliance"],
-    expiry: "2024-03-15",
-    lastActive: "2024-01-14"
-  },
-  {
-    id: "3",
-    name: "Emily Rodriguez",
-    email: "emily.rodriguez@advisor.com",
-    role: "Financial Advisor",
-    type: "External",
-    access: "Read-Only",
-    sections: ["Financial"],
-    expiry: "2024-02-28",
-    lastActive: "2024-01-13"
-  },
-  {
-    id: "4",
-    name: "David Kim",
-    email: "david.kim@targetco.com",
-    role: "Target Company CFO",
-    type: "Target",
-    access: "Upload Only",
-    sections: ["Financial", "Commercial"],
-    expiry: "2024-04-30",
-    lastActive: "2024-01-12"
-  }
-];
-
-const accessLevels = [
-  { level: "Full Access", count: 3, description: "View, edit, download all documents" },
-  { level: "Limited", count: 2, description: "View and download specific sections" },
-  { level: "Read-Only", count: 4, description: "View only, no downloads" },
-  { level: "Upload Only", count: 1, description: "Upload documents, limited viewing" }
-];
-
 export function DealAccessManagement() {
+  const [accessUsers, setAccessUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchAccessUsers() {
+      setLoading(true);
+      setError(null);
+      // @ts-expect-error: Supabase client is not typed with DB schema
+      const { data, error } = await (supabase as any).from("deal_access_users").select("*");
+      if (error) {
+        setError("Failed to load access users");
+        setAccessUsers([]);
+      } else {
+        setAccessUsers(data || []);
+      }
+      setLoading(false);
+    }
+    fetchAccessUsers();
+  }, []);
+
   const getTypeColor = (type: string) => {
     const colors = {
       "Internal": "bg-blue-100 text-blue-800",
@@ -78,6 +46,13 @@ export function DealAccessManagement() {
     };
     return colors[access as keyof typeof colors] || "bg-gray-100 text-gray-800";
   };
+
+  const accessLevels = [
+    { level: "Full Access", count: 3, description: "View, edit, download all documents" },
+    { level: "Limited", count: 2, description: "View and download specific sections" },
+    { level: "Read-Only", count: 4, description: "View only, no downloads" },
+    { level: "Upload Only", count: 1, description: "Upload documents, limited viewing" }
+  ];
 
   return (
     <div className="space-y-6">
@@ -146,68 +121,74 @@ export function DealAccessManagement() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Access Level</TableHead>
-                <TableHead>Sections</TableHead>
-                <TableHead>Expiry</TableHead>
-                <TableHead>Last Active</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockAccessUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{user.name}</div>
-                      <div className="text-sm text-muted-foreground">{user.email}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getTypeColor(user.type)}>
-                      {user.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>
-                    <Badge className={getAccessColor(user.access)}>
-                      {user.access}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {user.sections.map((section, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {section}
-                        </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className={user.expiry !== "N/A" ? "text-orange-600" : ""}>
-                      {user.expiry}
-                    </span>
-                  </TableCell>
-                  <TableCell>{user.lastActive}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        Edit Access
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        View Activity
-                      </Button>
-                    </div>
-                  </TableCell>
+          {loading ? (
+            <div className="text-center py-8">Loading access users...</div>
+          ) : error ? (
+            <div className="text-center text-destructive py-8">{error}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>User</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Access Level</TableHead>
+                  <TableHead>Sections</TableHead>
+                  <TableHead>Expiry</TableHead>
+                  <TableHead>Last Active</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {accessUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{user.name}</div>
+                        <div className="text-sm text-muted-foreground">{user.email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getTypeColor(user.type)}>
+                        {user.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>
+                      <Badge className={getAccessColor(user.access)}>
+                        {user.access}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {(user.sections || []).map((section: string, index: number) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {section}
+                          </Badge>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className={user.expiry !== "N/A" ? "text-orange-600" : ""}>
+                        {user.expiry}
+                      </span>
+                    </TableCell>
+                    <TableCell>{user.lastActive}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                          Edit Access
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          View Activity
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 

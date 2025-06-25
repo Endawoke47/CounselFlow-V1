@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,94 +6,58 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Building, Shield, AlertTriangle, CheckCircle, Search, Eye, Edit } from "lucide-react";
-
-const mockVendors = [
-  {
-    id: "V-001",
-    name: "CloudData Solutions",
-    role: "Processor",
-    jurisdiction: "United States",
-    dataTypes: "Customer Analytics, Marketing Data",
-    contractStatus: "Active DPA",
-    riskScore: 75,
-    lastAssessment: "2024-01-10",
-    nextReview: "2024-07-10",
-    safeguards: "Standard Contractual Clauses",
-    onboardingStatus: "Complete",
-    complianceStatus: "Compliant"
-  },
-  {
-    id: "V-002",
-    name: "HR Management Corp",
-    role: "Controller",
-    jurisdiction: "European Union",
-    dataTypes: "Employee Data, Payroll Information",
-    contractStatus: "DPA Signed",
-    riskScore: 45,
-    lastAssessment: "2024-01-08",
-    nextReview: "2024-06-08",
-    safeguards: "Adequacy Decision",
-    onboardingStatus: "Complete",
-    complianceStatus: "Compliant"
-  },
-  {
-    id: "V-003",
-    name: "Analytics Platform Inc",
-    role: "Sub-processor",
-    jurisdiction: "Singapore",
-    dataTypes: "Website Analytics, User Behavior",
-    contractStatus: "Under Review",
-    riskScore: 85,
-    lastAssessment: "2023-12-15",
-    nextReview: "2024-06-15",
-    safeguards: "Binding Corporate Rules",
-    onboardingStatus: "In Progress",
-    complianceStatus: "Pending Review"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export function VendorOversight() {
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedRisk, setSelectedRisk] = useState("all");
 
-  const getRiskBadge = (score: number) => {
-    if (score >= 75) {
-      return <Badge className="bg-red-100 text-red-800">High Risk</Badge>;
-    } else if (score >= 50) {
-      return <Badge className="bg-yellow-100 text-yellow-800">Medium Risk</Badge>;
-    } else {
-      return <Badge className="bg-green-100 text-green-800">Low Risk</Badge>;
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    supabase
+      .from("vendor_assessments")
+      .select("*")
+      .then(({ data, error }) => {
+        if (error) setError(error.message);
+        else setVendors(data || []);
+        setLoading(false);
+      });
+  }, []);
+
+  const getRiskBadge = (score: number | string) => {
+    if (typeof score === "string") {
+      if (score === "High") return <Badge variant="destructive">High Risk</Badge>;
+      if (score === "Medium") return <Badge variant="secondary">Medium Risk</Badge>;
+      if (score === "Low") return <Badge variant="default">Low Risk</Badge>;
+      return <Badge variant="outline">{score}</Badge>;
     }
+    if (score >= 75) return <Badge variant="destructive">High Risk</Badge>;
+    if (score >= 50) return <Badge variant="secondary">Medium Risk</Badge>;
+    return <Badge variant="default">Low Risk</Badge>;
   };
 
   const getComplianceBadge = (status: string) => {
-    switch (status) {
-      case "Compliant":
-        return <Badge className="bg-green-100 text-green-800">Compliant</Badge>;
-      case "Pending Review":
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending Review</Badge>;
-      case "Non-Compliant":
-        return <Badge className="bg-red-100 text-red-800">Non-Compliant</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+    if (status === "Compliant") return <Badge variant="default">Compliant</Badge>;
+    if (status === "Pending Review") return <Badge variant="secondary">Pending Review</Badge>;
+    if (status === "Non-Compliant") return <Badge variant="destructive">Non-Compliant</Badge>;
+    return <Badge variant="outline">{status}</Badge>;
   };
 
   const getContractBadge = (status: string) => {
-    switch (status) {
-      case "Active DPA":
-        return <Badge className="bg-green-100 text-green-800">Active DPA</Badge>;
-      case "DPA Signed":
-        return <Badge className="bg-blue-100 text-blue-800">DPA Signed</Badge>;
-      case "Under Review":
-        return <Badge className="bg-yellow-100 text-yellow-800">Under Review</Badge>;
-      case "Expired":
-        return <Badge className="bg-red-100 text-red-800">Expired</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+    if (status === "Active DPA") return <Badge variant="default">Active DPA</Badge>;
+    if (status === "DPA Signed") return <Badge variant="secondary">DPA Signed</Badge>;
+    if (status === "Under Review") return <Badge variant="secondary">Under Review</Badge>;
+    if (status === "Expired") return <Badge variant="destructive">Expired</Badge>;
+    return <Badge variant="outline">{status}</Badge>;
   };
+
+  if (loading) return <div className="p-8 text-center">Loading vendors...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">Error: {error}</div>;
 
   return (
     <div className="space-y-6">
@@ -119,7 +82,7 @@ export function VendorOversight() {
             <Building className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">156</div>
+            <div className="text-2xl font-bold">{vendors.length}</div>
             <p className="text-xs text-muted-foreground">
               Active relationships
             </p>
@@ -132,7 +95,9 @@ export function VendorOversight() {
             <AlertTriangle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
+            <div className="text-2xl font-bold">
+              {vendors.filter(v => v.riskScore >= 75).length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Require immediate review
             </p>
@@ -145,9 +110,11 @@ export function VendorOversight() {
             <Shield className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">142</div>
+            <div className="text-2xl font-bold">
+              {vendors.filter(v => v.contractStatus === "Active DPA").length}
+            </div>
             <p className="text-xs text-muted-foreground">
-              91% coverage
+              {Math.round((vendors.filter(v => v.contractStatus === "Active DPA").length / vendors.length) * 100)}% coverage
             </p>
           </CardContent>
         </Card>
@@ -158,7 +125,9 @@ export function VendorOversight() {
             <CheckCircle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">23</div>
+            <div className="text-2xl font-bold">
+              {vendors.filter(v => new Date(v.nextReview) <= new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)).length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Next 90 days
             </p>
@@ -184,8 +153,12 @@ export function VendorOversight() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold">18</div>
-                  <div className="text-xs text-muted-foreground">12%</div>
+                  <div className="font-bold">
+                    {vendors.filter(v => v.riskScore >= 75).length}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {Math.round((vendors.filter(v => v.riskScore >= 75).length / vendors.length) * 100)}%
+                  </div>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -197,8 +170,12 @@ export function VendorOversight() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold">67</div>
-                  <div className="text-xs text-muted-foreground">43%</div>
+                  <div className="font-bold">
+                    {vendors.filter(v => v.riskScore < 75 && v.riskScore >= 50).length}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {Math.round((vendors.filter(v => v.riskScore < 75 && v.riskScore >= 50).length / vendors.length) * 100)}%
+                  </div>
                 </div>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -210,8 +187,12 @@ export function VendorOversight() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold">71</div>
-                  <div className="text-xs text-muted-foreground">45%</div>
+                  <div className="font-bold">
+                    {vendors.filter(v => v.riskScore < 50).length}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {Math.round((vendors.filter(v => v.riskScore < 50).length / vendors.length) * 100)}%
+                  </div>
                 </div>
               </div>
             </div>
@@ -230,28 +211,36 @@ export function VendorOversight() {
                   <div className="font-medium">Standard Contractual Clauses</div>
                   <div className="text-sm text-muted-foreground">EU Commission approved</div>
                 </div>
-                <Badge className="bg-blue-100 text-blue-800">89 vendors</Badge>
+                <Badge variant="outline">
+                  {vendors.filter(v => v.safeguards?.includes("Standard Contractual Clauses")).length} vendors
+                </Badge>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <div className="font-medium">Adequacy Decision</div>
                   <div className="text-sm text-muted-foreground">EU-approved countries</div>
                 </div>
-                <Badge className="bg-green-100 text-green-800">34 vendors</Badge>
+                <Badge variant="default">
+                  {vendors.filter(v => v.safeguards?.includes("Adequacy Decision")).length} vendors
+                </Badge>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <div className="font-medium">Binding Corporate Rules</div>
                   <div className="text-sm text-muted-foreground">Multinational groups</div>
                 </div>
-                <Badge className="bg-purple-100 text-purple-800">12 vendors</Badge>
+                <Badge variant="secondary">
+                  {vendors.filter(v => v.safeguards?.includes("Binding Corporate Rules")).length} vendors
+                </Badge>
               </div>
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <div className="font-medium">Certification Schemes</div>
                   <div className="text-sm text-muted-foreground">Privacy certifications</div>
                 </div>
-                <Badge className="bg-orange-100 text-orange-800">21 vendors</Badge>
+                <Badge variant="destructive">
+                  {vendors.filter(v => v.safeguards?.includes("Certification Schemes")).length} vendors
+                </Badge>
               </div>
             </div>
           </CardContent>
@@ -303,7 +292,7 @@ export function VendorOversight() {
       {/* Vendors Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Vendor Register ({mockVendors.length})</CardTitle>
+          <CardTitle>Vendor Register ({vendors.length})</CardTitle>
           <CardDescription>Third-party data processors and controllers</CardDescription>
         </CardHeader>
         <CardContent>
@@ -323,7 +312,7 @@ export function VendorOversight() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockVendors.map((vendor) => (
+              {vendors.map((vendor) => (
                 <TableRow key={vendor.id}>
                   <TableCell className="font-medium">{vendor.id}</TableCell>
                   <TableCell>

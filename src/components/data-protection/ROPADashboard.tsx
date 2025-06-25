@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,69 +6,43 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, FileText, Download, Eye, Edit, Search } from "lucide-react";
-
-const mockROPARecords = [
-  {
-    id: "ROPA-001",
-    purpose: "Employee HR Management",
-    dataSubjects: "Employees, Job Applicants",
-    dataTypes: "Personal Details, Employment History",
-    legalBasis: "Contract",
-    retention: "7 years post-employment",
-    transfers: "None",
-    riskLevel: "Low",
-    entity: "HQ Entity",
-    jurisdiction: "EU",
-    lastUpdated: "2024-01-10"
-  },
-  {
-    id: "ROPA-002",
-    purpose: "Customer Relationship Management",
-    dataSubjects: "Customers, Prospects",
-    dataTypes: "Contact Details, Transaction History",
-    legalBasis: "Legitimate Interest",
-    retention: "5 years post-relationship",
-    transfers: "US (Adequacy Decision)",
-    riskLevel: "Medium",
-    entity: "Sales Entity",
-    jurisdiction: "UK",
-    lastUpdated: "2024-01-08"
-  },
-  {
-    id: "ROPA-003",
-    purpose: "Marketing & Communications",
-    dataSubjects: "Customers, Subscribers",
-    dataTypes: "Email, Preferences, Behavior Data",
-    legalBasis: "Consent",
-    retention: "Until consent withdrawn",
-    transfers: "US (Standard Contractual Clauses)",
-    riskLevel: "High",
-    entity: "Marketing Entity",
-    jurisdiction: "EU",
-    lastUpdated: "2024-01-05"
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
 
 export function ROPADashboard() {
+  const [records, setRecords] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string|null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEntity, setSelectedEntity] = useState("all");
   const [selectedRisk, setSelectedRisk] = useState("all");
 
-  const getRiskBadge = (risk: string) => {
-    switch (risk) {
-      case "High":
-        return <Badge className="bg-red-100 text-red-800">High Risk</Badge>;
-      case "Medium":
-        return <Badge className="bg-yellow-100 text-yellow-800">Medium Risk</Badge>;
-      case "Low":
-        return <Badge className="bg-green-100 text-green-800">Low Risk</Badge>;
-      default:
-        return <Badge variant="outline">{risk}</Badge>;
+  useEffect(() => {
+    async function fetchRecords() {
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase.from("ropa_entries").select("*");
+      if (error) {
+        setError("Failed to load ROPA records");
+        setRecords([]);
+      } else {
+        setRecords(data || []);
+      }
+      setLoading(false);
     }
+    fetchRecords();
+  }, []);
+
+  const getRiskBadge = (risk: string) => {
+    if (risk === "High") return <Badge variant="destructive">High Risk</Badge>;
+    if (risk === "Medium") return <Badge variant="secondary">Medium Risk</Badge>;
+    if (risk === "Low") return <Badge variant="default">Low Risk</Badge>;
+    return <Badge variant="outline">{risk}</Badge>;
   };
 
   return (
     <div className="space-y-6">
+      {loading && <div className="text-center py-8">Loading ROPA records...</div>}
+      {error && <div className="text-center text-red-600 py-4">{error}</div>}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Records of Processing Activities (ROPA)</h2>
@@ -97,7 +70,7 @@ export function ROPADashboard() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">142</div>
+            <div className="text-2xl font-bold">{records.length}</div>
             <p className="text-xs text-muted-foreground">
               Across 12 entities
             </p>
@@ -110,7 +83,9 @@ export function ROPADashboard() {
             <FileText className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
+            <div className="text-2xl font-bold">
+              {records.filter(record => record.riskLevel === "High").length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Require immediate review
             </p>
@@ -123,7 +98,9 @@ export function ROPADashboard() {
             <FileText className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">34</div>
+            <div className="text-2xl font-bold">
+              {records.filter(record => record.transfers !== "None").length}
+            </div>
             <p className="text-xs text-muted-foreground">
               With appropriate safeguards
             </p>
@@ -136,7 +113,9 @@ export function ROPADashboard() {
             <FileText className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7</div>
+            <div className="text-2xl font-bold">
+              {records.filter(record => new Date(record.lastUpdated) < new Date(Date.now() - 365*24*60*60*1000)).length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Overdue for annual review
             </p>
@@ -189,7 +168,7 @@ export function ROPADashboard() {
       {/* ROPA Records Table */}
       <Card>
         <CardHeader>
-          <CardTitle>ROPA Records ({mockROPARecords.length})</CardTitle>
+          <CardTitle>ROPA Records ({records.length})</CardTitle>
           <CardDescription>Complete records of processing activities</CardDescription>
         </CardHeader>
         <CardContent>
@@ -209,7 +188,7 @@ export function ROPADashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockROPARecords.map((record) => (
+              {records.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell className="font-medium">{record.id}</TableCell>
                   <TableCell>

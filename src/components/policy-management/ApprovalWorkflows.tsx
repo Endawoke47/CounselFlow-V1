@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,48 +7,30 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
-const mockWorkflows = [
-  {
-    id: "1",
-    policyTitle: "Updated Privacy Policy",
-    version: "3.0",
-    submittedBy: "Sarah Johnson",
-    submittedDate: "2024-03-01",
-    status: "Pending Review",
-    currentApprover: "Michael Schmidt",
-    priority: "High"
-  },
-  {
-    id: "2",
-    policyTitle: "New Security Guidelines",
-    version: "1.0",
-    submittedBy: "Jennifer Chen",
-    submittedDate: "2024-02-28",
-    status: "In Review",
-    currentApprover: "Legal Team",
-    priority: "Medium"
-  },
-  {
-    id: "3",
-    policyTitle: "Employee Handbook Update",
-    version: "2.5",
-    submittedBy: "David Wilson",
-    submittedDate: "2024-02-25",
-    status: "Approved",
-    currentApprover: "John Smith",
-    priority: "Low"
-  }
-];
-
-const mockApprovalSteps = [
-  { step: "Legal Review", approver: "Sarah Johnson", status: "Completed", date: "2024-03-02" },
-  { step: "Compliance Check", approver: "Michael Schmidt", status: "In Progress", date: null },
-  { step: "Executive Approval", approver: "Jennifer Chen", status: "Pending", date: null }
-];
-
 export function ApprovalWorkflows() {
+  const [workflows, setWorkflows] = useState<any[]>([]);
+  const [approvalSteps, setApprovalSteps] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      setError(null);
+      const [wfRes, stepsRes] = await Promise.all([
+        supabase.from("policy_workflows").select("*"),
+        supabase.from("approval_steps").select("*")
+      ]);
+      if (wfRes.error) setError("Failed to load approval workflows.");
+      if (stepsRes.error) setError("Failed to load approval steps.");
+      setWorkflows(wfRes.data || []);
+      setApprovalSteps(stepsRes.data || []);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -78,6 +60,9 @@ export function ApprovalWorkflows() {
       default: return "bg-gray-100 text-gray-800";
     }
   };
+
+  if (loading) return <div className="p-6">Loading approval workflows...</div>;
+  if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
     <div className="space-y-6">
@@ -174,7 +159,7 @@ export function ApprovalWorkflows() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockWorkflows.map((workflow) => (
+              {workflows.map((workflow) => (
                 <TableRow key={workflow.id}>
                   <TableCell className="font-medium">{workflow.policyTitle}</TableCell>
                   <TableCell>{workflow.version}</TableCell>
@@ -211,7 +196,7 @@ export function ApprovalWorkflows() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockApprovalSteps.map((step, index) => (
+            {approvalSteps.map((step, index) => (
               <div key={index} className="flex items-center space-x-4 p-4 border rounded-lg">
                 {getStatusIcon(step.status)}
                 <div className="flex-1">

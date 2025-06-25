@@ -1,40 +1,24 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, Plus, Shield, FileText, Eye, Calendar } from "lucide-react";
+import { Search, Filter, Plus, Shield, Eye, Calendar } from "lucide-react";
 import { AddIPAssetModal } from "./AddIPAssetModal";
 import { IPAssetDetailModal } from "./IPAssetDetailModal";
-import { CentralDataService } from "@/services/centralDataService";
+import { useIPAssets } from '@/hooks/useIPAssets';
+import type { Database } from '@/types/database';
 
 export function IPAssetRegister() {
+  const { assets, loading, error } = useIPAssets();
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState<any>(null);
+  const [selectedAsset, setSelectedAsset] = useState<Database['public']['Tables']['ip_assets']['Row'] | null>(null);
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-
-  const centralIPAssets = CentralDataService.getIPAssets();
-  
-  // Transform central data to match component interface
-  const assets = centralIPAssets.map(asset => ({
-    id: asset.applicationNumber || asset.id.toUpperCase(),
-    title: asset.title,
-    type: asset.type,
-    status: asset.status,
-    jurisdiction: asset.jurisdiction,
-    filingDate: asset.filingDate.toLocaleDateString(),
-    expiryDate: asset.expirationDate ? asset.expirationDate.toLocaleDateString() : 'N/A',
-    inventor: asset.inventorIds.map(id => CentralDataService.getPersonById(id)?.fullName).filter(Boolean).join(', ') || 'Unknown',
-    assignee: CentralDataService.getEntityById(asset.assigneeId)?.name || 'Unknown Entity',
-    renewalDue: asset.expirationDate ? asset.expirationDate.toLocaleDateString() : 'N/A',
-    value: `$${asset.estimatedValue.toLocaleString()}`,
-    maintenanceCost: `$${asset.maintenanceFees.toLocaleString()}`
-  }));
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -48,22 +32,24 @@ export function IPAssetRegister() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Active": return "bg-green-100 text-green-800";
-      case "Pending": return "bg-yellow-100 text-yellow-800";
-      case "Expired": return "bg-red-100 text-red-800";
-      case "Abandoned": return "bg-gray-100 text-gray-800";
+      case "registered": return "bg-green-100 text-green-800";
+      case "pending": return "bg-yellow-100 text-yellow-800";
+      case "expired": return "bg-red-100 text-red-800";
+      case "abandoned": return "bg-gray-100 text-gray-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
 
   const filteredAssets = assets.filter(asset => {
-    const matchesSearch = asset.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         asset.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = asset.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      asset.id?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === "all" || asset.type === typeFilter;
     const matchesStatus = statusFilter === "all" || asset.status === statusFilter;
-    
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  if (loading) return <div className="p-8 text-center">Loading IP assets...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
 
   return (
     <div className="space-y-6">
@@ -128,8 +114,6 @@ export function IPAssetRegister() {
                 <TableHead>Type</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Jurisdiction</TableHead>
-                <TableHead>Value</TableHead>
-                <TableHead>Next Renewal</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -140,10 +124,7 @@ export function IPAssetRegister() {
                     <div>
                       <div className="font-medium">{asset.title}</div>
                       <div className="text-sm text-muted-foreground">
-                        {asset.id} • Filed: {asset.filingDate}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Inventor: {asset.inventor}
+                        {asset.id}
                       </div>
                     </div>
                   </TableCell>
@@ -158,20 +139,6 @@ export function IPAssetRegister() {
                     </Badge>
                   </TableCell>
                   <TableCell>{asset.jurisdiction}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{asset.value}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Maintenance: {asset.maintenanceCost}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {asset.renewalDue}
-                    </div>
-                  </TableCell>
                   <TableCell>
                     <Button 
                       variant="ghost" 

@@ -1,68 +1,15 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, Calendar, DollarSign, MapPin, Building, AlertTriangle } from "lucide-react";
-
-const mockDeals = [
-  {
-    id: "1",
-    name: "TechCorp Acquisition",
-    sector: "Technology",
-    dealSize: "$50M",
-    geography: "North America",
-    status: "Due Diligence",
-    priority: "High",
-    probability: 75,
-    owner: "Sarah Johnson",
-    timeline: "Q1 2024",
-    riskLevel: "Medium"
-  },
-  {
-    id: "2",
-    name: "Healthcare Holdings",
-    sector: "Healthcare",
-    dealSize: "$125M",
-    geography: "Europe",
-    status: "Under Consideration",
-    priority: "Medium",
-    probability: 45,
-    owner: "Michael Chen",
-    timeline: "Q2 2024",
-    riskLevel: "Low"
-  },
-  {
-    id: "3",
-    name: "Manufacturing Co",
-    sector: "Manufacturing",
-    dealSize: "$80M",
-    geography: "Asia Pacific",
-    status: "Negotiation",
-    priority: "High",
-    probability: 85,
-    owner: "Emily Rodriguez",
-    timeline: "Q1 2024",
-    riskLevel: "High"
-  },
-  {
-    id: "4",
-    name: "Retail Chain",
-    sector: "Retail",
-    dealSize: "$30M",
-    geography: "North America",
-    status: "Sourced",
-    priority: "Low",
-    probability: 25,
-    owner: "David Kim",
-    timeline: "Q3 2024",
-    riskLevel: "Medium"
-  }
-];
-
-const statusOrder = ["Sourced", "Under Consideration", "Due Diligence", "Negotiation", "Completed", "Dropped"];
+import { useDealflow } from "@/hooks/useDealflow";
 
 export function DealPipelineTracker() {
+  const { deals, loading, error } = useDealflow();
+
+  const statusOrder = ["Sourced", "Under Consideration", "Due Diligence", "Negotiation", "Completed", "Dropped"];
+
   const getStatusColor = (status: string) => {
     const colors = {
       "Sourced": "bg-gray-100 text-gray-800",
@@ -95,41 +42,45 @@ export function DealPipelineTracker() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 stats-grid">
+        <Card className="stat-card fade-in-up stagger-1 glassmorphic-card">
+          <div className="stat-icon bg-gradient-to-br from-blue-500 to-blue-400 shadow-blue-200">📈</div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Deals</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">+2 from last month</p>
+            <div className="stat-number text-2xl font-bold">{deals.filter(d => d.status !== 'Completed' && d.status !== 'Dropped').length}</div>
+            <div className="stat-label text-xs text-muted-foreground">Live in pipeline</div>
           </CardContent>
         </Card>
-        
-        <Card>
+        <Card className="stat-card fade-in-up stagger-2 glassmorphic-card">
+          <div className="stat-icon bg-gradient-to-br from-green-500 to-green-400 shadow-green-200">💰</div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Deal Value</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$285M</div>
-            <p className="text-xs text-muted-foreground">Across active pipeline</p>
+            <div className="stat-number text-2xl font-bold">
+              ${deals.filter(d => d.status !== 'Completed' && d.status !== 'Dropped').reduce((sum, d) => sum + (d.dealSize || 0), 0).toLocaleString()}M
+            </div>
+            <div className="stat-label text-xs text-muted-foreground">Across active pipeline</div>
           </CardContent>
         </Card>
-        
-        <Card>
+        <Card className="stat-card fade-in-up stagger-3 glassmorphic-card">
+          <div className="stat-icon bg-gradient-to-br from-purple-500 to-purple-400 shadow-purple-200">🎯</div>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avg. Close Probability</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">58%</div>
-            <p className="text-xs text-muted-foreground">Based on current status</p>
+            <div className="stat-number text-2xl font-bold">
+              {deals.length > 0 ? `${Math.round(deals.reduce((sum, d) => sum + (d.probability || 0), 0) / deals.length)}%` : 'N/A'}
+            </div>
+            <div className="stat-label text-xs text-muted-foreground">Based on current status</div>
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Deal Pipeline</CardTitle>
@@ -138,73 +89,79 @@ export function DealPipelineTracker() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {mockDeals.map((deal) => (
-              <div key={deal.id} className="p-4 border rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-3">
-                      <h4 className="font-semibold">{deal.name}</h4>
-                      <Badge className={getStatusColor(deal.status)}>
-                        {deal.status}
-                      </Badge>
-                      <Badge className={getPriorityColor(deal.priority)}>
-                        {deal.priority} Priority
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Building className="h-4 w-4" />
-                        {deal.sector}
+          {loading ? (
+            <div className="text-center py-8">Loading deals...</div>
+          ) : error ? (
+            <div className="text-center text-destructive py-8">{error}</div>
+          ) : (
+            <div className="space-y-4">
+              {deals.map((deal) => (
+                <div key={deal.id} className="p-4 border rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h4 className="font-semibold">{deal.name}</h4>
+                        <Badge className={getStatusColor(deal.status)}>
+                          {deal.status}
+                        </Badge>
+                        <Badge className={getPriorityColor(deal.priority)}>
+                          {deal.priority} Priority
+                        </Badge>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="h-4 w-4" />
-                        {deal.dealSize}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-4 w-4" />
-                        {deal.geography}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {deal.timeline}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="flex-1">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Close Probability</span>
-                          <span>{deal.probability}%</span>
+                      
+                      <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Building className="h-4 w-4" />
+                          {deal.sector}
                         </div>
-                        <Progress value={deal.probability} className="h-2" />
+                        <div className="flex items-center gap-1">
+                          <DollarSign className="h-4 w-4" />
+                          {deal.dealSize}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          {deal.geography}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {deal.timeline}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <AlertTriangle className={`h-4 w-4 ${getRiskColor(deal.riskLevel)}`} />
-                        <span className={`text-sm ${getRiskColor(deal.riskLevel)}`}>
-                          {deal.riskLevel} Risk
-                        </span>
+                      
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Close Probability</span>
+                            <span>{deal.probability}%</span>
+                          </div>
+                          <Progress value={deal.probability} className="h-2" />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <AlertTriangle className={`h-4 w-4 ${getRiskColor(deal.riskLevel)}`} />
+                          <span className={`text-sm ${getRiskColor(deal.riskLevel)}`}>
+                            {deal.riskLevel} Risk
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground">
+                        Owner: {deal.owner}
                       </div>
                     </div>
                     
-                    <div className="text-sm text-muted-foreground">
-                      Owner: {deal.owner}
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        View Details
+                      </Button>
+                      <Button variant="outline" size="sm">
+                        Update Status
+                      </Button>
                     </div>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Update Status
-                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

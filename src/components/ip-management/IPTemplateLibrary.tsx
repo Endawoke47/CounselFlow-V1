@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,96 +18,32 @@ import {
 } from "lucide-react";
 
 export function IPTemplateLibrary() {
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
 
-  const templates = [
-    {
-      id: "TPL-001",
-      title: "Patent Application Template",
-      category: "Patents",
-      type: "Application",
-      description: "Comprehensive template for utility patent applications including claims, drawings, and specifications",
-      lastUpdated: "2024-01-15",
-      downloads: 156,
-      rating: 4.8,
-      author: "IP Legal Team",
-      fileSize: "2.3 MB",
-      format: "DOCX",
-      jurisdiction: "US"
-    },
-    {
-      id: "TPL-002",
-      title: "Trademark License Agreement",
-      category: "Trademarks",
-      type: "License",
-      description: "Standard template for trademark licensing agreements with customizable terms and conditions",
-      lastUpdated: "2024-01-10",
-      downloads: 89,
-      rating: 4.6,
-      author: "Sarah Chen",
-      fileSize: "850 KB",
-      format: "DOCX",
-      jurisdiction: "Multi"
-    },
-    {
-      id: "TPL-003",
-      title: "IP Assignment Agreement",
-      category: "General",
-      type: "Assignment",
-      description: "Template for transferring intellectual property rights from inventors to company",
-      lastUpdated: "2024-01-08",
-      downloads: 203,
-      rating: 4.9,
-      author: "David Park",
-      fileSize: "1.2 MB",
-      format: "PDF",
-      jurisdiction: "US"
-    },
-    {
-      id: "TPL-004",
-      title: "Copyright License Template",
-      category: "Copyright",
-      type: "License",
-      description: "Flexible template for licensing copyrighted materials with various usage rights",
-      lastUpdated: "2023-12-20",
-      downloads: 67,
-      rating: 4.5,
-      author: "Emily Rodriguez",
-      fileSize: "720 KB",
-      format: "DOCX",
-      jurisdiction: "Global"
-    },
-    {
-      id: "TPL-005",
-      title: "Trade Secret Protection Agreement",
-      category: "Trade Secrets",
-      type: "Protection",
-      description: "Comprehensive template for protecting confidential information and trade secrets",
-      lastUpdated: "2024-01-05",
-      downloads: 124,
-      rating: 4.7,
-      author: "Legal Operations",
-      fileSize: "1.5 MB",
-      format: "DOCX",
-      jurisdiction: "US, EU"
-    },
-    {
-      id: "TPL-006",
-      title: "Patent Search Report Template",
-      category: "Patents",
-      type: "Report",
-      description: "Structured template for documenting prior art search results and analysis",
-      lastUpdated: "2023-12-15",
-      downloads: 78,
-      rating: 4.4,
-      author: "Research Team",
-      fileSize: "980 KB",
-      format: "XLSX",
-      jurisdiction: "Global"
+  useEffect(() => {
+    async function fetchTemplates() {
+      setLoading(true);
+      setError(null);
+      try {
+        // TODO: Replace 'ip_templates' with the actual table name if different
+        const { data, error: fetchError } = await supabase
+          .from("ip_templates")
+          .select("*");
+        if (fetchError) throw fetchError;
+        setTemplates(data || []);
+      } catch (err: any) {
+        setError(err.message || "Failed to load templates");
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchTemplates();
+  }, []);
 
   const categories = [
     { value: "all", label: "All Categories" },
@@ -150,11 +86,10 @@ export function IPTemplateLibrary() {
   };
 
   const filteredTemplates = templates.filter(template => {
-    const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = template.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "all" || template.category === categoryFilter;
     const matchesType = typeFilter === "all" || template.type === typeFilter;
-    
     return matchesSearch && matchesCategory && matchesType;
   });
 
@@ -166,6 +101,9 @@ export function IPTemplateLibrary() {
       />
     ));
   };
+
+  if (loading) return <div className="p-8 text-center">Loading templates...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,10 +27,12 @@ import { GroupStructureViewer } from "./GroupStructureViewer";
 import { AIResolutionDrafter } from "./AIResolutionDrafter";
 import { MeetingCalendar } from "./MeetingCalendar";
 import { BoardPackManager } from "./BoardPackManager";
-import { CentralDataService } from "@/services/centralDataService";
+import { useEntities } from '@/hooks/useEntities';
+import type { Database } from '@/types/database';
 
 export function CompanySecretarialDashboard() {
-  const [selectedEntity, setSelectedEntity] = useState<any>(null);
+  const { entities, loading, error } = useEntities();
+  const [selectedEntity, setSelectedEntity] = useState<Database['public']['Tables']['entities']['Row'] | null>(null);
   const [isEntityModalOpen, setIsEntityModalOpen] = useState(false);
   const [isAddEntityModalOpen, setIsAddEntityModalOpen] = useState(false);
   const [isMeetingSchedulerOpen, setIsMeetingSchedulerOpen] = useState(false);
@@ -39,19 +40,28 @@ export function CompanySecretarialDashboard() {
   const [showGroupStructure, setShowGroupStructure] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'resolutions' | 'calendar' | 'boardpacks'>('dashboard');
 
-  const entities = CentralDataService.getEntities();
-
-  const handleEntityClick = (entity: any) => {
+  const handleEntityClick = (entity: Database['public']['Tables']['entities']['Row']) => {
     setSelectedEntity(entity);
     setIsEntityModalOpen(true);
   };
 
-  const handleAddEntity = (entityData: any) => {
+  const handleAddEntity = (entityData: Database['public']['Tables']['entities']['Insert']) => {
     console.log("Adding new entity:", entityData);
     // Here you would typically save to your backend
   };
 
-  const handleScheduleMeeting = (meetingData: any) => {
+  interface MeetingFormData {
+    title: string;
+    type: string;
+    entity: string;
+    date: string;
+    time: string;
+    location: string;
+    agenda: string;
+    attendees: string;
+  }
+
+  const handleScheduleMeeting = (meetingData: MeetingFormData) => {
     console.log("Scheduling meeting:", meetingData);
     // Here you would typically save to your backend
   };
@@ -286,31 +296,12 @@ export function CompanySecretarialDashboard() {
                               <MapPin className="h-3 w-3" />
                               {entity.jurisdiction}
                             </span>
-                            <span>
-                              Company Number: {entity.companyNumber}
-                            </span>
-                            <Badge variant="secondary">{entity.status}</Badge>
                           </div>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <FileText className="h-3 w-3" />
-                              {entity.documentCount} Documents
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <BookOpen className="h-3 w-3" />
-                              {entity.registerEntries} Register Entries
-                            </span>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {entity.hasOverdue ? (
-                          <Badge variant="destructive">Overdue Filing</Badge>
-                        ) : entity.pendingFilings > 0 ? (
-                          <Badge variant="outline">{entity.pendingFilings} Pending Filings</Badge>
-                        ) : (
-                          <Badge variant="outline">No Pending Actions</Badge>
-                        )}
                         <Button variant="ghost" size="sm">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>

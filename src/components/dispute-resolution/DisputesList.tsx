@@ -9,11 +9,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Search, Filter, Download, Eye, Edit, MoreHorizontal, Link, Upload } from "lucide-react";
 import { DisputeDetailModal } from "./DisputeDetailModal";
 import { RelationshipsPanel } from "@/components/ui/relationships-panel";
-import { RelatedItem } from "@/services/relationshipService";
 import { ExcelImportModal } from "@/components/shared/ExcelImportModal";
 import { ExcelExportModal } from "@/components/shared/ExcelExportModal";
+import { useDisputes } from "../../hooks/useDisputes";
 
 export function DisputesList() {
+  const { disputes, loading, error } = useDisputes();
   const [selectedDisputes, setSelectedDisputes] = useState<string[]>([]);
   const [showDisputeDetail, setShowDisputeDetail] = useState(false);
   const [selectedDisputeId, setSelectedDisputeId] = useState<string | null>(null);
@@ -21,65 +22,6 @@ export function DisputesList() {
   const [showRelationships, setShowRelationships] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
-
-  const disputes = [
-    {
-      id: "DIS-001",
-      title: "Contract Breach - Supplier XYZ",
-      entity: "Tech Corp Ltd",
-      counterparty: "XYZ Supplies Inc",
-      status: "In Review",
-      priority: "High",
-      owner: "Sarah Johnson",
-      exposure: "$450,000",
-      provisioned: true,
-      initiated: "2024-01-15",
-      deadline: "2024-02-15",
-      lastUpdated: "2 hours ago"
-    },
-    {
-      id: "DIS-002", 
-      title: "Employment Dispute - Wrongful Termination",
-      entity: "Tech Corp UK",
-      counterparty: "John Smith",
-      status: "Negotiation",
-      priority: "Medium",
-      owner: "Mike Chen",
-      exposure: "$125,000",
-      provisioned: false,
-      initiated: "2024-01-10",
-      deadline: "2024-03-01",
-      lastUpdated: "1 day ago"
-    },
-    {
-      id: "DIS-003",
-      title: "IP Infringement Claim",
-      entity: "Innovation Labs",
-      counterparty: "Patent Co LLC",
-      status: "Escalated",
-      priority: "Critical",
-      owner: "Lisa Wang",
-      exposure: "$800,000",
-      provisioned: true,
-      initiated: "2024-01-05",
-      deadline: "2024-01-30",
-      lastUpdated: "3 days ago"
-    },
-    {
-      id: "DIS-004",
-      title: "Lease Dispute - Office Space",
-      entity: "Real Estate Holdings",
-      counterparty: "Property Management Co",
-      status: "Open",
-      priority: "Low",
-      owner: "Tom Rodriguez",
-      exposure: "$75,000",
-      provisioned: false,
-      initiated: "2024-01-20",
-      deadline: "2024-04-01",
-      lastUpdated: "5 days ago"
-    }
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -113,7 +55,7 @@ export function DisputesList() {
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedDisputes(disputes.map(d => d.id));
+      setSelectedDisputes(disputes.map((d: any) => d.id));
     } else {
       setSelectedDisputes([]);
     }
@@ -124,38 +66,27 @@ export function DisputesList() {
     setShowDisputeDetail(true);
   };
 
-  // Excel import/export configuration
-  const disputeColumns = [
-    { key: 'title', label: 'Dispute Title', type: 'text' as const },
-    { key: 'entity', label: 'Entity', type: 'text' as const },
-    { key: 'counterparty', label: 'Counterparty', type: 'text' as const },
-    { key: 'status', label: 'Status', type: 'text' as const },
-    { key: 'priority', label: 'Priority', type: 'text' as const },
-    { key: 'exposure', label: 'Exposure Amount', type: 'currency' as const },
-    { key: 'currency', label: 'Currency', type: 'text' as const },
-    { key: 'initiated', label: 'Initiated Date', type: 'date' as const },
-    { key: 'deadline', label: 'Deadline', type: 'date' as const },
-    { key: 'owner', label: 'Owner', type: 'text' as const },
-    { key: 'caseType', label: 'Case Type', type: 'text' as const }
-  ];
+  if (loading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Eye className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-  const handleImportDisputes = async (data: any[]) => {
-    // In a real implementation, this would call an API to import the disputes
-    console.log('Importing disputes:', data);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  };
-
-  const handleExportDisputes = async (config: any) => {
-    // In a real implementation, this would prepare the data for export
-    console.log('Exporting disputes with config:', config);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  };
+  if (error) {
+    return (
+      <Card className="glass tab-fade-in">
+        <CardContent className="p-6 text-center text-red-600">
+          Error loading disputes: {error}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="glass tab-fade-in">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -186,54 +117,7 @@ export function DisputesList() {
               </Button>
             </div>
           </div>
-          
-          {/* Filters */}
-          <div className="flex gap-4 mt-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search disputes by title, entity, or counterparty..." className="pl-9" />
-            </div>
-            <Select>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="open">Open</SelectItem>
-                <SelectItem value="in-review">In Review</SelectItem>
-                <SelectItem value="negotiation">Negotiation</SelectItem>
-                <SelectItem value="escalated">Escalated</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-                <SelectItem value="closed">Closed</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Priority" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Priority</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Entity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Entities</SelectItem>
-                <SelectItem value="tech-corp">Tech Corp Ltd</SelectItem>
-                <SelectItem value="tech-uk">Tech Corp UK</SelectItem>
-                <SelectItem value="innovation">Innovation Labs</SelectItem>
-                <SelectItem value="real-estate">Real Estate Holdings</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </CardHeader>
-        
         <CardContent>
           <Table>
             <TableHeader>
@@ -257,7 +141,7 @@ export function DisputesList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {disputes.map((dispute) => (
+              {disputes.map((dispute: any) => (
                 <TableRow key={dispute.id} className="hover:bg-muted/50">
                   <TableCell>
                     <Checkbox 
@@ -350,21 +234,9 @@ export function DisputesList() {
         onOpenChange={setShowImportModal}
         title="Import Disputes from Excel"
         description="Upload an Excel file to bulk import dispute data"
-        templateColumns={disputeColumns.map(col => col.label)}
-        onImport={handleImportDisputes}
-        sampleData={[{
-          'Dispute Title': 'Contract Breach - Vendor ABC',
-          'Entity': 'Acme Corporation Ltd',
-          'Counterparty': 'ABC Supplies Inc',
-          'Status': 'In Review',
-          'Priority': 'High',
-          'Exposure Amount': '250000',
-          'Currency': 'USD',
-          'Initiated Date': '2024-01-15',
-          'Deadline': '2024-03-15',
-          'Owner': 'Sarah Johnson',
-          'Case Type': 'Contract Dispute'
-        }]}
+        templateColumns={[]}
+        onImport={() => {}}
+        sampleData={[]}
       />
 
       {/* Export Modal */}
@@ -374,8 +246,8 @@ export function DisputesList() {
         title="Export Disputes to Excel"
         description="Export dispute data to Excel or CSV format"
         data={disputes}
-        columns={disputeColumns}
-        onExport={handleExportDisputes}
+        columns={[]}
+        onExport={() => {}}
       />
     </div>
   );
