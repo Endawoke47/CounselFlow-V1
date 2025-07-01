@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  /* Legal Color Palette */
+  --legal-navy: 10 22 40;
+  --legal-blue: 30 64 175;
+  --legal-gold: 217 119 6;
+  --legal-silver: 100 116 139;
+  --legal-white: 255 255 255;
+  
+  --background: #ffffff;
+  --foreground: #171717;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+:root {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  --font-legal: "IBM Plex Serif", Georgia, serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", monospace;
+  
+  /* Legal Design System */
+  --color-legal-navy: rgb(10 22 40);
+  --color-legal-blue: rgb(30 64 175);
+  --color-legal-gold: rgb(217 119 6);
+  --color-legal-silver: rgb(100 116 139);
+  --color-legal-white: rgb(255 255 255);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Legal Design System Components */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+
+.legal-gradient {
+  background: linear-gradient(135deg, #0a1628 0%, #1e40af 50%, #3b82f6 100%);
+}
+
+.legal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgb(10 22 40);
+  font-family: var(--font-legal);
+}
+
+.ai-pulse {
+  animation: pulse-legal 2s ease-in-out infinite;
+}
+
+@keyframes pulse-legal {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
