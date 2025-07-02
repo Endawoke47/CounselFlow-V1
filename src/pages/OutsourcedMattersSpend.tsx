@@ -1,32 +1,35 @@
-import { CorporateLayout } from "@/components/corporate";
-import { CorporateCard, CorporateCardHeader, CorporateCardContent } from "@/components/corporate/CorporateCard";
-import { CorporateButton } from "@/components/corporate/CorporateButton";
-import { DollarSign, TrendingUp, TrendingDown, Users, PieChart, Search, Filter, Plus, BarChart3 } from "lucide-react";
+import React, { useState } from 'react'
+import { CorporateLayout } from "@/components/corporate/CorporateLayout"
+import { CorporateCard } from "@/components/corporate/CorporateCard"
+import { CorporateButton } from "@/components/corporate/CorporateButton"
+import { DollarSign, TrendingUp, TrendingDown, Users, PieChart, Search, Filter, Plus, BarChart3, Brain, Sparkles, Zap, Target, Activity, Eye, Settings } from "lucide-react"
 
 const OutsourcedMattersSpend = () => {
+  const [searchQuery, setSearchQuery] = useState('')
+
   const stats = [
     {
-      title: "Total Spend",
-      value: "$2.4M",
-      change: "+15%",
+      title: "Quantum Legal Spend",
+      value: "$12.4M",
+      change: "+45%",
       trend: "up" as const,
       icon: DollarSign,
       variant: "default" as const,
     },
     {
-      title: "Active Vendors",
-      value: "28",
-      change: "+3",
+      title: "AI-Verified Vendors",
+      value: "87",
+      change: "+23",
       trend: "up" as const,
       icon: Users,
       variant: "success" as const,
     },
     {
-      title: "Avg. Matter Cost",
-      value: "$45K",
-      change: "-8%",
+      title: "Neural Cost Optimization",
+      value: "$145K",
+      change: "-32%",
       trend: "down" as const,
-      icon: TrendingDown,
+      icon: Brain,
       variant: "success" as const,
     },
     {
@@ -128,24 +131,24 @@ const OutsourcedMattersSpend = () => {
         </div>
 
         {/* Matters and Spend */}
-        <CorporateCard variant="elevated" padding="none">
-          <CorporateCardHeader 
-            title="Outsourced Matters" 
-            subtitle="Track spend and performance of external legal matters"
-            action={
-              <div className="flex space-x-2">
-                <CorporateButton variant="ghost" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Filter
-                </CorporateButton>
-                <CorporateButton variant="primary" size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Matter
-                </CorporateButton>
-              </div>
-            }
-          />
-          <CorporateCardContent className="p-6">
+        <CorporateCard variant="elevated" padding="lg">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Outsourced Matters</h2>
+              <p className="text-sm text-slate-600">Track spend and performance of external legal matters</p>
+            </div>
+            <div className="flex space-x-2">
+              <CorporateButton variant="outline" size="sm">
+                <Filter className="w-4 h-4 mr-2" />
+                Filter
+              </CorporateButton>
+              <CorporateButton variant="primary" size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Matter
+              </CorporateButton>
+            </div>
+          </div>
+          <div className="space-y-6">
             {/* Search Bar */}
             <div className="mb-6">
               <div className="relative">
@@ -212,7 +215,7 @@ const OutsourcedMattersSpend = () => {
                 </tbody>
               </table>
             </div>
-          </CorporateCardContent>
+          </div>
         </CorporateCard>
       </div>
     </CorporateLayout>

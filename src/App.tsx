@@ -4,66 +4,87 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SidebarProvider } from "@/contexts/SidebarContext";
 import Index from "./pages/Index";
-import CompanySecretarial from "./pages/CompanySecretarial";
 import Contracts from "./pages/Contracts";
-import DisputeResolution from "./pages/DisputeResolution";
-import MatterManagement from "./pages/MatterManagement";
-import LicensingRegulatory from "./pages/LicensingRegulatory";
-import PolicyManagement from "./pages/PolicyManagement";
+import ContractsNew from "./pages/ContractsNew";
+import EntityManagement from "./pages/EntityManagement";
+import TaskManagement from "./pages/TaskManagement";
 import KnowledgeManagement from "./pages/KnowledgeManagement";
+import MatterManagement from "./pages/MatterManagement";
+import RiskManagement from "./pages/RiskManagement";
+import RiskDashboard from "./pages/RiskDashboard";
+import DisputeResolution from "./pages/DisputeResolution";
+import OutsourcedMattersSpend from "./pages/OutsourcedMattersSpend";
+import ComplianceManagement from "./pages/ComplianceManagement";
+import PolicyManagement from "./pages/PolicyManagement";
+import UserAccessManagement from "./pages/UserAccessManagement";
 import IPManagement from "./pages/IPManagement";
 import DataProtection from "./pages/DataProtection";
-import OutsourcedMattersSpend from "./pages/OutsourcedMattersSpend";
-import NotFound from "./pages/NotFound";
-import RiskDashboard from "./pages/RiskDashboard";
-import TaskManagement from "./pages/TaskManagement";
-import UserAccessManagement from "./pages/UserAccessManagement";
+import LicensingRegulatory from "./pages/LicensingRegulatory";
 import Dealflow from "./pages/Dealflow";
+import CompanySecretarial from "./pages/CompanySecretarial";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <div className="min-h-screen w-full bg-slate-50">
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+    <SidebarProvider>
+      <LanguageProvider>
+        <ThemeProvider>
+          <div className="min-h-screen w-full bg-slate-50 overflow-x-hidden">
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/company-secretarial" element={<CompanySecretarial />} />
               <Route path="/contracts" element={<Contracts />} />
-              <Route path="/dispute-resolution" element={<DisputeResolution />} />
-              <Route path="/matters" element={<MatterManagement />} />
-              <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
-              <Route path="/policy-management" element={<PolicyManagement />} />
+              <Route path="/contracts-new" element={<ContractsNew />} />
+              <Route path="/entity-management" element={<EntityManagement />} />
+              <Route path="/task-management" element={<TaskManagement />} />
               <Route path="/knowledge-management" element={<KnowledgeManagement />} />
+              <Route path="/matters" element={<MatterManagement />} />
+              <Route path="/risk-management" element={<RiskManagement />} />
+              <Route path="/risk-dashboard" element={<RiskDashboard />} />
+              <Route path="/dispute-resolution" element={<DisputeResolution />} />
+              <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
+              <Route path="/compliance" element={<ComplianceManagement />} />
+              <Route path="/policy-management" element={<PolicyManagement />} />
+              <Route path="/user-access-management" element={<UserAccessManagement />} />
               <Route path="/ip-management" element={<IPManagement />} />
               <Route path="/data-protection" element={<DataProtection />} />
-              <Route path="/outsourced-matters-spend" element={<OutsourcedMattersSpend />} />
-              <Route path="/risk-dashboard" element={<RiskDashboard />} />
-              <Route path="/task-management" element={<TaskManagement />} />
-              <Route path="/user-access-management" element={<UserAccessManagement />} />
+              <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
               <Route path="/dealflow" element={<Dealflow />} />
-              {/* Redirect from old paths to new paths */}
+              <Route path="/company-secretarial" element={<CompanySecretarial />} />
+              
+              {/* Legacy redirects */}
               <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />
-              <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
               <Route path="/policies" element={<Navigate to="/policy-management" replace />} />
               <Route path="/knowledge" element={<Navigate to="/knowledge-management" replace />} />
-              <Route path="/ip" element={<Navigate to="/ip-management" replace />} />
               <Route path="/legal-spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
               <Route path="/spend" element={<Navigate to="/outsourced-matters-spend" replace />} />
-              <Route path="/risk" element={<Navigate to="/risk-dashboard" replace />} />
+              <Route path="/risk" element={<Navigate to="/risk-management" replace />} />
               <Route path="/tasks" element={<Navigate to="/task-management" replace />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/compliance-management" element={<Navigate to="/compliance" replace />} />
+              <Route path="/users" element={<Navigate to="/user-access-management" replace />} />
+              <Route path="/ip" element={<Navigate to="/ip-management" replace />} />
+              <Route path="/data" element={<Navigate to="/data-protection" replace />} />
+              <Route path="/licensing" element={<Navigate to="/licensing-regulatory" replace />} />
+              <Route path="/deals" element={<Navigate to="/dealflow" replace />} />
+              <Route path="/company" element={<Navigate to="/company-secretarial" replace />} />
+              
+              {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
       </div>
     </ThemeProvider>
+    </LanguageProvider>
+    </SidebarProvider>
   </QueryClientProvider>
 );
 
