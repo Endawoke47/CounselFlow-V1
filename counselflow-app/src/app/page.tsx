@@ -1,10 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Navigation } from '../components/ui/Navigation'
-import { Card, Button, Badge, Notification, Modal, LoadingSpinner, Divider } from '../components/ui/UIComponents'
+import { ModernNavigation } from '../components/ui/ModernNavigation'
+import { ModernDashboard } from '../components/ui/ModernDashboard'
+import { LoginPage } from '../components/ui/LoginPage'
+import { Button, Badge, Notification, Modal, Divider } from '../components/ui/UIComponents'
+import { AuthProvider, useAuth } from '../lib/auth'
+import { theme } from '../lib/theme'
 
-export default function CounselFlowApp() {
+function CounselFlowApp() {
+  const { user, isAuthenticated, login, loading, error } = useAuth()
   const [activeModule, setActiveModule] = useState('dashboard')
   const [showWelcome, setShowWelcome] = useState(true)
   const [notifications, setNotifications] = useState<Array<{
@@ -14,14 +19,15 @@ export default function CounselFlowApp() {
     message: string
   }>>([])
   const [showModal, setShowModal] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    // Welcome notification
-    setTimeout(() => {
-      addNotification('success', 'Welcome to CounselFlow', 'Your AI-native legal operating system is ready.')
-    }, 1000)
-  }, [])
+    if (isAuthenticated && user) {
+      // Welcome notification for authenticated users
+      setTimeout(() => {
+        addNotification('success', `Welcome back, ${user.name || user.username}!`, 'Your AI-native legal operating system is ready.')
+      }, 1000)
+    }
+  }, [isAuthenticated, user])
 
   const addNotification = (type: 'success' | 'warning' | 'error' | 'info', title: string, message: string) => {
     const id = Date.now()
@@ -38,86 +44,156 @@ export default function CounselFlowApp() {
     addNotification('info', 'Module Switched', `Now viewing ${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)} module`)
   }
 
+  const handleLogin = async (credentials: { username: string; password: string }) => {
+    const success = await login(credentials)
+    if (success) {
+      setShowWelcome(false)
+    }
+  }
+
+  const handleForgotPassword = () => {
+    addNotification('info', 'Password Reset', 'Password reset functionality would be implemented here. Contact your administrator.')
+  }
+
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <LoginPage 
+        onLogin={handleLogin}
+        onForgotPassword={handleForgotPassword}
+        error={error || undefined}
+        loading={loading}
+      />
+    )
+  }
+
   if (showWelcome) {
     return <WelcomeScreen onEnter={() => setShowWelcome(false)} />
   }
 
   return (
-    <div style={{ background: '#0F172A', minHeight: '100vh' }}>
-      <Navigation onModuleSelect={handleModuleSelect} activeModule={activeModule} />
-      
-      {/* Main Content Area */}
-      <main style={{
-        marginLeft: '280px',
-        padding: '2rem',
-        paddingBottom: '100px',
-        minHeight: '100vh'
-      }} className="mobile-full">
-        <ModuleContent 
-          activeModule={activeModule} 
-          onShowModal={() => setShowModal(true)}
-          onAddNotification={addNotification}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
+    <>
+      <div style={{ minHeight: '100vh', position: 'relative' }}>
+        <ModernNavigation 
+          onModuleSelect={handleModuleSelect} 
+          activeModule={activeModule}
         />
-      </main>
+        
+        {/* Main Content Area */}
+        <main 
+          style={{
+            marginLeft: '320px',
+            minHeight: '100vh',
+            transition: theme.animation.transition.normal
+          }} 
+          className="mobile-full"
+        >
+          {activeModule === 'dashboard' ? (
+            <ModernDashboard />
+          ) : (
+            <ModuleContent 
+              activeModule={activeModule} 
+              onAddNotification={addNotification}
+            />
+          )}
+        </main>
 
-      {/* Notifications */}
-      {notifications.map((notification) => (
-        <Notification
-          key={notification.id}
-          type={notification.type}
-          title={notification.title}
-          message={notification.message}
-          onClose={() => removeNotification(notification.id)}
-        />
-      ))}
+        {/* Notifications */}
+        {notifications.map((notification) => (
+          <Notification
+            key={notification.id}
+            type={notification.type}
+            title={notification.title}
+            message={notification.message}
+            onClose={() => removeNotification(notification.id)}
+          />
+        ))}
 
-      {/* Example Modal */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title="Contract Details"
-        size="large"
-      >
-        <div style={{ color: '#94A3B8' }}>
-          <h3 style={{ color: 'white', marginBottom: '1rem' }}>Service Agreement - TechCorp Inc.</h3>
-          <p style={{ marginBottom: '1rem' }}>
-            This comprehensive service agreement outlines the terms and conditions for legal services 
-            provided to TechCorp Inc. The contract includes provisions for intellectual property, 
-            confidentiality, and dispute resolution.
-          </p>
-          <Divider />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', margin: '1rem 0' }}>
-            <div>
-              <strong style={{ color: 'white' }}>Contract Value:</strong>
-              <p>$250,000</p>
+        {/* Example Modal */}
+        <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title="Contract Details"
+          size="large"
+        >
+          <div style={{ color: theme.colors.neutral[400] }}>
+            <h3 style={{ color: 'white', marginBottom: theme.spacing.lg }}>Service Agreement - TechCorp Inc.</h3>
+            <p style={{ marginBottom: theme.spacing.lg }}>
+              This comprehensive service agreement outlines the terms and conditions for legal services 
+              provided to TechCorp Inc. The contract includes provisions for intellectual property, 
+              confidentiality, and dispute resolution.
+            </p>
+            <Divider />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: theme.spacing.xl, margin: `${theme.spacing.lg} 0` }}>
+              <div>
+                <strong style={{ color: 'white' }}>Contract Value:</strong>
+                <p>$250,000</p>
+              </div>
+              <div>
+                <strong style={{ color: 'white' }}>Duration:</strong>
+                <p>12 months</p>
+              </div>
+              <div>
+                <strong style={{ color: 'white' }}>Status:</strong>
+                <p><Badge variant="warning">Under Review</Badge></p>
+              </div>
+              <div>
+                <strong style={{ color: 'white' }}>Next Action:</strong>
+                <p>Client signature required</p>
+              </div>
             </div>
-            <div>
-              <strong style={{ color: 'white' }}>Duration:</strong>
-              <p>12 months</p>
-            </div>
-            <div>
-              <strong style={{ color: 'white' }}>Status:</strong>
-              <p><Badge variant="warning">Under Review</Badge></p>
-            </div>
-            <div>
-              <strong style={{ color: 'white' }}>Next Action:</strong>
-              <p>Client signature required</p>
+            <Divider />
+            <div style={{ display: 'flex', gap: theme.spacing.lg, justifyContent: 'flex-end' }}>
+              <Button variant="outline" onClick={() => setShowModal(false)}>
+                Close
+              </Button>
+              <Button variant="primary">
+                Send for Signature
+              </Button>
             </div>
           </div>
-          <Divider />
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-            <Button variant="outline" onClick={() => setShowModal(false)}>
-              Close
-            </Button>
-            <Button variant="primary">
-              Send for Signature
-            </Button>
-          </div>
-        </div>
-      </Modal>
-    </div>
+        </Modal>
+      </div>
+
+      {/* CSS Styles */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          @keyframes pulse {
+            0%, 100% {
+              transform: scale(1);
+              box-shadow: 0 25px 70px ${theme.colors.primary[500]}40;
+            }
+            50% {
+              transform: scale(1.05);
+              box-shadow: 0 30px 80px ${theme.colors.primary[500]}60;
+            }
+          }
+
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+          
+          @media (max-width: 768px) {
+            .mobile-full {
+              margin-left: 0 !important;
+              padding-top: 80px !important;
+            }
+          }
+        `
+      }} />
+    </>
   )
 }
 
@@ -125,29 +201,29 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 25%, #334155 50%, #475569 75%, #64748B 100%)',
+      background: `linear-gradient(135deg, ${theme.colors.neutral[900]} 0%, ${theme.colors.neutral[800]} 25%, ${theme.colors.neutral[700]} 50%, ${theme.colors.neutral[600]} 75%, ${theme.colors.neutral[500]} 100%)`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '2rem'
+      padding: theme.spacing.xl
     }}>
       <div style={{
         textAlign: 'center',
-        maxWidth: '800px',
+        maxWidth: '900px',
         animation: 'fadeInUp 1s ease-out'
       }}>
         {/* Logo */}
         <div style={{
-          width: '120px',
-          height: '120px',
-          background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)',
-          borderRadius: '30px',
+          width: '140px',
+          height: '140px',
+          background: `linear-gradient(135deg, ${theme.colors.primary[500]}, ${theme.colors.accent.purple})`,
+          borderRadius: theme.borderRadius.xl,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '3rem',
-          margin: '0 auto 2rem',
-          boxShadow: '0 20px 60px rgba(59, 130, 246, 0.3)',
+          fontSize: '3.5rem',
+          margin: `0 auto ${theme.spacing['3xl']}`,
+          boxShadow: `0 25px 70px ${theme.colors.primary[500]}40`,
           animation: 'pulse 3s infinite'
         }}>
           ⚖️
@@ -155,34 +231,35 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
 
         {/* Title */}
         <h1 style={{
-          fontSize: '4rem',
-          fontWeight: '800',
-          marginBottom: '1rem',
-          background: 'linear-gradient(135deg, #60A5FA, #A78BFA, #34D399)',
+          fontSize: theme.typography.fontSize['4xl'],
+          fontWeight: theme.typography.fontWeight.extrabold,
+          marginBottom: theme.spacing.lg,
+          background: `linear-gradient(135deg, ${theme.colors.primary[400]}, ${theme.colors.accent.purple}, ${theme.colors.accent.emerald})`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
-          lineHeight: '1.1'
+          lineHeight: '1.1',
+          fontFamily: theme.typography.fontFamily.sans.join(', ')
         }}>
           CounselFlow
         </h1>
 
         <p style={{
-          fontSize: '1.5rem',
-          color: '#94A3B8',
-          marginBottom: '0.5rem',
-          fontWeight: '300'
+          fontSize: theme.typography.fontSize['2xl'],
+          color: theme.colors.neutral[300],
+          marginBottom: theme.spacing.md,
+          fontWeight: theme.typography.fontWeight.normal
         }}>
           AI-Native Legal Operating System
         </p>
 
         <p style={{
-          fontSize: '1.1rem',
-          color: '#64748B',
-          marginBottom: '3rem',
+          fontSize: theme.typography.fontSize.lg,
+          color: theme.colors.neutral[400],
+          marginBottom: theme.spacing['3xl'],
           lineHeight: '1.6',
-          maxWidth: '600px',
-          margin: '0 auto 3rem'
+          maxWidth: '700px',
+          margin: `0 auto ${theme.spacing['3xl']}`
         }}>
           Experience the future of legal practice with revolutionary AI-powered workflow automation, 
           advanced analytics, and comprehensive case management in one unified platform.
@@ -191,38 +268,54 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
         {/* Features Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1.5rem',
-          marginBottom: '3rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: theme.spacing.xl,
+          marginBottom: theme.spacing['3xl']
         }}>
           {[
-            { icon: '🤖', title: 'AI-Powered', desc: 'Intelligent legal assistance' },
-            { icon: '📊', title: 'Advanced Analytics', desc: 'Real-time insights' },
-            { icon: '🔒', title: 'Enterprise Security', desc: 'Military-grade protection' },
-            { icon: '⚡', title: 'Lightning Fast', desc: 'Optimized performance' }
+            { icon: '🤖', title: 'AI Assistant', desc: 'Intelligent legal guidance' },
+            { icon: '📊', title: 'Analytics', desc: 'Advanced insights & reports' },
+            { icon: '⚖️', title: 'Case Management', desc: 'Streamlined workflows' },
+            { icon: '🛡️', title: 'Compliance', desc: 'Risk monitoring & control' }
           ].map((feature, index) => (
-            <div key={index} style={{
-              background: 'rgba(15, 23, 42, 0.6)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(148, 163, 184, 0.1)',
-              borderRadius: '16px',
-              padding: '2rem 1rem',
-              animation: `fadeInUp 1s ease-out ${index * 0.1}s both`
-            }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
+            <div
+              key={index}
+              style={{
+                background: 'rgba(15, 23, 42, 0.6)',
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${theme.colors.neutral[700]}`,
+                borderRadius: theme.borderRadius.lg,
+                padding: theme.spacing.xl,
+                textAlign: 'center',
+                transition: theme.animation.transition.normal,
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px)'
+                e.currentTarget.style.boxShadow = theme.shadows['2xl']
+                e.currentTarget.style.borderColor = theme.colors.primary[500]
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = 'none'
+                e.currentTarget.style.borderColor = theme.colors.neutral[700]
+              }}
+            >
+              <div style={{ fontSize: '2.5rem', marginBottom: theme.spacing.md }}>
                 {feature.icon}
               </div>
               <h3 style={{
                 color: 'white',
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                marginBottom: '0.5rem'
+                fontSize: theme.typography.fontSize.lg,
+                fontWeight: theme.typography.fontWeight.semibold,
+                marginBottom: theme.spacing.sm
               }}>
                 {feature.title}
               </h3>
               <p style={{
-                color: '#94A3B8',
-                fontSize: '0.9rem'
+                color: theme.colors.neutral[400],
+                fontSize: theme.typography.fontSize.sm,
+                margin: 0
               }}>
                 {feature.desc}
               </p>
@@ -231,383 +324,104 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
         </div>
 
         {/* CTA Button */}
-        <Button
-          variant="primary"
-          size="large"
+        <button
           onClick={onEnter}
+          style={{
+            background: `linear-gradient(135deg, ${theme.colors.primary[600]}, ${theme.colors.primary[700]})`,
+            border: 'none',
+            borderRadius: theme.borderRadius.lg,
+            padding: `${theme.spacing.lg} ${theme.spacing['2xl']}`,
+            color: 'white',
+            fontSize: theme.typography.fontSize.lg,
+            fontWeight: theme.typography.fontWeight.semibold,
+            cursor: 'pointer',
+            transition: theme.animation.transition.normal,
+            boxShadow: theme.shadows.xl,
+            fontFamily: theme.typography.fontFamily.sans.join(', ')
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-3px)'
+            e.currentTarget.style.boxShadow = theme.shadows['2xl']
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = theme.shadows.xl
+          }}
         >
-          🚀 Enter CounselFlow
-        </Button>
+          Enter CounselFlow →
+        </button>
 
         <p style={{
-          color: '#64748B',
-          fontSize: '0.9rem',
-          marginTop: '2rem'
+          color: theme.colors.neutral[500],
+          fontSize: theme.typography.fontSize.sm,
+          marginTop: theme.spacing.lg
         }}>
-          Trusted by elite law firms and corporate legal departments worldwide
+          Click anywhere or press Enter to continue
         </p>
       </div>
     </div>
   )
 }
 
+// Module Content Component (placeholder for other modules)
 function ModuleContent({ 
   activeModule, 
-  onShowModal, 
-  onAddNotification,
-  isLoading,
-  setIsLoading 
-}: { 
+  onAddNotification
+}: {
   activeModule: string
-  onShowModal: () => void
   onAddNotification: (type: 'success' | 'warning' | 'error' | 'info', title: string, message: string) => void
-  isLoading: boolean
-  setIsLoading: (loading: boolean) => void
 }) {
-  const handleAction = (action: string) => {
-    setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
-      onAddNotification('success', 'Action Completed', `${action} has been successfully executed.`)
-    }, 2000)
-  }
-
-  switch (activeModule) {
-    case 'dashboard':
-      return <DashboardModule onShowModal={onShowModal} onAction={handleAction} isLoading={isLoading} />
-    case 'analytics':
-      return <AnalyticsModule onAction={handleAction} isLoading={isLoading} />
-    case 'contracts':
-      return <ContractsModule onShowModal={onShowModal} onAction={handleAction} isLoading={isLoading} />
-    case 'matters':
-      return <MattersModule onAction={handleAction} isLoading={isLoading} />
-    case 'ai-assistant':
-      return <AIAssistantModule onAction={handleAction} isLoading={isLoading} />
-    default:
-      return <DashboardModule onShowModal={onShowModal} onAction={handleAction} isLoading={isLoading} />
-  }
-}
-
-function DashboardModule({ onShowModal, onAction, isLoading }: { onShowModal: () => void, onAction: (action: string) => void, isLoading: boolean }) {
   return (
-    <div>
-      {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{
-          color: 'white',
-          fontSize: '2.5rem',
-          fontWeight: '700',
-          marginBottom: '0.5rem'
-        }}>
-          Welcome to CounselFlow
-        </h1>
-        <p style={{ color: '#94A3B8', fontSize: '1.1rem' }}>
-          Your AI-native legal operating system dashboard
-        </p>
-      </div>
-
-      {/* Quick Stats */}
+    <div style={{ 
+      padding: theme.spacing.xl,
+      maxWidth: '1400px',
+      margin: '0 auto'
+    }}>
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem'
+        textAlign: 'center',
+        padding: theme.spacing['3xl']
       }}>
-        {[
-          { title: 'Active Matters', value: '23', change: '+3 this week', color: '#3B82F6', icon: '⚖️' },
-          { title: 'Pending Reviews', value: '8', change: '2 urgent', color: '#F59E0B', icon: '📋' },
-          { title: 'Contracts Due', value: '5', change: 'Next 30 days', color: '#EF4444', icon: '📄' },
-          { title: 'AI Insights', value: '12', change: 'New recommendations', color: '#10B981', icon: '🤖' }
-        ].map((stat, index) => (
-          <Card key={index} hover>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '1rem'
-            }}>
-              <h3 style={{ color: '#94A3B8', fontSize: '0.9rem', margin: 0 }}>
-                {stat.title}
-              </h3>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                background: `${stat.color}20`,
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.2rem'
-              }}>
-                {stat.icon}
-              </div>
-            </div>
-            <div style={{
-              color: 'white',
-              fontSize: '2.5rem',
-              fontWeight: '700',
-              marginBottom: '0.5rem'
-            }}>
-              {stat.value}
-            </div>
-            <div style={{ color: '#94A3B8', fontSize: '0.8rem' }}>
-              {stat.change}
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Quick Actions */}
-      <Card style={{ marginBottom: '2rem' }}>
-        <h3 style={{ color: 'white', fontSize: '1.3rem', marginBottom: '1rem' }}>
-          Quick Actions
-        </h3>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1rem'
+        <h2 style={{
+          color: 'white',
+          fontSize: theme.typography.fontSize['3xl'],
+          fontWeight: theme.typography.fontWeight.bold,
+          marginBottom: theme.spacing.lg
         }}>
-          <Button variant="primary" onClick={() => onAction('New Matter Created')} disabled={isLoading}>
-            {isLoading ? <LoadingSpinner size="small" /> : '⚖️'} New Matter
-          </Button>
-          <Button variant="outline" onClick={onShowModal}>
-            📄 Review Contract
-          </Button>
-          <Button variant="secondary" onClick={() => onAction('Report Generated')}>
-            📊 Generate Report
-          </Button>
-          <Button variant="ghost" onClick={() => onAction('AI Analysis Started')}>
-            🤖 AI Analysis
-          </Button>
-        </div>
-      </Card>
-
-      {/* Recent Activity */}
-      <Card>
-        <h3 style={{ color: 'white', fontSize: '1.3rem', marginBottom: '1rem' }}>
-          Recent Activity
-        </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {[
-            { action: 'Contract reviewed and approved', client: 'TechCorp Inc.', time: '2 hours ago', status: 'completed', priority: 'high' },
-            { action: 'Matter status updated', client: 'Global Industries', time: '4 hours ago', status: 'pending', priority: 'medium' },
-            { action: 'AI analysis completed', client: 'StartupXYZ', time: '6 hours ago', status: 'completed', priority: 'low' }
-          ].map((activity, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '1rem',
-              background: 'rgba(30, 41, 59, 0.5)',
-              borderRadius: '10px'
-            }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ color: 'white', marginBottom: '0.25rem', fontWeight: '500' }}>
-                  {activity.action}
-                </div>
-                <div style={{ color: '#94A3B8', fontSize: '0.9rem' }}>
-                  {activity.client}
-                </div>
-              </div>
-              <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Badge 
-                  variant={activity.priority === 'high' ? 'error' : activity.priority === 'medium' ? 'warning' : 'success'} 
-                  size="small"
-                >
-                  {activity.priority}
-                </Badge>
-                <Badge 
-                  variant={activity.status === 'completed' ? 'success' : 'warning'} 
-                  size="small"
-                >
-                  {activity.status}
-                </Badge>
-                <div style={{ color: '#64748B', fontSize: '0.8rem', minWidth: '80px' }}>
-                  {activity.time}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  )
-}
-
-function AnalyticsModule({ onAction, isLoading }: { onAction: (action: string) => void, isLoading: boolean }) {
-  return (
-    <div>
-      <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '700', marginBottom: '2rem' }}>
-        📊 Advanced Analytics
-      </h1>
-      
-      <div style={{ display: 'grid', gap: '2rem' }}>
-        <Card>
-          <h3 style={{ color: 'white', marginBottom: '1rem' }}>Performance Metrics</h3>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '2rem'
-          }}>
-            {[
-              { metric: 'Case Success Rate', value: '94.2%', trend: '+5.3%' },
-              { metric: 'Avg. Resolution Time', value: '18.5 days', trend: '-12%' },
-              { metric: 'Client Satisfaction', value: '4.8/5', trend: '+0.2' },
-              { metric: 'Revenue Growth', value: '+23%', trend: 'YoY' }
-            ].map((item, index) => (
-              <div key={index} style={{ textAlign: 'center' }}>
-                <div style={{ color: 'white', fontSize: '2rem', fontWeight: '700' }}>
-                  {item.value}
-                </div>
-                <div style={{ color: '#94A3B8', fontSize: '0.9rem', margin: '0.5rem 0' }}>
-                  {item.metric}
-                </div>
-                <Badge variant="success" size="small">{item.trend}</Badge>
-              </div>
-            ))}
-          </div>
-        </Card>
-        
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-          <Card>
-            <h4 style={{ color: 'white', marginBottom: '1rem' }}>AI Predictions</h4>
-            <p style={{ color: '#94A3B8', marginBottom: '1rem' }}>
-              Based on current data trends and case patterns
-            </p>
-            <Button variant="primary" onClick={() => onAction('AI Prediction Generated')} disabled={isLoading}>
-              {isLoading ? <LoadingSpinner size="small" /> : '🤖'} Generate Predictions
-            </Button>
-          </Card>
-          
-          <Card>
-            <h4 style={{ color: 'white', marginBottom: '1rem' }}>Risk Assessment</h4>
-            <p style={{ color: '#94A3B8', marginBottom: '1rem' }}>
-              Comprehensive risk analysis across all active matters
-            </p>
-            <Button variant="outline" onClick={() => onAction('Risk Analysis Completed')}>
-              🛡️ Run Analysis
-            </Button>
-          </Card>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function ContractsModule({ onShowModal, onAction, isLoading }: { onShowModal: () => void, onAction: (action: string) => void, isLoading: boolean }) {
-  const contracts = [
-    { name: 'Service Agreement - TechCorp', status: 'Under Review', value: '$250K', due: '2025-07-15', priority: 'high' },
-    { name: 'NDA - Global Industries', status: 'Signed', value: '-', due: '2025-12-31', priority: 'low' },
-    { name: 'Partnership Agreement', status: 'Draft', value: '$1.2M', due: '2025-08-01', priority: 'medium' }
-  ]
-
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '700' }}>
-          📄 Contract Management
-        </h1>
-        <Button variant="primary" onClick={() => onAction('New Contract Created')} disabled={isLoading}>
-          {isLoading ? <LoadingSpinner size="small" /> : '+'} New Contract
-        </Button>
-      </div>
-
-      <Card>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {contracts.map((contract, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '1.5rem',
-              background: 'rgba(30, 41, 59, 0.5)',
-              borderRadius: '12px',
-              cursor: 'pointer'
-            }} onClick={onShowModal}>
-              <div>
-                <div style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem' }}>
-                  {contract.name}
-                </div>
-                <div style={{ color: '#94A3B8', fontSize: '0.9rem' }}>
-                  Due: {contract.due} • Value: {contract.value}
-                </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Badge 
-                  variant={contract.priority === 'high' ? 'error' : contract.priority === 'medium' ? 'warning' : 'success'} 
-                  size="small"
-                >
-                  {contract.priority}
-                </Badge>
-                <Badge 
-                  variant={contract.status === 'Signed' ? 'success' : contract.status === 'Under Review' ? 'warning' : 'info'} 
-                  size="small"
-                >
-                  {contract.status}
-                </Badge>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-    </div>
-  )
-}
-
-function MattersModule({ onAction, isLoading }: { onAction: (action: string) => void, isLoading: boolean }) {
-  return (
-    <div>
-      <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '700', marginBottom: '2rem' }}>
-        ⚖️ Matter Management
-      </h1>
-      
-      <Card>
-        <p style={{ color: '#94A3B8', textAlign: 'center', padding: '2rem' }}>
-          Matter management interface coming soon. This will include case tracking, 
-          timeline management, and collaboration tools.
+          {activeModule.charAt(0).toUpperCase() + activeModule.slice(1)} Module
+        </h2>
+        <p style={{
+          color: theme.colors.neutral[400],
+          fontSize: theme.typography.fontSize.lg,
+          marginBottom: theme.spacing.xl
+        }}>
+          This module is under development. Enhanced features coming soon!
         </p>
-        <div style={{ textAlign: 'center' }}>
-          <Button variant="primary" onClick={() => onAction('Matter Created')} disabled={isLoading}>
-            {isLoading ? <LoadingSpinner size="small" /> : '⚖️'} Create New Matter
-          </Button>
-        </div>
-      </Card>
+        <button
+          onClick={() => onAddNotification('info', 'Module Demo', `${activeModule} features will be available in the next update.`)}
+          style={{
+            background: `linear-gradient(135deg, ${theme.colors.primary[600]}, ${theme.colors.primary[700]})`,
+            border: 'none',
+            borderRadius: theme.borderRadius.lg,
+            padding: `${theme.spacing.md} ${theme.spacing.xl}`,
+            color: 'white',
+            fontSize: theme.typography.fontSize.base,
+            fontWeight: theme.typography.fontWeight.medium,
+            cursor: 'pointer',
+            transition: theme.animation.transition.normal
+          }}
+        >
+          Request Demo
+        </button>
+      </div>
     </div>
   )
 }
 
-function AIAssistantModule({ onAction, isLoading }: { onAction: (action: string) => void, isLoading: boolean }) {
+// Main App Component with Auth Provider
+export default function App() {
   return (
-    <div>
-      <h1 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '700', marginBottom: '2rem' }}>
-        🤖 AI Legal Assistant
-      </h1>
-      
-      <Card>
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <div style={{
-            width: '80px',
-            height: '80px',
-            background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '2rem',
-            margin: '0 auto 1rem'
-          }}>
-            🤖
-          </div>
-          <h3 style={{ color: 'white', marginBottom: '1rem' }}>AI-Powered Legal Intelligence</h3>
-          <p style={{ color: '#94A3B8', marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
-            Get instant legal insights, document analysis, and smart recommendations 
-            powered by advanced AI technology.
-          </p>
-          <Button variant="primary" onClick={() => onAction('AI Assistant Activated')} disabled={isLoading} size="large">
-            {isLoading ? <LoadingSpinner size="small" /> : '✨'} Start AI Analysis
-          </Button>
-        </div>
-      </Card>
-    </div>
+    <AuthProvider>
+      <CounselFlowApp />
+    </AuthProvider>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Badge } from './UIComponents'
+import { Badge } from './UIComponents'
 
 interface NavigationProps {
   onModuleSelect: (moduleId: string) => void

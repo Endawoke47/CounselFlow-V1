@@ -26,7 +26,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <div className="min-h-screen w-full bg-gradient-to-br from-[#F1F3F4] via-[#D6E6F7] to-[#A9C6EA] glass-container">
+      <div className="min-h-screen w-full bg-slate-50">
         <TooltipProvider>
           <Toaster />
           <Sonner />

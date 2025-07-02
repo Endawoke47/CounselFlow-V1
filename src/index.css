@@ -1,53 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Desktop-First Legal Workflow Design System */
+/* Corporate Legal Design System */
 
 @layer base {
   :root {
-    /* Light Mode - Professional Legal Theme */
+    /* Corporate Professional Theme */
     --background: 0 0% 100%;
-    --foreground: #101622; /* 10% darker and bluer */
+    --foreground: 215 25% 27%; /* Professional dark slate */
     
     --card: 0 0% 100%;
-    --card-foreground: #101622;
+    --card-foreground: 215 25% 27%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: #101622;
+    --popover-foreground: 215 25% 27%;
     
-    /* Deep navy blue for primary elements */
-    --primary: 210 50% 25%;
+    /* Corporate blue for primary elements */
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 98%;
     
-    /* Slate blue for secondary elements */
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 210 50% 25%;
+    /* Professional slate for secondary elements */
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 215 25% 27%;
     
     --muted: 210 40% 98%;
     --muted-foreground: 215 16% 47%;
     
-    /* Emerald green for success states and CTAs */
-    --accent: 158 64% 52%;
+    /* Corporate accent color */
+    --accent: 221 83% 53%;
     --accent-foreground: 0 0% 98%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 210 50% 25%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
     
     --radius: 0.5rem;
     
-    /* Sidebar colors for light mode */
-    --sidebar-background: 210 40% 98%;
-    --sidebar-foreground: 210 11% 15%;
-    --sidebar-primary: 210 50% 25%;
+    /* Corporate sidebar colors */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 25% 27%;
+    --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 214 32% 91%;
-    --sidebar-accent-foreground: 210 50% 25%;
+    --sidebar-accent: 210 40% 98%;
+    --sidebar-accent-foreground: 215 25% 27%;
     --sidebar-border: 214 32% 91%;
     --sidebar-ring: 210 50% 25%;
     
