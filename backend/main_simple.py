@@ -7,8 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="CounselFlow Legal Operating System",
-    description="AI-native legal operating system",
+    title="CounselFlow Legal Support",
+    description="Professional legal support system",
     version="1.0.0",
     docs_url="/docs",  # Standard docs URL
     redoc_url="/redoc"
@@ -25,7 +25,7 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {"message": "CounselFlow Legal OS", "status": "running", "version": "1.0.0"}
+    return {"message": "CounselFlow Legal Support", "status": "running", "version": "1.0.0"}
 
 @app.get("/health")
 def health():

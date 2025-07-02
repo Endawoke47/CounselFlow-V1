@@ -1,5 +1,5 @@
 """
-CounselFlow API - Legal Operating System Backend
+CounselFlow API - Legal Support Backend
 FastAPI-based REST API with PostgreSQL, LangChain, and LlamaIndex integration
 Enhanced with military-grade security and comprehensive legal modules
 """
@@ -69,8 +69,8 @@ audit_logger = AuditLogger()
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="CounselFlow Legal Operating System",
-    description="World-class AI-native legal operating system with military-grade security",
+    title="CounselFlow Legal Support",
+    description="Professional legal support system with advanced features",
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
@@ -173,7 +173,7 @@ async def startup_event():
             }
         )
         
-        logger.info("CounselFlow Legal OS started successfully")
+        logger.info("CounselFlow Legal Support started successfully")
         
     except Exception as e:
         logger.error(f"Startup failed: {str(e)}")
@@ -193,7 +193,7 @@ async def shutdown_event():
             }
         )
         
-        logger.info("CounselFlow Legal OS shutdown completed")
+        logger.info("CounselFlow Legal Support shutdown completed")
         
     except Exception as e:
         logger.error(f"Shutdown error: {str(e)}")

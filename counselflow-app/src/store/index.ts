@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { User, Client, Matter, AIInsight, RiskAssessment, Contract } from '@/types'
+import { User, Client, Matter, BusinessInsight, RiskAssessment, Contract } from '@/types'
 
 // Auth Store
 interface AuthState {
@@ -212,7 +212,7 @@ export const useMatterStore = create<MatterState>()(
               clientId: '1',
               assignedLawyers: [],
               documents: [],
-              aiInsights: [],
+              businessInsights: [],
               riskScore: 6.5,
               budget: 50000,
               actualCost: 32000,
@@ -290,9 +290,9 @@ export const useMatterStore = create<MatterState>()(
   )
 )
 
-// AI Store
-interface AIState {
-  insights: AIInsight[]
+// Analytics Store
+interface AnalyticsState {
+  insights: BusinessInsight[]
   chatHistory: ChatMessage[]
   isProcessing: boolean
   error: string | null
@@ -305,12 +305,12 @@ interface AIState {
 interface ChatMessage {
   id: string
   content: string
-  sender: 'user' | 'ai'
+  sender: 'user' | 'system'
   timestamp: Date
   confidence?: number
 }
 
-export const useAIStore = create<AIState>()(
+export const useAnalyticsStore = create<AnalyticsState>()(
   devtools(
     (set, get) => ({
       insights: [],
@@ -320,8 +320,8 @@ export const useAIStore = create<AIState>()(
 
       fetchInsights: async () => {
         try {
-          // Mock AI insights
-          const mockInsights: AIInsight[] = [
+          // Mock analytics insights
+          const mockInsights: BusinessInsight[] = [
             {
               id: '1',
               type: 'risk_alert',
@@ -340,7 +340,7 @@ export const useAIStore = create<AIState>()(
           ]
           set({ insights: mockInsights })
         } catch (error) {
-          set({ error: 'Failed to fetch AI insights' })
+          set({ error: 'Failed to fetch analytics insights' })
         }
       },
 
@@ -354,17 +354,17 @@ export const useAIStore = create<AIState>()(
             timestamp: new Date()
           }
 
-          // Simulate AI response
-          const aiResponse: ChatMessage = {
+          // Simulate system response
+          const systemResponse: ChatMessage = {
             id: crypto.randomUUID(),
             content: `Based on your question about "${message}", I can help you with legal research and analysis. Here are some key points...`,
-            sender: 'ai',
+            sender: 'system',
             timestamp: new Date(),
             confidence: 0.85
           }
 
           set(state => ({
-            chatHistory: [...state.chatHistory, userMessage, aiResponse],
+            chatHistory: [...state.chatHistory, userMessage, systemResponse],
             isProcessing: false
           }))
         } catch (error) {
@@ -382,7 +382,7 @@ export const useAIStore = create<AIState>()(
         }))
       }
     }),
-    { name: 'ai-store' }
+    { name: 'analytics-store' }
   )
 )
 
@@ -418,7 +418,7 @@ export const useRiskStore = create<RiskState>()(
               probability: 0.6,
               impact: 0.7,
               compositeScore: 4.2,
-              aiGenerated: true,
+              analyticsGenerated: true,
               humanValidated: false,
               mitigationStrategy: {
                 description: 'Implement additional contract review process',

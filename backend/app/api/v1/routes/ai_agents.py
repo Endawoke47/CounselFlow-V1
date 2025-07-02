@@ -1,5 +1,5 @@
 """
-AI Agents API Routes for CounselFlow Legal Operating System
+Analytics Agents API Routes for CounselFlow Legal Support
 Provides access to specialized legal AI agents for various use cases
 """
 

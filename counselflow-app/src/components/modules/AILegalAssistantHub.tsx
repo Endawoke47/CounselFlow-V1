@@ -1,21 +1,21 @@
-// Module 1: AI Legal Assistant Hub
+// Module 1: Legal Analytics Assistant Hub
 'use client'
 
 import React, { useState } from 'react'
-import { AIInsight, ModuleProps, Priority, AIAgentType } from '@/types'
-import { useAIStore } from '@/store'
+import { BusinessInsight, ModuleProps, Priority, AnalyticsAgentType } from '@/types'
+import { useAnalyticsStore } from '@/store'
 
-export interface AILegalAssistantHubProps extends ModuleProps {
-  onInsightGenerated?: (insight: AIInsight) => void
+export interface LegalAnalyticsAssistantHubProps extends ModuleProps {
+  onInsightGenerated?: (insight: BusinessInsight) => void
   onAgentInteraction?: (agentId: string, query: string, response: string) => void
 }
 
-export function AILegalAssistantHub({
+export function LegalAnalyticsAssistantHub({
   className,
   onInsightGenerated,
   onAgentInteraction
-}: AILegalAssistantHubProps) {
-  const { insights, isProcessing: storeProcessing, error } = useAIStore()
+}: LegalAnalyticsAssistantHubProps) {
+  const { insights, isProcessing: storeProcessing, error } = useAnalyticsStore()
   const [selectedAgent, setSelectedAgent] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
@@ -84,15 +84,15 @@ export function AILegalAssistantHub({
       const mockResponse = generateMockResponse(agentId, userQuery)
       
       // Generate insight based on the query
-      const insight: AIInsight = {
+      const insight: BusinessInsight = {
         id: `insight_${Date.now()}`,
         type: getInsightType(agentId),
-        title: `AI Analysis: ${userQuery.substring(0, 50)}...`,
+        title: `Analytics Analysis: ${userQuery.substring(0, 50)}...`,
         description: mockResponse,
         confidence: agent?.confidence || 0.85,
         severity: 'medium',
         recommendations: generateRecommendations(agentId),
-        source: agentId as AIAgentType,
+        source: agentId as AnalyticsAgentType,
         createdAt: new Date()
       }
 
@@ -120,7 +120,7 @@ export function AILegalAssistantHub({
     return responses[agentId as keyof typeof responses] || 'AI analysis completed. Please review the generated insights and recommendations.'
   }
 
-  const getInsightType = (agentId: string): AIInsight['type'] => {
+  const getInsightType = (agentId: string): BusinessInsight['type'] => {
     const types = {
       legal_researcher: 'legal_precedent',
       contract_analyzer: 'contract_anomaly',
@@ -129,7 +129,7 @@ export function AILegalAssistantHub({
       compliance_monitor: 'compliance_issue',
       litigation_strategist: 'legal_precedent'
     }
-    return (types[agentId as keyof typeof types] || 'legal_precedent') as AIInsight['type']
+    return (types[agentId as keyof typeof types] || 'legal_precedent') as BusinessInsight['type']
   }
 
   const generateRecommendations = (agentId: string): string[] => {

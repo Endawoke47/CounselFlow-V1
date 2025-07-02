@@ -51,12 +51,12 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface FuturisticEntity {
+interface BusinessEntity {
   id: string
   name: string
-  type: 'Quantum Corp' | 'Neural LLC' | 'Cyber Partnership' | 'AI Subsidiary' | 'Digital Branch' | 'Metaverse Entity'
+  type: 'Corporation' | 'LLC' | 'Partnership' | 'Subsidiary' | 'Branch Office' | 'Joint Venture'
   jurisdiction: string[]
-  status: 'Hyper-Active' | 'AI-Managed' | 'Quantum-Processing' | 'Dormant' | 'Dissolving' | 'Virtual'
+  status: 'Active' | 'Managed' | 'Processing' | 'Dormant' | 'Dissolving' | 'Virtual'
   incorporationDate: string
   lastFiling: string
   nextDeadline: string
@@ -65,9 +65,9 @@ interface FuturisticEntity {
   shareholderCount: number
   revenue: string
   marketCap: string
-  compliance: 'Perfect' | 'AI-Optimized' | 'Quantum-Secured' | 'At-Risk' | 'Non-Compliant'
+  compliance: 'Perfect' | 'Analytics-Optimized' | 'Enhanced-Security' | 'At-Risk' | 'Non-Compliant'
   riskScore: number
-  aiInsights: string[]
+  businessInsights: string[]
   predictedGrowth: number
   esgScore: number
   digitalAssets: string
@@ -103,7 +103,7 @@ interface ComplianceAutomation {
   automationLevel: 'Fully-Automated' | 'AI-Assisted' | 'Manual-Override' | 'Quantum-Enhanced'
 }
 
-const futuristicEntities: FuturisticEntity[] = [
+const businessEntities: BusinessEntity[] = [
   {
     id: 'QNT-001',
     name: 'CounselFlow Quantum Technologies Corp.',
@@ -118,13 +118,13 @@ const futuristicEntities: FuturisticEntity[] = [
     shareholderCount: 1247,
     revenue: '$847M',
     marketCap: '$12.4B',
-    compliance: 'Quantum-Secured',
+    compliance: 'Enhanced-Security',
     riskScore: 12,
-    aiInsights: [
-      'Quantum computing division showing 347% YoY growth',
+    businessInsights: [
+      'Technology division showing 347% YoY growth',
       'ESG compliance exceeds industry standards by 89%',
-      'AI governance model reduces regulatory risk by 67%',
-      'Blockchain integration enables real-time compliance monitoring'
+      'Analytics governance model reduces regulatory risk by 67%',
+      'Digital integration enables real-time compliance monitoring'
     ],
     predictedGrowth: 234,
     esgScore: 94,
@@ -263,6 +263,94 @@ const futuristicEntities: FuturisticEntity[] = [
     metaversePresence: false,
     carbonNeutral: true,
     tags: ['biotech', 'quantum-discovery', 'AI-trials', 'regulatory-AI', 'bioethics']
+  },
+  {
+    id: '2',
+    name: 'EcoGreen Dynamics AG',
+    type: 'Subsidiary',
+    jurisdiction: 'Switzerland',
+    shareholderCount: 892,
+    revenue: '€456M',
+    marketCap: '€8.9B',
+    compliance: 'Analytics-Optimized',
+    riskScore: 8,
+    businessInsights: [
+      'Advanced governance outperforms traditional boards by 156%',
+      'Automated compliance reduces legal costs by 78%',
+      'Predictive risk modeling prevents 94% of potential violations',
+      'Cross-jurisdictional systems ensure global regulatory alignment'
+    ],
+    predictedGrowth: 178,
+    esgScore: 87,
+    quantumSecurityLevel: 'Alpha-7',
+    neuralComplexity: 0.89,
+    sustainabilityRating: 'Platinum-Plus'
+  },
+  {
+    id: '3',
+    name: 'DataVault Solutions LLC',
+    type: 'Joint Venture',
+    jurisdiction: 'Delaware, USA',
+    shareholderCount: 234,
+    revenue: '$1.2B',
+    marketCap: '$18.7B',
+    compliance: 'Perfect',
+    riskScore: 3,
+    businessInsights: [
+      'Zero-trust architecture reduces data breaches by 99.97%',
+      'Multi-dimensional encryption exceeds government standards',
+      'Real-time threat detection prevents advanced persistent threats',
+      'Compliance automation ensures perfect regulatory adherence'
+    ],
+    predictedGrowth: 312,
+    esgScore: 96,
+    quantumSecurityLevel: 'Omega-9',
+    neuralComplexity: 0.94,
+    sustainabilityRating: 'Quantum-Green'
+  },
+  {
+    id: '4',
+    name: 'NeuroCorp Holdings Inc.',
+    type: 'Holding Company',
+    jurisdiction: 'Singapore',
+    shareholderCount: 1456,
+    revenue: 'S$2.8B',
+    marketCap: 'S$45.2B',
+    compliance: 'Analytics-Optimized',
+    riskScore: 15,
+    businessInsights: [
+      'Advanced cognitive systems process 50TB of legal data daily',
+      'Predictive compliance prevents regulatory violations before they occur',
+      'Multi-jurisdictional expertise reduces cross-border legal costs by 89%',
+      'Real-time legal precedent analysis improves case outcomes by 234%'
+    ],
+    predictedGrowth: 423,
+    esgScore: 91,
+    quantumSecurityLevel: 'Beta-6',
+    neuralComplexity: 0.97,
+    sustainabilityRating: 'Diamond-Standard'
+  },
+  {
+    id: '5',
+    name: 'QuantumLogistics Networks',
+    type: 'Partnership',
+    jurisdiction: 'Hong Kong SAR',
+    shareholderCount: 678,
+    revenue: 'HK$890M',
+    marketCap: 'HK$12.3B',
+    compliance: 'Enhanced-Security',
+    riskScore: 22,
+    businessInsights: [
+      'Advanced security protocols ensure 99.99% uptime',
+      'Multi-modal transport optimization reduces costs by 67%',
+      'Predictive maintenance prevents 98% of equipment failures',
+      'Real-time supply chain visibility improves delivery accuracy by 156%'
+    ],
+    predictedGrowth: 189,
+    esgScore: 83,
+    quantumSecurityLevel: 'Gamma-4',
+    neuralComplexity: 0.76,
+    sustainabilityRating: 'Gold-Premium'
   }
 ]
 
@@ -463,7 +551,7 @@ const FuturisticMetricCard: React.FC<FuturisticMetric> = ({
   )
 }
 
-const EnhancedEntityCard: React.FC<{ entity: FuturisticEntity }> = ({ entity }) => {
+const EnhancedEntityCard: React.FC<{ entity: BusinessEntity }> = ({ entity }) => {
   const [isHovered, setIsHovered] = useState(false)
 
   const getStatusColor = (status: string) => {
@@ -688,7 +776,7 @@ const EntityManagement = () => {
   const stats = {
     totalEntities: futuristicEntities.length,
     activeEntities: futuristicEntities.filter(e => e.status === 'Hyper-Active' || e.status === 'AI-Managed').length,
-    perfectCompliance: futuristicEntities.filter(e => e.compliance === 'Perfect' || e.compliance === 'Quantum-Secured').length,
+    perfectCompliance: futuristicEntities.filter(e => e.compliance === 'Perfect' || e.compliance === 'Enhanced-Security').length,
     aiGovernance: Math.round(futuristicEntities.reduce((sum, e) => sum + e.aiGovernance, 0) / futuristicEntities.length)
   }
 

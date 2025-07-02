@@ -13,8 +13,8 @@ import {
   Plus, 
   BarChart3, 
   Settings,
-  Brain,
-  Sparkles,
+  Key,
+  ShieldCheck,
   Eye,
   Lock,
   Unlock,
@@ -22,14 +22,14 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  Zap,
+  Award,
   Target,
   Globe,
   Database,
   Network,
   Fingerprint,
   Scan,
-  Cpu
+  UserCheck
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell, AreaChart, Area, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Pie, Radar as RadarChart_Radar } from 'recharts'
@@ -44,114 +44,114 @@ interface User {
   lastLogin: string
   permissions: string[]
   securityScore: number
-  aiRiskAssessment?: string
+  riskAssessment?: string
   biometricEnabled?: boolean
-  quantumEncryption?: boolean
-  neuralAccess?: boolean
+  encryptionEnabled?: boolean
+  advancedAccess?: boolean
   accessAttempts?: number
   suspiciousActivity?: boolean
 }
 
-const quantumUserData: User[] = [
+const userData: User[] = [
   {
-    id: 'QU-2024-001',
+    id: 'UA-2024-001',
     name: 'Dr. Elena Vasquez',
-    email: 'elena.vasquez@counselflow.ai',
-    role: 'Quantum Legal Director',
-    department: 'AI Ethics & Quantum Law',
+    email: 'elena.vasquez@counselflow.com',
+    role: 'Senior Legal Director',
+    department: 'Legal Operations & Compliance',
     status: 'active',
     lastLogin: '2 minutes ago',
-    permissions: ['quantum_encryption', 'ai_governance', 'neural_analysis', 'full_system_access'],
+    permissions: ['advanced_encryption', 'governance_oversight', 'risk_analysis', 'full_system_access'],
     securityScore: 98.7,
-    aiRiskAssessment: 'Ultra-Low Risk - Neural Pattern Verified',
+    riskAssessment: 'Ultra-Low Risk - Security Pattern Verified',
     biometricEnabled: true,
-    quantumEncryption: true,
-    neuralAccess: true,
+    encryptionEnabled: true,
+    advancedAccess: true,
     accessAttempts: 1,
     suspiciousActivity: false
   },
   {
-    id: 'QU-2024-002',
+    id: 'UA-2024-002',
     name: 'Marcus Chen',
-    email: 'marcus.chen@counselflow.ai',
-    role: 'AI Rights Attorney',
-    department: 'Digital Rights & AI Ethics',
+    email: 'marcus.chen@counselflow.com',
+    role: 'Corporate Attorney',
+    department: 'Digital Rights & Compliance',
     status: 'active',
     lastLogin: '15 minutes ago',
-    permissions: ['ai_governance', 'client_data_access', 'document_generation', 'compliance_monitoring'],
+    permissions: ['governance_oversight', 'client_data_access', 'document_generation', 'compliance_monitoring'],
     securityScore: 94.2,
-    aiRiskAssessment: 'Low Risk - Behavioral Pattern Normal',
+    riskAssessment: 'Low Risk - Normal Access Patterns',
     biometricEnabled: true,
-    quantumEncryption: true,
-    neuralAccess: true,
+    encryptionEnabled: true,
+    advancedAccess: true,
     accessAttempts: 3,
     suspiciousActivity: false
   },
   {
-    id: 'QU-2024-003',
+    id: 'UA-2024-003',
     name: 'Sarah Kim',
-    email: 'sarah.kim@counselflow.ai',
+    email: 'sarah.kim@counselflow.com',
     role: 'Regulatory Compliance Lead',
-    department: 'Global Compliance Matrix',
+    department: 'Global Compliance Operations',
     status: 'active',
     lastLogin: '1 hour ago',
     permissions: ['compliance_monitoring', 'regulatory_database', 'risk_assessment', 'audit_trails'],
     securityScore: 96.1,
-    aiRiskAssessment: 'Low Risk - Consistent Access Patterns',
+    riskAssessment: 'Low Risk - Consistent Access Patterns',
     biometricEnabled: true,
-    quantumEncryption: false,
-    neuralAccess: true,
+    encryptionEnabled: false,
+    advancedAccess: true,
     accessAttempts: 2,
     suspiciousActivity: false
   },
   {
-    id: 'QU-2024-004',
+    id: 'UA-2024-004',
     name: 'Alex Thompson',
-    email: 'alex.thompson@counselflow.ai',
-    role: 'Blockchain Legal Specialist',
+    email: 'alex.thompson@counselflow.com',
+    role: 'Digital Asset Legal Specialist',
     department: 'Digital Asset Law',
     status: 'active',
     lastLogin: '3 hours ago',
-    permissions: ['blockchain_analysis', 'smart_contract_review', 'crypto_compliance', 'defi_governance'],
+    permissions: ['blockchain_analysis', 'smart_contract_review', 'crypto_compliance', 'governance_oversight'],
     securityScore: 92.8,
-    aiRiskAssessment: 'Medium Risk - Unusual Access Times Detected',
+    riskAssessment: 'Medium Risk - Unusual Access Times Detected',
     biometricEnabled: true,
-    quantumEncryption: false,
-    neuralAccess: false,
+    encryptionEnabled: false,
+    advancedAccess: false,
     accessAttempts: 7,
     suspiciousActivity: true
   },
   {
-    id: 'QU-2024-005',
+    id: 'UA-2024-005',
     name: 'Dr. Jennifer Walsh',
-    email: 'jennifer.walsh@counselflow.ai',
-    role: 'Quantum Technology Law Advisor',
-    department: 'Future Technology Division',
+    email: 'jennifer.walsh@counselflow.com',
+    role: 'Technology Law Advisor',
+    department: 'Technology & Innovation',
     status: 'pending',
     lastLogin: 'Never',
-    permissions: ['pending_quantum_clearance'],
+    permissions: ['pending_security_clearance'],
     securityScore: 88.5,
-    aiRiskAssessment: 'Pending - Security Verification in Progress',
+    riskAssessment: 'Pending - Security Verification in Progress',
     biometricEnabled: false,
-    quantumEncryption: false,
-    neuralAccess: false,
+    encryptionEnabled: false,
+    advancedAccess: false,
     accessAttempts: 0,
     suspiciousActivity: false
   },
   {
-    id: 'QU-2024-006',
+    id: 'UA-2024-006',
     name: 'Lisa Rodriguez',
-    email: 'lisa.rodriguez@counselflow.ai',
-    role: 'Future Work Law Specialist',
-    department: 'Human-AI Collaboration',
+    email: 'lisa.rodriguez@counselflow.com',
+    role: 'Employment Law Specialist',
+    department: 'Human Resources & Labor',
     status: 'suspended',
     lastLogin: '2 weeks ago',
     permissions: ['restricted_access'],
     securityScore: 76.3,
-    aiRiskAssessment: 'High Risk - Anomalous Behavior Detected',
+    riskAssessment: 'High Risk - Anomalous Behavior Detected',
     biometricEnabled: false,
-    quantumEncryption: false,
-    neuralAccess: false,
+    encryptionEnabled: false,
+    advancedAccess: false,
     accessAttempts: 23,
     suspiciousActivity: true
   }
@@ -168,16 +168,16 @@ const accessTrendData = [
 ]
 
 const securityLevelData = [
-  { name: 'Quantum Level', value: 35, color: '#8B5CF6' },
-  { name: 'Neural Access', value: 28, color: '#06B6D4' },
+  { name: 'Advanced Level', value: 35, color: '#8B5CF6' },
+  { name: 'Enhanced Access', value: 28, color: '#06B6D4' },
   { name: 'Biometric Only', value: 22, color: '#10B981' },
   { name: 'Standard Auth', value: 15, color: '#F59E0B' }
 ]
 
 const permissionMatrixData = [
-  { subject: 'AI Governance', current: 95, target: 100, fullMark: 100 },
-  { subject: 'Quantum Access', current: 67, target: 80, fullMark: 100 },
-  { subject: 'Neural Analysis', current: 82, target: 90, fullMark: 100 },
+  { subject: 'Governance', current: 95, target: 100, fullMark: 100 },
+  { subject: 'Advanced Access', current: 67, target: 80, fullMark: 100 },
+  { subject: 'Risk Analysis', current: 82, target: 90, fullMark: 100 },
   { subject: 'Compliance', current: 91, target: 95, fullMark: 100 },
   { subject: 'Data Access', current: 78, target: 85, fullMark: 100 },
   { subject: 'System Admin', current: 45, target: 60, fullMark: 100 }
@@ -191,13 +191,13 @@ const riskIndicators = [
 ]
 
 const statusConfig = {
-  active: { color: 'text-green-700 bg-green-100', icon: CheckCircle, neural: 'Neural Verified' },
-  inactive: { color: 'text-slate-700 bg-slate-100', icon: Clock, neural: 'Inactive Status' },
-  pending: { color: 'text-yellow-700 bg-yellow-100', icon: Clock, neural: 'Pending Verification' },
-  suspended: { color: 'text-red-700 bg-red-100', icon: AlertTriangle, neural: 'Security Alert' }
+  active: { color: 'text-green-700 bg-green-100', icon: CheckCircle, status: 'Active Status' },
+  inactive: { color: 'text-slate-700 bg-slate-100', icon: Clock, status: 'Inactive Status' },
+  pending: { color: 'text-yellow-700 bg-yellow-100', icon: Clock, status: 'Pending Verification' },
+  suspended: { color: 'text-red-700 bg-red-100', icon: AlertTriangle, status: 'Security Alert' }
 }
 
-const QuantumUserCard: React.FC<{ user: User }> = ({ user }) => {
+const UserCard: React.FC<{ user: User }> = ({ user }) => {
   const StatusIcon = statusConfig[user.status].icon
 
   return (
@@ -222,11 +222,11 @@ const QuantumUserCard: React.FC<{ user: User }> = ({ user }) => {
             <div className="flex items-center space-x-3 mb-2">
               <h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
                 <span>{user.name}</span>
-                {user.neuralAccess && (
-                  <Brain className="w-4 h-4 text-purple-600" />
+                {user.advancedAccess && (
+                  <ShieldCheck className="w-4 h-4 text-purple-600" />
                 )}
-                {user.quantumEncryption && (
-                  <Sparkles className="w-4 h-4 text-cyan-600" />
+                {user.encryptionEnabled && (
+                  <Lock className="w-4 h-4 text-cyan-600" />
                 )}
                 {user.biometricEnabled && (
                   <Fingerprint className="w-4 h-4 text-green-600" />
@@ -263,7 +263,7 @@ const QuantumUserCard: React.FC<{ user: User }> = ({ user }) => {
             statusConfig[user.status].color
           )}>
             <StatusIcon className="w-3 h-3" />
-            <span>{statusConfig[user.status].neural}</span>
+            <span>{statusConfig[user.status].status}</span>
           </span>
           <span className="px-3 py-1 text-xs bg-gradient-to-r from-purple-100 to-cyan-100 text-purple-700 rounded-full font-medium">
             {user.permissions.length} Permissions
@@ -275,8 +275,8 @@ const QuantumUserCard: React.FC<{ user: User }> = ({ user }) => {
           )}
         </div>
 
-        {/* AI Risk Assessment */}
-        {user.aiRiskAssessment && (
+        {/* Business Risk Assessment */}
+        {user.riskAssessment && (
           <div className={cn(
             'rounded-lg p-3 border',
             user.securityScore > 95 ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' :
@@ -284,10 +284,10 @@ const QuantumUserCard: React.FC<{ user: User }> = ({ user }) => {
             'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
           )}>
             <div className="flex items-center space-x-2 mb-2">
-              <Brain className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-700">AI Risk Assessment</span>
+              <Shield className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-700">Risk Assessment</span>
             </div>
-            <p className="text-sm text-slate-700">{user.aiRiskAssessment}</p>
+            <p className="text-sm text-slate-700">{user.riskAssessment}</p>
           </div>
         )}
 
@@ -305,23 +305,23 @@ const QuantumUserCard: React.FC<{ user: User }> = ({ user }) => {
           </div>
           <div className={cn(
             'text-center p-3 rounded-lg border',
-            user.quantumEncryption ? 'bg-cyan-50 border-cyan-200' : 'bg-slate-50 border-slate-200'
+            user.encryptionEnabled ? 'bg-cyan-50 border-cyan-200' : 'bg-slate-50 border-slate-200'
           )}>
-            <Sparkles className={cn(
+            <Lock className={cn(
               'w-6 h-6 mx-auto mb-1',
-              user.quantumEncryption ? 'text-cyan-600' : 'text-slate-400'
+              user.encryptionEnabled ? 'text-cyan-600' : 'text-slate-400'
             )} />
-            <div className="text-xs font-medium">Quantum</div>
+            <div className="text-xs font-medium">Encryption</div>
           </div>
           <div className={cn(
             'text-center p-3 rounded-lg border',
-            user.neuralAccess ? 'bg-purple-50 border-purple-200' : 'bg-slate-50 border-slate-200'
+            user.advancedAccess ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-200'
           )}>
-            <Brain className={cn(
+            <ShieldCheck className={cn(
               'w-6 h-6 mx-auto mb-1',
-              user.neuralAccess ? 'text-purple-600' : 'text-slate-400'
+              user.advancedAccess ? 'text-blue-600' : 'text-slate-400'
             )} />
-            <div className="text-xs font-medium">Neural</div>
+            <div className="text-xs font-medium">Advanced</div>
           </div>
         </div>
 
@@ -381,18 +381,18 @@ const UserAccessManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [departmentFilter, setDepartmentFilter] = useState<string>('all')
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(quantumUserData)
+  const [filteredUsers, setFilteredUsers] = useState<User[]>(userData)
 
-  const stats = {
-    total: quantumUserData.length,
-    active: quantumUserData.filter(u => u.status === 'active').length,
-    suspended: quantumUserData.filter(u => u.status === 'suspended').length,
-    avgScore: (quantumUserData.reduce((sum, u) => sum + u.securityScore, 0) / quantumUserData.length).toFixed(1)
+  const userStats = {
+    total: userData.length,
+    active: userData.filter(u => u.status === 'active').length,
+    suspended: userData.filter(u => u.status === 'suspended').length,
+    avgScore: (userData.reduce((sum, u) => sum + u.securityScore, 0) / userData.length).toFixed(1)
   }
 
   // Apply filters
   useEffect(() => {
-    let filtered = quantumUserData
+    let filtered = userData
 
     if (searchQuery) {
       filtered = filtered.filter(user => 
@@ -416,33 +416,33 @@ const UserAccessManagement: React.FC = () => {
   return (
     <CorporateLayout>
       <div className="space-y-8">
-        {/* Neural Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 rounded-2xl p-8 text-white">
+        {/* Professional Header */}
+        <div className="bg-gradient-to-r from-blue-600 via-slate-700 to-blue-800 rounded-2xl p-8 text-white">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <Users className="w-8 h-8" />
-                <h1 className="text-3xl font-bold">Quantum User Access Matrix</h1>
-                <Sparkles className="w-6 h-6 animate-pulse" />
+                <h1 className="text-3xl font-bold">User Access Management</h1>
+                <Shield className="w-6 h-6" />
               </div>
               <p className="text-xl opacity-90 mb-6">
-                AI-Powered Identity Management & Neural Security Protocols
+                Advanced Identity Management & Security Protocols
               </p>
               <div className="grid grid-cols-4 gap-6">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats.total}</div>
+                  <div className="text-3xl font-bold">{userStats.total}</div>
                   <div className="text-sm opacity-80">Total Users</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats.active}</div>
+                  <div className="text-3xl font-bold">{userStats.active}</div>
                   <div className="text-sm opacity-80">Active Users</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats.suspended}</div>
+                  <div className="text-3xl font-bold">{userStats.suspended}</div>
                   <div className="text-sm opacity-80">Security Alerts</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats.avgScore}</div>
+                  <div className="text-3xl font-bold">{userStats.avgScore}</div>
                   <div className="text-sm opacity-80">Avg Security Score</div>
                 </div>
               </div>
@@ -543,8 +543,8 @@ const UserAccessManagement: React.FC = () => {
                 Add User
               </CorporateButton>
               <CorporateButton variant="outline" size="sm">
-                <Brain className="w-4 h-4 mr-2" />
-                AI Security Scan
+                <Shield className="w-4 h-4 mr-2" />
+                Security Scan
               </CorporateButton>
             </div>
             
@@ -578,10 +578,10 @@ const UserAccessManagement: React.FC = () => {
                 className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-corporate-500 focus:border-transparent"
               >
                 <option value="all">All Departments</option>
-                <option value="ai">AI Ethics</option>
-                <option value="quantum">Quantum Law</option>
-                <option value="digital">Digital Rights</option>
+                <option value="legal">Legal Operations</option>
                 <option value="compliance">Compliance</option>
+                <option value="digital">Digital Rights</option>
+                <option value="corporate">Corporate Law</option>
               </select>
             </div>
           </div>
@@ -590,7 +590,7 @@ const UserAccessManagement: React.FC = () => {
         {/* Users Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {filteredUsers.map((user) => (
-            <QuantumUserCard key={user.id} user={user} />
+            <UserCard key={user.id} user={user} />
           ))}
         </div>
 

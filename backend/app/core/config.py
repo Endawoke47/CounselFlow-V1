@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # Application
     PROJECT_NAME: str = "CounselFlow"
     VERSION: str = "1.0.0"
-    DESCRIPTION: str = "Modular Legal Operating System"
+    DESCRIPTION: str = "Modular Legal Support"
     ENVIRONMENT: str = Field(default="development", env="ENVIRONMENT")
     DEBUG: bool = Field(default=True, env="DEBUG")
     
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7, env="REFRESH_TOKEN_EXPIRE_DAYS")
     PASSWORD_MIN_LENGTH: int = Field(default=12, env="PASSWORD_MIN_LENGTH")
     PASSWORD_REQUIRE_SPECIAL: bool = Field(default=True, env="PASSWORD_REQUIRE_SPECIAL")
-    MFA_ISSUER_NAME: str = Field(default="CounselFlow Legal OS", env="MFA_ISSUER_NAME")
+    MFA_ISSUER_NAME: str = Field(default="CounselFlow Legal Support", env="MFA_ISSUER_NAME")
     
     # Session Security
     SESSION_TIMEOUT_MINUTES: int = Field(default=60, env="SESSION_TIMEOUT_MINUTES")

@@ -27,6 +27,18 @@ import Dealflow from "./pages/Dealflow";
 import CompanySecretarial from "./pages/CompanySecretarial";
 import NotFound from "./pages/NotFound";
 
+// Enhanced module imports
+import ContractsEnhanced from "./pages/ContractsEnhanced";
+import EntityManagementEnhanced from "./pages/EntityManagementEnhanced";
+import TaskManagementEnhanced from "./pages/TaskManagementEnhanced";
+import KnowledgeManagementEnhanced from "./pages/KnowledgeManagementEnhanced";
+import MatterManagementEnhanced from "./pages/MatterManagementEnhanced";
+// import RiskManagementEnhanced from "./pages/RiskManagementEnhanced"; // Temporarily disabled due to syntax errors
+import DisputeResolutionEnhanced from "./pages/DisputeResolutionEnhanced";
+import OutsourcedMattersSpendEnhanced from "./pages/OutsourcedMattersSpendEnhanced";
+import RegulatoryComplianceEnhanced from "./pages/RegulatoryComplianceEnhanced";
+import PolicyManagementEnhanced from "./pages/PolicyManagementEnhanced";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -59,6 +71,18 @@ const App = () => (
               <Route path="/licensing-regulatory" element={<LicensingRegulatory />} />
               <Route path="/dealflow" element={<Dealflow />} />
               <Route path="/company-secretarial" element={<CompanySecretarial />} />
+              
+              {/* Enhanced routes */}
+              <Route path="/contracts-enhanced" element={<ContractsEnhanced />} />
+              <Route path="/entity-management-enhanced" element={<EntityManagementEnhanced />} />
+              <Route path="/task-management-enhanced" element={<TaskManagementEnhanced />} />
+              <Route path="/knowledge-management-enhanced" element={<KnowledgeManagementEnhanced />} />
+              <Route path="/matter-management-enhanced" element={<MatterManagementEnhanced />} />
+              {/* <Route path="/risk-management-enhanced" element={<RiskManagementEnhanced />} /> */}
+              <Route path="/dispute-resolution-enhanced" element={<DisputeResolutionEnhanced />} />
+              <Route path="/outsourced-matters-spend-enhanced" element={<OutsourcedMattersSpendEnhanced />} />
+              <Route path="/regulatory-compliance-enhanced" element={<RegulatoryComplianceEnhanced />} />
+              <Route path="/policy-management-enhanced" element={<PolicyManagementEnhanced />} />
               
               {/* Legacy redirects */}
               <Route path="/disputes" element={<Navigate to="/dispute-resolution" replace />} />

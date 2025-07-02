@@ -23,17 +23,14 @@ import {
   PieChart,
   Activity,
   Target,
-  Zap,
+  Settings,
   BookOpen,
   Award,
   XCircle,
   Gauge,
-  Brain,
   Sparkles,
   Radar,
-  Cpu,
   Globe,
-  Settings,
   Database,
   Network
 } from 'lucide-react'
@@ -53,13 +50,13 @@ interface Risk {
   lastReviewed: string
   description: string
   mitigationPlan?: string
-  aiRiskScore?: number
+  riskScore?: number
   predictedTrend?: string
-  quantumComplexity?: number
-  neuralInsights?: string[]
+  complexity?: number
+  insights?: string[]
 }
 
-const quantumRiskData: Risk[] = [
+const riskData: Risk[] = [
   {
     id: 'QR-2024-001',
     title: 'Quantum Computing Threat to Current Encryption',
@@ -73,10 +70,10 @@ const quantumRiskData: Risk[] = [
     lastReviewed: '2024-06-28',
     description: 'Emergence of fault-tolerant quantum computers poses existential threat to RSA and ECC encryption across all legal data systems.',
     mitigationPlan: 'Migration to quantum-resistant cryptography protocols and implementation of post-quantum security architecture.',
-    aiRiskScore: 9.2,
+    riskScore: 9.2,
     predictedTrend: 'Escalating - Quantum supremacy timeline accelerating',
-    quantumComplexity: 9.8,
-    neuralInsights: [
+    complexity: 9.8,
+    insights: [
       'Timeline compressed by 3 years due to recent breakthroughs',
       'Legal industry exposure: 87% of current security inadequate',
       'Migration window: 18-24 months for critical systems'
@@ -95,10 +92,10 @@ const quantumRiskData: Risk[] = [
     lastReviewed: '2024-07-01',
     description: 'AI systems generating factually incorrect legal content leading to malpractice liability and client harm.',
     mitigationPlan: 'Implementation of multi-layer AI verification systems and human oversight protocols.',
-    aiRiskScore: 8.1,
+    riskScore: 8.1,
     predictedTrend: 'Stabilizing - New verification protocols reducing incidents',
-    quantumComplexity: 7.4,
-    neuralInsights: [
+    complexity: 7.4,
+    insights: [
       'False positive rate decreased 34% with new verification',
       'Human oversight requirements increase cost by 23%',
       'Client confidence metric improved to 89.3%'
@@ -117,10 +114,10 @@ const quantumRiskData: Risk[] = [
     lastReviewed: '2024-06-30',
     description: 'Systematic biases in AI training data leading to discriminatory outcomes in legal recommendations and client profiling.',
     mitigationPlan: 'Diverse dataset curation, bias detection algorithms, and regular fairness audits.',
-    aiRiskScore: 7.9,
+    riskScore: 7.9,
     predictedTrend: 'Improving - Bias metrics showing positive trends',
-    quantumComplexity: 6.7,
-    neuralInsights: [
+    complexity: 6.7,
+    insights: [
       'Bias scores reduced by 42% across protected categories',
       'Fairness audit coverage expanded to 95% of AI systems',
       'Regulatory compliance confidence: 91.2%'
@@ -139,10 +136,10 @@ const quantumRiskData: Risk[] = [
     lastReviewed: '2024-06-25',
     description: 'Code vulnerabilities in smart contracts managing legal escrows and automated compliance systems.',
     mitigationPlan: 'Formal verification protocols and regular security audits of smart contract code.',
-    aiRiskScore: 6.4,
+    riskScore: 6.4,
     predictedTrend: 'Stable - Security measures keeping pace with threats',
-    quantumComplexity: 5.8,
-    neuralInsights: [
+    complexity: 5.8,
+    insights: [
       'Vulnerability detection rate improved 67%',
       'Formal verification coverage: 100% of critical contracts',
       'Economic impact contained to <0.1% of total value'
@@ -161,10 +158,10 @@ const quantumRiskData: Risk[] = [
     lastReviewed: '2024-06-29',
     description: 'Conflicting AI regulations across 15+ jurisdictions creating compliance complexity and potential violations.',
     mitigationPlan: 'Dynamic compliance matrix and AI governance framework adaptable to multiple regulatory regimes.',
-    aiRiskScore: 8.6,
+    riskScore: 8.6,
     predictedTrend: 'Escalating - New regulations emerging monthly',
-    quantumComplexity: 8.9,
-    neuralInsights: [
+    complexity: 8.9,
+    insights: [
       'Regulatory complexity index: 9.2/10 and rising',
       'Compliance cost impact: +67% operational overhead',
       'Risk of violation without adaptive systems: 78%'
@@ -183,10 +180,10 @@ const quantumRiskData: Risk[] = [
     lastReviewed: '2024-06-27',
     description: 'Single points of failure in quantum key distribution network could compromise secure client communications.',
     mitigationPlan: 'Redundant quantum communication channels and classical backup encryption systems.',
-    aiRiskScore: 5.8,
+    riskScore: 5.8,
     predictedTrend: 'Stable - Infrastructure redundancy implemented',
-    quantumComplexity: 8.1,
-    neuralInsights: [
+    complexity: 8.1,
+    insights: [
       'Network uptime: 99.97% with redundancy',
       'Quantum channel availability: 3.2x improvement',
       'Classical backup utilization: <2% of communications'
@@ -267,8 +264,8 @@ const QuantumRiskCard: React.FC<{ risk: Risk }> = ({ risk }) => {
             <div className="flex items-center space-x-3 mb-2">
               <h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
                 <span>{risk.title}</span>
-                {risk.aiRiskScore && risk.aiRiskScore > 8 && (
-                  <Brain className="w-4 h-4 text-purple-600" />
+                {risk.riskScore && risk.riskScore > 8 && (
+                  <Activity className="w-4 h-4 text-purple-600" />
                 )}
               </h3>
             </div>
@@ -284,15 +281,15 @@ const QuantumRiskCard: React.FC<{ risk: Risk }> = ({ risk }) => {
                 'text-green-600'
               )}>{riskScore}</div>
             </div>
-            {risk.aiRiskScore && (
+            {risk.riskScore && (
               <div className="text-right">
-                <div className="text-xs text-slate-500">AI Score</div>
+                <div className="text-xs text-slate-500">Risk Score</div>
                 <div className={cn(
                   'text-lg font-bold',
-                  risk.aiRiskScore > 8 ? 'text-red-600' :
-                  risk.aiRiskScore > 6 ? 'text-orange-600' :
+                  risk.riskScore > 8 ? 'text-red-600' :
+                  risk.riskScore > 6 ? 'text-orange-600' :
                   'text-green-600'
-                )}>{risk.aiRiskScore}/10</div>
+                )}>{risk.riskScore}/10</div>
               </div>
             )}
           </div>
@@ -322,14 +319,14 @@ const QuantumRiskCard: React.FC<{ risk: Risk }> = ({ risk }) => {
         </div>
 
         {/* AI Insights */}
-        {risk.neuralInsights && (
+        {risk.insights && (
           <div className="bg-gradient-to-r from-purple-50 to-cyan-50 rounded-lg p-4 border border-purple-200">
             <div className="flex items-center space-x-2 mb-3">
-              <Brain className="w-4 h-4 text-purple-600" />
+              <Activity className="w-4 h-4 text-purple-600" />
               <span className="text-sm font-medium text-purple-700">Neural Risk Analysis</span>
             </div>
             <div className="space-y-2">
-              {risk.neuralInsights.map((insight, index) => (
+              {risk.insights.map((insight, index) => (
                 <div key={index} className="flex items-start space-x-2">
                   <Sparkles className="w-3 h-3 text-purple-500 mt-0.5 flex-shrink-0" />
                   <span className="text-sm text-slate-700">{insight}</span>
@@ -391,7 +388,7 @@ const QuantumRiskCard: React.FC<{ risk: Risk }> = ({ risk }) => {
               {new Date(risk.lastReviewed).toLocaleDateString()}
             </div>
           </div>
-          {risk.quantumComplexity && (
+          {risk.complexity && (
             <div className="space-y-1">
               <div className="flex items-center space-x-2 text-xs text-slate-500">
                 <Gauge className="w-3 h-3" />
@@ -422,18 +419,18 @@ export const RiskManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [severityFilter, setSeverityFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [filteredRisks, setFilteredRisks] = useState<Risk[]>(quantumRiskData)
+  const [filteredRisks, setFilteredRisks] = useState<Risk[]>(riskData)
 
   const stats = {
-    total: quantumRiskData.length,
-    critical: quantumRiskData.filter(r => r.severity === 'critical').length,
-    active: quantumRiskData.filter(r => !['resolved'].includes(r.status)).length,
-    avgScore: (quantumRiskData.reduce((sum, r) => sum + (r.aiRiskScore || 0), 0) / quantumRiskData.length).toFixed(1)
+    total: riskData.length,
+    critical: riskData.filter(r => r.severity === 'critical').length,
+    active: riskData.filter(r => !['resolved'].includes(r.status)).length,
+    avgScore: (riskData.reduce((sum, r) => sum + (r.riskScore || 0), 0) / riskData.length).toFixed(1)
   }
 
   // Apply filters
   useEffect(() => {
-    let filtered = quantumRiskData
+    let filtered = riskData
 
     if (searchQuery) {
       filtered = filtered.filter(risk => 

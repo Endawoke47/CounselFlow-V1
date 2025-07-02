@@ -354,7 +354,7 @@ export default function Dashboard({ user = mockUser }: DashboardProps) {
             <div className="flex items-center space-x-4">
               <div className="text-2xl font-bold text-blue-600">⚖️ CounselFlow</div>
               <div className="hidden md:block text-sm text-gray-500">
-                Modular Legal Operating System
+                Modular Legal Support
               </div>
             </div>
             

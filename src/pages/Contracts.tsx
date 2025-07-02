@@ -23,13 +23,11 @@ import {
   BarChart3,
   PieChart,
   Activity,
-  Brain,
-  Zap,
-  Shield,
   Target,
+  Shield,
   Globe,
-  Bot,
-  Cpu,
+  Settings,
+  Database,
   Network,
   Radar,
   Gauge,
@@ -49,7 +47,7 @@ interface EnhancedContract {
   title: string
   counterparty: string
   type: string
-  status: 'draft' | 'ai-review' | 'legal-review' | 'active' | 'expired' | 'terminated' | 'auto-renewed'
+  status: 'draft' | 'review' | 'legal-review' | 'active' | 'expired' | 'terminated' | 'auto-renewed'
   value: number
   startDate: string
   endDate: string
@@ -57,14 +55,14 @@ interface EnhancedContract {
   department: string
   owner: string
   riskLevel: 'Low' | 'Medium' | 'High' | 'Critical'
-  aiScore: number
-  aiInsights: string[]
+  riskScore: number
+  insights: string[]
   predictedOutcome?: string
-  automationLevel: 'Manual' | 'Semi-Automated' | 'Fully-Automated' | 'AI-Driven'
+  automationLevel: 'Manual' | 'Semi-Automated' | 'Fully-Automated' | 'System-Driven'
   complexity: number
   jurisdiction: string[]
   tags: string[]
-  mlMetrics: {
+  metrics: {
     riskAssessment: number
     complianceScore: number
     negotiationPower: number
@@ -72,24 +70,24 @@ interface EnhancedContract {
   }
 }
 
-interface FuturisticMetric {
+interface BusinessMetric {
   title: string
   value: string
   unit?: string
   change: { value: number; trend: 'up' | 'down' | 'stable'; period: string }
   icon: React.ComponentType<{ className?: string }>
-  variant: 'neural' | 'quantum' | 'plasma' | 'cyber'
+  variant: 'primary' | 'success' | 'warning' | 'info'
   prediction?: string
-  aiConfidence: number
+  confidence: number
 }
 
-const futuristicContracts: EnhancedContract[] = [
+const professionalContracts: EnhancedContract[] = [
   {
-    id: 'NEU-001',
+    id: 'CON-001',
     title: 'Tesla Gigafactory 5 Manufacturing Partnership',
     counterparty: 'Tesla Motors Inc.',
     type: 'Strategic Partnership',
-    status: 'ai-review',
+    status: 'review',
     value: 847000000,
     startDate: '2024-07-15',
     endDate: '2029-07-14',
@@ -97,19 +95,19 @@ const futuristicContracts: EnhancedContract[] = [
     department: 'Strategic Partnerships',
     owner: 'Dr. Sarah Chen',
     riskLevel: 'Medium',
-    aiScore: 94,
-    aiInsights: [
+    riskScore: 94,
+    insights: [
       'High-value strategic partnership with 94% success probability',
       'Supply chain risks mitigated through diversification clauses',
       'ESG compliance framework exceeds industry standards',
-      'Intellectual property protection enhanced with quantum encryption'
+      'Intellectual property protection enhanced with security measures'
     ],
     predictedOutcome: '96% probability of successful completion, $847M value realization',
-    automationLevel: 'AI-Driven',
+    automationLevel: 'System-Driven',
     complexity: 89,
     jurisdiction: ['California', 'Nevada', 'Texas', 'International'],
     tags: ['high-value', 'strategic', 'manufacturing', 'EV', 'sustainability'],
-    mlMetrics: {
+    metrics: {
       riskAssessment: 76,
       complianceScore: 97,
       negotiationPower: 84,
@@ -117,8 +115,8 @@ const futuristicContracts: EnhancedContract[] = [
     }
   },
   {
-    id: 'QUA-002',
-    title: 'Google Cloud Quantum Computing Services',
+    id: 'CON-002',
+    title: 'Google Cloud Computing Services',
     counterparty: 'Google LLC (Alphabet)',
     type: 'Technology License',
     status: 'active',
@@ -126,22 +124,22 @@ const futuristicContracts: EnhancedContract[] = [
     startDate: '2024-01-01',
     endDate: '2027-12-31',
     renewalDate: '2027-10-01',
-    department: 'Quantum Research',
+    department: 'Technology Research',
     owner: 'Prof. Michael Zhang',
     riskLevel: 'Low',
-    aiScore: 98,
-    aiInsights: [
-      'Quantum advantage achieved in legal document processing',
-      'Security protocols meet post-quantum cryptography standards',
-      'Cost optimization through hybrid quantum-classical architecture',
+    riskScore: 98,
+    insights: [
+      'Advanced computing capabilities achieved in legal document processing',
+      'Security protocols meet enterprise-grade standards',
+      'Cost optimization through hybrid architecture',
       'Patent landscape analysis shows strong IP position'
     ],
     predictedOutcome: '98% renewal probability, potential 234% value increase',
     automationLevel: 'Fully-Automated',
     complexity: 95,
     jurisdiction: ['Global', 'Multi-National'],
-    tags: ['quantum', 'AI', 'research', 'breakthrough', 'strategic'],
-    mlMetrics: {
+    tags: ['technology', 'research', 'breakthrough', 'strategic'],
+    metrics: {
       riskAssessment: 23,
       complianceScore: 99,
       negotiationPower: 92,
@@ -149,30 +147,30 @@ const futuristicContracts: EnhancedContract[] = [
     }
   },
   {
-    id: 'CYB-003',
-    title: 'Palantir Cyber Intelligence Platform',
+    id: 'CON-003',
+    title: 'Enterprise Intelligence Platform',
     counterparty: 'Palantir Technologies',
     type: 'SaaS Subscription',
     status: 'auto-renewed',
     value: 89000000,
     startDate: '2023-06-01',
     endDate: '2026-05-31',
-    department: 'Cybersecurity',
+    department: 'Technology Security',
     owner: 'Alex Rodriguez',
     riskLevel: 'High',
-    aiScore: 87,
-    aiInsights: [
+    riskScore: 87,
+    insights: [
       'Advanced threat detection capabilities exceed baseline requirements',
-      'Data sovereignty concerns addressed through federated learning',
+      'Data sovereignty concerns addressed through secure architecture',
       'Real-time compliance monitoring integrated with legal workflows',
-      'Predictive threat modeling reduces legal exposure by 67%'
+      'Predictive modeling reduces legal exposure by 67%'
     ],
-    predictedOutcome: 'Contract extension likely, cybersecurity ROI: 347%',
-    automationLevel: 'AI-Driven',
+    predictedOutcome: 'Contract extension likely, security ROI: 347%',
+    automationLevel: 'System-Driven',
     complexity: 78,
     jurisdiction: ['US', 'EU', 'APAC'],
-    tags: ['cybersecurity', 'AI', 'real-time', 'compliance', 'threat-intel'],
-    mlMetrics: {
+    tags: ['security', 'technology', 'real-time', 'compliance', 'intelligence'],
+    metrics: {
       riskAssessment: 67,
       complianceScore: 93,
       negotiationPower: 78,
@@ -180,8 +178,8 @@ const futuristicContracts: EnhancedContract[] = [
     }
   },
   {
-    id: 'BIO-004',
-    title: 'Moderna mRNA Technology Licensing',
+    id: 'CON-004',
+    title: 'Technology Licensing Agreement',
     counterparty: 'Moderna Inc.',
     type: 'IP License',
     status: 'legal-review',
@@ -191,19 +189,19 @@ const futuristicContracts: EnhancedContract[] = [
     department: 'Biotech Licensing',
     owner: 'Dr. Lisa Wang',
     riskLevel: 'Critical',
-    aiScore: 91,
-    aiInsights: [
-      'Breakthrough mRNA delivery system with 89% efficacy improvement',
-      'Regulatory pathway optimized through AI-driven clinical trial design',
-      'Patent portfolio strength validated by quantum prior art analysis',
+    riskScore: 91,
+    insights: [
+      'Breakthrough delivery system with 89% efficacy improvement',
+      'Regulatory pathway optimized through strategic clinical trial design',
+      'Patent portfolio strength validated by comprehensive analysis',
       'Market exclusivity period maximized through strategic filing sequence'
     ],
     predictedOutcome: 'Regulatory approval: 87% probability, market value: $2.3B+',
     automationLevel: 'Semi-Automated',
     complexity: 97,
     jurisdiction: ['FDA', 'EMA', 'Global Regulatory'],
-    tags: ['biotech', 'mRNA', 'pandemic-ready', 'breakthrough', 'regulatory'],
-    mlMetrics: {
+    tags: ['biotech', 'technology', 'regulatory', 'breakthrough', 'licensing'],
+    metrics: {
       riskAssessment: 89,
       complianceScore: 94,
       negotiationPower: 85,
@@ -211,8 +209,8 @@ const futuristicContracts: EnhancedContract[] = [
     }
   },
   {
-    id: 'SPA-005',
-    title: 'SpaceX Starlink Constellation Licensing',
+    id: 'CON-005',
+    title: 'Satellite Communication Licensing',
     counterparty: 'Space Exploration Technologies Corp.',
     type: 'Satellite License',
     status: 'active',
@@ -221,175 +219,81 @@ const futuristicContracts: EnhancedContract[] = [
     endDate: '2029-02-28',
     renewalDate: '2028-12-01',
     department: 'Space Communications',
-    owner: 'Commander Sarah Mitchell',
+    owner: 'Sarah Mitchell',
     riskLevel: 'Medium',
-    aiScore: 92,
-    aiInsights: [
-      'Mars mission communication protocols approved by NASA',
-      'Quantum-encrypted satellite network provides unprecedented security',
+    riskScore: 92,
+    insights: [
+      'Advanced mission communication protocols approved by regulatory bodies',
+      'Secure satellite network provides unprecedented security',
       'Global coverage enables 24/7 legal consultation capabilities',
-      'Inter-planetary jurisdiction framework established for future expansion'
+      'International jurisdiction framework established for future expansion'
     ],
-    predictedOutcome: 'Mars colony communication ready, expansion to 100k satellites',
-    automationLevel: 'AI-Driven',
+    predictedOutcome: 'Global communication ready, expansion to 100k satellites',
+    automationLevel: 'System-Driven',
     complexity: 88,
     jurisdiction: ['International Space Law', 'FCC', 'ITU', 'Global'],
-    tags: ['space', 'satellite', 'global-comms', 'mars-ready', 'quantum-secure'],
-    mlMetrics: {
+    tags: ['space', 'satellite', 'global-comms', 'secure', 'advanced'],
+    metrics: {
       riskAssessment: 54,
       complianceScore: 96,
       negotiationPower: 87,
       renewalProbability: 94
     }
-  },
-  {
-    id: 'NEU-006',
-    title: 'Neuralink Brain-Computer Interface License',
-    counterparty: 'Neuralink Corporation',
-    type: 'Medical Technology',
-    status: 'legal-review',
-    value: 678000000,
-    startDate: '2024-06-01',
-    endDate: '2031-05-31',
-    department: 'Neurotechnology',
-    owner: 'Dr. Elena Vasquez',
-    riskLevel: 'Critical',
-    aiScore: 85,
-    aiInsights: [
-      'Revolutionary neural interface enables direct thought-to-legal-document creation',
-      'FDA breakthrough device designation accelerates regulatory timeline',
-      'Ethical AI safeguards prevent unauthorized neural data access',
-      'Brain-computer interface protocols validated through simulations'
-    ],
-    predictedOutcome: 'Clinical trials: 78% success probability, market: $890M',
-    automationLevel: 'Semi-Automated',
-    complexity: 99,
-    jurisdiction: ['FDA', 'EU MDR', 'Global Healthcare'],
-    tags: ['neurotechnology', 'BCI', 'clinical', 'breakthrough', 'medical'],
-    mlMetrics: {
-      riskAssessment: 92,
-      complianceScore: 87,
-      negotiationPower: 73,
-      renewalProbability: 82
-    }
-  },
-  {
-    id: 'AGI-007',
-    title: 'OpenAI GPT-5 Enterprise Licensing',
-    counterparty: 'OpenAI Inc.',
-    type: 'AI License',
-    status: 'ai-review',
-    value: 123000000,
-    startDate: '2024-09-01',
-    endDate: '2027-08-31',
-    department: 'AI Research',
-    owner: 'Dr. James Liu',
-    riskLevel: 'Medium',
-    aiScore: 96,
-    aiInsights: [
-      'AGI capabilities enable autonomous legal document generation',
-      'Model alignment ensures ethical AI behavior in legal contexts',
-      'Multi-modal reasoning supports complex contract analysis',
-      'Self-improving architecture adapts to legal precedent changes'
-    ],
-    predictedOutcome: 'Legal automation efficiency: +456%, cost reduction: 67%',
-    automationLevel: 'AI-Driven',
-    complexity: 84,
-    jurisdiction: ['Global', 'AI Governance'],
-    tags: ['AGI', 'autonomous', 'legal-AI', 'generative', 'transformative'],
-    mlMetrics: {
-      riskAssessment: 45,
-      complianceScore: 91,
-      negotiationPower: 89,
-      renewalProbability: 97
-    }
-  },
-  {
-    id: 'QUA-008',
-    title: 'IBM Quantum Network Membership',
-    counterparty: 'IBM Corporation',
-    type: 'Research Partnership',
-    status: 'active',
-    value: 89000000,
-    startDate: '2024-01-15',
-    endDate: '2027-01-14',
-    renewalDate: '2026-10-15',
-    department: 'Quantum Research',
-    owner: 'Dr. Raj Patel',
-    riskLevel: 'Low',
-    aiScore: 93,
-    aiInsights: [
-      'Quantum supremacy achieved in contract optimization algorithms',
-      'Post-quantum cryptography secures all legal communications',
-      'Quantum machine learning predicts contract disputes with 97% accuracy',
-      'Partnership enables access to 1000+ qubit quantum computers'
-    ],
-    predictedOutcome: 'Quantum legal advantage: 10x processing speed improvement',
-    automationLevel: 'Fully-Automated',
-    complexity: 91,
-    jurisdiction: ['Global', 'Quantum Computing Standards'],
-    tags: ['quantum', 'research', 'partnership', 'cryptography', 'ML'],
-    mlMetrics: {
-      riskAssessment: 18,
-      complianceScore: 98,
-      negotiationPower: 91,
-      renewalProbability: 96
-    }
   }
 ]
 
-const futuristicMetrics: FuturisticMetric[] = [
+const businessMetrics: BusinessMetric[] = [
   {
-    title: 'Neural Contract Velocity',
+    title: 'Contract Processing Velocity',
     value: '847',
     unit: 'processed/day',
     change: { value: 156, trend: 'up', period: 'vs last quarter' },
-    icon: Brain,
-    variant: 'neural',
-    prediction: '+234% with quantum processing',
-    aiConfidence: 94
+    icon: Activity,
+    variant: 'primary',
+    prediction: '+234% with advanced processing',
+    confidence: 94
   },
   {
-    title: 'AI Risk Assessment',
+    title: 'Risk Assessment Accuracy',
     value: '99.7%',
     unit: 'accuracy',
     change: { value: 23, trend: 'up', period: 'vs baseline' },
     icon: Shield,
-    variant: 'quantum',
+    variant: 'success',
     prediction: '99.9% with next model update',
-    aiConfidence: 97
+    confidence: 97
   },
   {
-    title: 'Quantum Optimization',
+    title: 'Process Optimization',
     value: '$23.4M',
     unit: 'saved annually',
     change: { value: 67, trend: 'up', period: 'vs traditional methods' },
-    icon: Zap,
-    variant: 'plasma',
+    icon: Target,
+    variant: 'warning',
     prediction: '$45M potential with full deployment',
-    aiConfidence: 89
+    confidence: 89
   },
   {
-    title: 'Cyber Compliance',
+    title: 'Compliance Coverage',
     value: '100%',
     unit: 'coverage',
     change: { value: 0, trend: 'stable', period: 'maintained 90 days' },
-    icon: Radar,
-    variant: 'cyber',
+    icon: Database,
+    variant: 'info',
     prediction: 'Expanding to 15 new frameworks',
-    aiConfidence: 99
+    confidence: 99
   }
 ]
 
-const FuturisticMetricCard: React.FC<FuturisticMetric> = ({ 
-  title, 
-  value, 
-  unit, 
-  change, 
-  icon: Icon, 
+const BusinessMetricCard: React.FC<BusinessMetric> = ({
+  title,
+  value,
+  unit,
+  change,
+  icon: Icon,
   variant,
   prediction,
-  aiConfidence 
+  confidence
 }) => {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -424,8 +328,8 @@ const FuturisticMetricCard: React.FC<FuturisticMetric> = ({
           </div>
           <div className="text-right">
             <div className="flex items-center space-x-1 text-xs text-slate-500">
-              <Brain className="w-3 h-3" />
-              <span>{aiConfidence}%</span>
+              <Activity className="w-3 h-3" />
+              <span>{confidence}%</span>
             </div>
           </div>
         </div>
@@ -474,7 +378,7 @@ const FuturisticMetricCard: React.FC<FuturisticMetric> = ({
 
 const statusConfig = {
   draft: { color: 'text-slate-700 bg-slate-100', icon: FileText },
-  'ai-review': { color: 'text-purple-700 bg-purple-100', icon: Brain },
+  'review': { color: 'text-purple-700 bg-purple-100', icon: Activity },
   'legal-review': { color: 'text-amber-700 bg-amber-100', icon: Clock },
   active: { color: 'text-emerald-700 bg-emerald-100', icon: CheckCircle },
   expired: { color: 'text-red-700 bg-red-100', icon: AlertTriangle },
@@ -522,8 +426,8 @@ const EnhancedContractCard: React.FC<{ contract: EnhancedContract }> = ({ contra
       {/* AI Score Indicator */}
       <div className="absolute top-3 right-3">
         <div className="flex items-center space-x-1 px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white text-xs">
-          <Brain className="w-3 h-3" />
-          <span>{contract.aiScore}%</span>
+          <Activity className="w-3 h-3" />
+          <span>{contract.riskScore}%</span>
         </div>
       </div>
 
@@ -599,38 +503,38 @@ const EnhancedContractCard: React.FC<{ contract: EnhancedContract }> = ({ contra
         {/* ML Metrics */}
         <div className="bg-slate-50 p-3 rounded-lg space-y-2">
           <h4 className="text-xs font-medium text-slate-700 flex items-center">
-            <Cpu className="w-3 h-3 mr-1" />
+            <Settings className="w-3 h-3 mr-1" />
             AI Analytics
           </h4>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="flex justify-between">
               <span className="text-slate-600">Risk Score</span>
-              <span className="font-medium">{contract.mlMetrics.riskAssessment}%</span>
+              <span className="font-medium">{contract.metrics.riskAssessment}%</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Compliance</span>
-              <span className="font-medium">{contract.mlMetrics.complianceScore}%</span>
+              <span className="font-medium">{contract.metrics.complianceScore}%</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Renewal Prob.</span>
-              <span className="font-medium">{contract.mlMetrics.renewalProbability}%</span>
+              <span className="font-medium">{contract.metrics.renewalProbability}%</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">Negotiation</span>
-              <span className="font-medium">{contract.mlMetrics.negotiationPower}%</span>
+              <span className="font-medium">{contract.metrics.negotiationPower}%</span>
             </div>
           </div>
         </div>
 
         {/* AI Insights */}
-        {isHovered && contract.aiInsights.length > 0 && (
+        {isHovered && contract.insights.length > 0 && (
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-3 rounded-lg border border-purple-200 animate-fade-in">
             <div className="flex items-center space-x-2 mb-2">
               <Lightbulb className="w-4 h-4 text-purple-600" />
               <span className="text-sm font-medium text-purple-800">AI Insights</span>
             </div>
             <ul className="space-y-1">
-              {contract.aiInsights.slice(0, 2).map((insight, index) => (
+              {contract.insights.slice(0, 2).map((insight, index) => (
                 <li key={index} className="text-xs text-purple-700 flex items-start">
                   <Circle className="w-1.5 h-1.5 mt-1.5 mr-2 flex-shrink-0" />
                   {insight}
@@ -691,12 +595,12 @@ const EnhancedContractCard: React.FC<{ contract: EnhancedContract }> = ({ contra
 const Contracts = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [contracts] = useState(futuristicContracts)
+  const [contracts] = useState(professionalContracts)
 
   const stats = {
     total: contracts.length,
     active: contracts.filter(c => c.status === 'active').length,
-    review: contracts.filter(c => c.status === 'ai-review' || c.status === 'legal-review').length,
+    review: contracts.filter(c => c.status === 'review' || c.status === 'legal-review').length,
     totalValue: contracts.reduce((sum, c) => sum + c.value, 0)
   }
 
@@ -713,7 +617,7 @@ const Contracts = () => {
       subtitle="AI-powered contract lifecycle management with quantum-enhanced analytics"
       actions={
         <div className="flex space-x-3">
-          <CorporateButton variant="secondary" leftIcon={<Brain className="w-4 h-4" />}>
+          <CorporateButton variant="secondary" leftIcon={<Activity className="w-4 h-4" />}>
             AI Assistant
           </CorporateButton>
           <CorporateButton variant="primary" leftIcon={<Plus className="w-4 h-4" />}>
@@ -724,8 +628,8 @@ const Contracts = () => {
     >
       {/* Enhanced Metrics Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {futuristicMetrics.map((metric, index) => (
-          <FuturisticMetricCard key={index} {...metric} />
+        {businessMetrics.map((metric, index) => (
+          <BusinessMetricCard key={index} {...metric} />
         ))}
       </div>
 
@@ -734,7 +638,7 @@ const Contracts = () => {
         <CorporateCardHeader>
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <Brain className="w-4 h-4 text-white" />
+              <Activity className="w-4 h-4 text-white" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-slate-900">Neural Contract Intelligence</h3>
@@ -786,7 +690,7 @@ const Contracts = () => {
             {/* AI Predictions */}
             <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-xl border border-purple-200">
               <div className="flex items-center space-x-3 mb-3">
-                <Bot className="w-5 h-5 text-purple-500" />
+                <Settings className="w-5 h-5 text-purple-500" />
                 <h4 className="font-medium text-purple-900">AI Predictions</h4>
               </div>
               <div className="space-y-2">
@@ -831,7 +735,7 @@ const Contracts = () => {
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
-                <option value="ai-review">AI Review</option>
+                <option value="review">Review</option>
                 <option value="legal-review">Legal Review</option>
                 <option value="draft">Draft</option>
                 <option value="expired">Expired</option>

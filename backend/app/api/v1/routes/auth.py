@@ -1,5 +1,5 @@
 """
-Authentication Routes for CounselFlow Legal Operating System
+Authentication Routes for CounselFlow Legal Support
 Enhanced with military-grade security, MFA, and comprehensive audit logging
 """
 

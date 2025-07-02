@@ -105,7 +105,7 @@ class AuthenticationService:
         """Generate QR code for MFA setup"""
         totp_uri = pyotp.totp.TOTP(secret).provisioning_uri(
             name=user_email,
-            issuer_name="CounselFlow Legal OS"
+            issuer_name="CounselFlow Legal Support"
         )
         
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -314,7 +314,7 @@ class AuthenticationService:
             # Generate QR code URL
             provisioning_uri = totp.provisioning_uri(
                 name=user.email,
-                issuer_name="CounselFlow Legal OS"
+                issuer_name="CounselFlow Legal Support"
             )
             
             # Generate QR code

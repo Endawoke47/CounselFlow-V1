@@ -24,7 +24,7 @@ function CounselFlowApp() {
     if (isAuthenticated && user) {
       // Welcome notification for authenticated users
       setTimeout(() => {
-        addNotification('success', `Welcome back, ${user.name || user.username}!`, 'Your AI-native legal operating system is ready.')
+        addNotification('success', `Welcome back, ${user.name || user.username}!`, 'Your professional legal support system is ready.')
       }, 1000)
     }
   }, [isAuthenticated, user])
@@ -250,7 +250,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
           marginBottom: theme.spacing.md,
           fontWeight: theme.typography.fontWeight.normal
         }}>
-          AI-Native Legal Operating System
+          Professional Legal Support
         </p>
 
         <p style={{

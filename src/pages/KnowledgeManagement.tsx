@@ -159,7 +159,7 @@ const KnowledgeManagement = () => {
   ];
 
   // AI Insights for Knowledge Management
-  const aiInsights = [
+  const businessInsights = [
     {
       title: "Neural Content Clustering",
       description: "AI identified 7 knowledge gaps that could be filled to increase team efficiency by 28%.",
@@ -419,7 +419,7 @@ const KnowledgeManagement = () => {
           />
           <CorporateCardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {aiInsights.map((insight, index) => (
+              {businessInsights.map((insight, index) => (
                 <div key={index} className="bg-white rounded-xl p-4 border border-slate-200 hover:shadow-lg transition-shadow">
                   <div className="flex items-start space-x-3">
                     <div className="p-2 bg-corporate-100 rounded-lg">

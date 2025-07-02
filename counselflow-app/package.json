@@ -1,7 +1,7 @@
 {
   "name": "counselflow",
   "version": "1.0.0",
-  "description": "AI-Native Legal Operating System - Revolutionary platform for elite law firms",
+  "description": "Professional Legal Support - Advanced platform for elite law firms",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",

@@ -139,7 +139,7 @@ export function ModernNavigation({ onModuleSelect, activeModule }: ModernNavigat
                   fontSize: theme.typography.fontSize.sm, 
                   margin: 0 
                 }}>
-                  AI Legal OS
+                  Legal Support
                 </p>
               </div>
             )}

@@ -1,5 +1,5 @@
 """
-User Management Routes for CounselFlow Legal Operating System
+User Management Routes for CounselFlow Legal Support
 Enhanced with privilege validation and comprehensive user operations
 """
 

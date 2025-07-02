@@ -154,7 +154,7 @@ const IPManagement = () => {
   ];
 
   // AI Insights for IP Management
-  const aiInsights = [
+  const businessInsights = [
     {
       title: "Neural Patent Clustering",
       description: "AI identified 4 patent applications that could be bundled for 47% faster approval rates.",
@@ -419,7 +419,7 @@ const IPManagement = () => {
           />
           <CorporateCardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {aiInsights.map((insight, index) => (
+              {businessInsights.map((insight, index) => (
                 <div key={index} className="bg-white rounded-xl p-4 border border-slate-200 hover:shadow-lg transition-shadow">
                   <div className="flex items-start space-x-3">
                     <div className="p-2 bg-corporate-100 rounded-lg">

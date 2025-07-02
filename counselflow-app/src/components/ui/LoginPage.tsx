@@ -113,7 +113,7 @@ export function LoginPage({
               fontSize: '1.1rem',
               fontWeight: 500,
             }}>
-              AI-Native Legal Operating System
+              Professional Legal Support
             </p>
           </div>
 

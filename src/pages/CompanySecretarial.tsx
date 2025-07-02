@@ -4,8 +4,8 @@ import { CorporateCard, CorporateCardHeader, CorporateCardContent } from '@/comp
 import { CorporateButton } from '@/components/corporate/CorporateButton'
 import { 
   Plus, Search, Building, Calendar, AlertTriangle, CheckCircle, Clock, FileText, Users, Briefcase,
-  Brain, Zap, Target, Cpu, Activity, Eye, ChevronRight, Star, Rocket, Timer, Database, BarChart3,
-  Layers, Globe, Settings, Network, Bot, Gauge, BookOpen, Scale, Monitor, TrendingUp, TrendingDown
+  Activity, Eye, ChevronRight, Star, Timer, Database, BarChart3, Layers, Globe, Settings, 
+  Monitor, TrendingUp, TrendingDown, PieChart, LineChart, Target, Shield, FileCheck
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -14,163 +14,171 @@ interface Entity {
   name: string
   type: string
   jurisdiction: string
-  status: 'neural-active' | 'quantum-active' | 'cyber-pending' | 'plasma-dissolved' | 'ai-inactive'
+  status: 'active' | 'pending' | 'dissolved' | 'inactive'
   incorporationDate: string
   nextFilingDate: string
   directors: number
   shareholders: number
-  aiConfidence: string
+  confidence: string
   complianceScore: string
   riskLevel: string
-  neuralInsights: string
+  insights: string
 }
 
-const advancedEntities: Entity[] = [
+const entities: Entity[] = [
   {
     id: 'E001',
-    name: 'CounselFlow Neural Technologies Inc.',
-    type: 'Quantum Corporation',
-    jurisdiction: 'Delaware AI Zone',
-    status: 'neural-active',
+    name: 'CounselFlow Technologies Inc.',
+    type: 'Corporation',
+    jurisdiction: 'Delaware',
+    status: 'active',
     incorporationDate: '2024-01-15',
     nextFilingDate: '2025-03-15',
     directors: 7,
     shareholders: 24,
-    aiConfidence: '99.2%',
-    complianceScore: 'S-Tier',
-    riskLevel: 'Ultra-Low',
-    neuralInsights: 'Optimal corporate structure with quantum governance'
+    confidence: '99.2%',
+    complianceScore: 'A+',
+    riskLevel: 'Low',
+    insights: 'Optimal corporate structure with excellent governance'
   },
   {
     id: 'E002',
-    name: 'CF Plasma Holdings LLC',
-    type: 'Neural Limited Liability Company',
-    jurisdiction: 'Nevada Cyber District',
-    status: 'quantum-active',
+    name: 'CF Holdings LLC',
+    type: 'Limited Liability Company',
+    jurisdiction: 'Nevada',
+    status: 'active',
     incorporationDate: '2024-06-01',
     nextFilingDate: '2025-02-28',
     directors: 5,
     shareholders: 16,
-    aiConfidence: '96.7%',
-    complianceScore: 'A++',
-    riskLevel: 'Minimal',
-    neuralInsights: 'Advanced holdings structure with plasma optimization'
+    confidence: '96.7%',
+    complianceScore: 'A',
+    riskLevel: 'Low',
+    insights: 'Advanced holdings structure with strong performance'
   },
   {
     id: 'E003',
-    name: 'Quantum Legal Services Subsidiary',
-    type: 'AI Subsidiary Corporation',
-    jurisdiction: 'California Neural Zone',
-    status: 'cyber-pending',
+    name: 'Legal Services Subsidiary',
+    type: 'Subsidiary Corporation',
+    jurisdiction: 'California',
+    status: 'pending',
     incorporationDate: '2024-12-01',
     nextFilingDate: '2025-01-31',
     directors: 4,
     shareholders: 3,
-    aiConfidence: '87.4%',
-    complianceScore: 'A',
-    riskLevel: 'Low-Medium',
-    neuralInsights: 'Emerging subsidiary with cyber integration potential'
+    confidence: '87.4%',
+    complianceScore: 'B+',
+    riskLevel: 'Medium',
+    insights: 'Emerging subsidiary with good growth potential'
   },
   {
     id: 'E004',
-    name: 'Neural Innovation Partners',
-    type: 'Cyber Partnership',
-    jurisdiction: 'Texas Quantum District',
-    status: 'neural-active',
+    name: 'Innovation Partners',
+    type: 'Partnership',
+    jurisdiction: 'Texas',
+    status: 'active',
     incorporationDate: '2024-03-20',
     nextFilingDate: '2025-04-15',
     directors: 6,
     shareholders: 12,
-    aiConfidence: '94.8%',
-    complianceScore: 'A+',
+    confidence: '94.8%',
+    complianceScore: 'A',
     riskLevel: 'Low',
-    neuralInsights: 'Strategic partnership with neural acceleration capabilities'
+    insights: 'Strategic partnership with strong fundamentals'
   },
   {
     id: 'E005',
-    name: 'Plasma Biotech Ventures',
-    type: 'Quantum Investment Entity',
-    jurisdiction: 'New York AI Hub',
-    status: 'quantum-active',
+    name: 'Biotech Ventures',
+    type: 'Investment Entity',
+    jurisdiction: 'New York',
+    status: 'active',
     incorporationDate: '2024-07-10',
     nextFilingDate: '2025-05-20',
     directors: 8,
     shareholders: 31,
-    aiConfidence: '98.1%',
-    complianceScore: 'S-Tier',
-    riskLevel: 'Ultra-Low',
-    neuralInsights: 'High-performance biotech venture with plasma analytics'
+    confidence: '98.1%',
+    complianceScore: 'A+',
+    riskLevel: 'Low',
+    insights: 'High-performance biotech venture with excellent analytics'
   },
   {
     id: 'E006',
-    name: 'Cyber Compliance Solutions',
-    type: 'Neural Service Corporation',
-    jurisdiction: 'Florida Cyber Zone',
-    status: 'ai-inactive',
+    name: 'Compliance Solutions',
+    type: 'Service Corporation',
+    jurisdiction: 'Florida',
+    status: 'inactive',
     incorporationDate: '2023-11-05',
     nextFilingDate: '2025-01-10',
     directors: 3,
     shareholders: 7,
-    aiConfidence: '78.3%',
-    complianceScore: 'B+',
-    riskLevel: 'Medium',
-    neuralInsights: 'Dormant entity requiring AI reactivation protocols'
+    confidence: '78.3%',
+    complianceScore: 'C+',
+    riskLevel: 'High',
+    insights: 'Dormant entity requiring reactivation procedures'
   }
 ]
 
-const neuralMetrics = [
+const entityMetrics = [
   {
-    title: "Neural Entity Health",
+    title: "Entity Performance",
     value: "97.6%",
     change: "+14.2%",
     trend: "up" as const,
-    icon: Brain,
+    icon: Building,
     variant: "success" as const,
-    description: "AI-powered entity optimization",
-    prediction: "Entity health approaching 99.1%",
+    description: "Overall entity health and optimization",
+    prediction: "Entity performance approaching 99.1%",
   },
   {
-    title: "Quantum Compliance",
+    title: "Compliance Rate",
     value: "94.8%",
     change: "+18.7%",
     trend: "up" as const,
-    icon: Zap,
+    icon: Shield,
     variant: "default" as const,
     description: "Advanced compliance tracking",
     prediction: "Compliance optimization confirmed",
   },
   {
-    title: "Cyber Filing Efficiency",
+    title: "Filing Efficiency",
     value: "89.3%",
     change: "+22.4%",
     trend: "up" as const,
-    icon: Target,
+    icon: FileCheck,
     variant: "success" as const,
     description: "Real-time filing acceleration",
-    prediction: "Filing efficiency surge detected",
+    prediction: "Filing efficiency improvements detected",
   },
   {
-    title: "Plasma Risk Score",
+    title: "Risk Score",
     value: "92.7",
     change: "+11.6%",
     trend: "up" as const,
     icon: Timer,
     variant: "success" as const,
     description: "Multi-dimensional risk optimization",
-    prediction: "Risk mitigation trajectory optimized",
+    prediction: "Risk mitigation strategies optimized",
   },
 ]
 
 const statusConfig = {
-  'neural-active': { color: 'text-emerald-700 bg-gradient-to-r from-emerald-100 to-emerald-200 border-emerald-300', icon: Brain, label: 'Neural Active' },
-  'quantum-active': { color: 'text-blue-700 bg-gradient-to-r from-blue-100 to-blue-200 border-blue-300', icon: Zap, label: 'Quantum Active' },
-  'cyber-pending': { color: 'text-amber-700 bg-gradient-to-r from-amber-100 to-amber-200 border-amber-300', icon: Activity, label: 'Cyber Pending' },
-  'plasma-dissolved': { color: 'text-red-700 bg-gradient-to-r from-red-100 to-red-200 border-red-300', icon: AlertTriangle, label: 'Plasma Dissolved' },
-  'ai-inactive': { color: 'text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200 border-slate-300', icon: Clock, label: 'AI Inactive' }
+  'active': { color: 'text-emerald-700 bg-gradient-to-r from-emerald-100 to-emerald-200 border-emerald-300', icon: CheckCircle, label: 'Active' },
+  'pending': { color: 'text-amber-700 bg-gradient-to-r from-amber-100 to-amber-200 border-amber-300', icon: Clock, label: 'Pending' },
+  'dissolved': { color: 'text-red-700 bg-gradient-to-r from-red-100 to-red-200 border-red-300', icon: AlertTriangle, label: 'Dissolved' },
+  'inactive': { color: 'text-slate-700 bg-gradient-to-r from-slate-100 to-slate-200 border-slate-300', icon: Timer, label: 'Inactive' }
 }
 
-// Enhanced StatCard component with neural analytics
-const NeuralStatCard = ({ title, value, change, trend, icon: Icon, variant, description, prediction }: any) => {
+// Enhanced StatCard component with advanced analytics
+const EntityStatCard = ({ title, value, change, trend, icon: Icon, variant, description, prediction }: {
+  title: string;
+  value: string;
+  change: string;
+  trend: 'up' | 'down';
+  icon: React.ComponentType<{ className?: string }>;
+  variant: 'default' | 'success' | 'warning' | 'danger';
+  description: string;
+  prediction: string;
+}) => {
   const variantStyles = {
     default: 'border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100',
     success: 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100',
@@ -224,8 +232,8 @@ const NeuralStatCard = ({ title, value, change, trend, icon: Icon, variant, desc
           
           <div className="p-2 bg-white/40 rounded-lg border border-slate-200/50">
             <div className="flex items-center space-x-2">
-              <Cpu className="w-3 h-3 text-slate-400" />
-              <p className="text-xs text-slate-600 font-medium">AI Prediction:</p>
+              <BarChart3 className="w-3 h-3 text-slate-400" />
+              <p className="text-xs text-slate-600 font-medium">Analytics:</p>
             </div>
             <p className="text-xs text-slate-500 mt-1">{prediction}</p>
           </div>
@@ -260,7 +268,7 @@ const EntityCard: React.FC<{ entity: Entity }> = ({ entity }) => {
               <Globe className="w-4 h-4 mr-2 text-slate-400" />
               {entity.type} • {entity.jurisdiction}
             </p>
-            <p className="text-xs text-slate-500 italic">{entity.neuralInsights}</p>
+            <p className="text-xs text-slate-500 italic">{entity.insights}</p>
           </div>
         </div>
 
@@ -281,15 +289,15 @@ const EntityCard: React.FC<{ entity: Entity }> = ({ entity }) => {
         {/* AI Confidence & Risk */}
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-600 font-medium">AI Confidence:</span>
+            <span className="text-slate-600 font-medium">Confidence Score:</span>
             <div className="flex items-center space-x-2">
               <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full"
-                  style={{ width: entity.aiConfidence }}
+                  style={{ width: entity.confidence }}
                 ></div>
               </div>
-              <span className="font-semibold text-slate-700">{entity.aiConfidence}</span>
+              <span className="font-semibold text-slate-700">{entity.confidence}</span>
             </div>
           </div>
           
@@ -349,10 +357,10 @@ const CompanySecretarial: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('')
 
   const stats = {
-    total: advancedEntities.length,
-    active: advancedEntities.filter(e => e.status.includes('active')).length,
-    pending: advancedEntities.filter(e => e.status.includes('pending')).length,
-    filingsDue: advancedEntities.filter(e => 
+    total: entities.length,
+    active: entities.filter(e => e.status === 'active').length,
+    pending: entities.filter(e => e.status === 'pending').length,
+    filingsDue: entities.filter(e => 
       new Date(e.nextFilingDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     ).length
   }
@@ -360,9 +368,9 @@ const CompanySecretarial: React.FC = () => {
   return (
     <CorporateLayout>
       <div className="space-y-8">
-        {/* Enhanced Neural Header */}
+        {/* Professional Header */}
         <div className="relative bg-gradient-to-r from-corporate-600 via-corporate-700 to-corporate-800 rounded-2xl p-8 text-white overflow-hidden">
-          {/* Neural Background Effects */}
+          {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10"></div>
           <div className="absolute top-0 left-0 w-full h-full">
             <div className="absolute top-4 left-4 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
@@ -378,11 +386,11 @@ const CompanySecretarial: React.FC = () => {
                 </div>
                 <div>
                   <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
-                    Neural Company Secretarial
+                    Company Secretarial
                   </h1>
                   <p className="text-corporate-100 text-lg flex items-center space-x-2">
-                    <Brain className="w-5 h-5 text-cyan-300" />
-                    <span>AI-powered corporate governance & quantum entity management</span>
+                    <Shield className="w-5 h-5 text-cyan-300" />
+                    <span>Advanced corporate governance & entity management</span>
                   </p>
                 </div>
               </div>
@@ -390,15 +398,15 @@ const CompanySecretarial: React.FC = () => {
               <div className="flex items-center space-x-6 text-sm">
                 <div className="flex items-center space-x-2">
                   <Activity className="w-4 h-4 text-green-400" />
-                  <span className="text-green-200">Neural Engine Active</span>
+                  <span className="text-green-200">System Active</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <span className="text-yellow-200">Quantum Processing</span>
+                  <FileCheck className="w-4 h-4 text-yellow-400" />
+                  <span className="text-yellow-200">Compliance Monitoring</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Target className="w-4 h-4 text-purple-400" />
-                  <span className="text-purple-200">Plasma Analytics</span>
+                  <span className="text-purple-200">Advanced Analytics</span>
                 </div>
               </div>
             </div>
@@ -418,23 +426,23 @@ const CompanySecretarial: React.FC = () => {
           <div className="relative z-10 mt-8 flex flex-wrap gap-4">
             <CorporateButton variant="secondary" size="md" className="bg-white/10 border-white/20 hover:bg-white/20 backdrop-blur-sm">
               <Plus className="w-4 h-4 mr-2" />
-              Add Neural Entity
+              Add Entity
             </CorporateButton>
             <CorporateButton variant="ghost" size="md" className="text-white border-white/20 hover:bg-white/10 backdrop-blur-sm">
               <BarChart3 className="w-4 h-4 mr-2" />
-              Quantum Analytics
+              Analytics Dashboard
             </CorporateButton>
             <CorporateButton variant="ghost" size="md" className="text-white border-white/20 hover:bg-white/10 backdrop-blur-sm">
-              <Brain className="w-4 h-4 mr-2" />
-              AI Governance
+              <Shield className="w-4 h-4 mr-2" />
+              Governance Reports
             </CorporateButton>
           </div>
         </div>
 
-        {/* Neural Analytics Grid */}
+        {/* Entity Analytics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {neuralMetrics.map((metric, index) => (
-            <NeuralStatCard key={index} {...metric} />
+          {entityMetrics.map((metric, index) => (
+            <EntityStatCard key={index} {...metric} />
           ))}
         </div>
 
@@ -445,7 +453,7 @@ const CompanySecretarial: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search neural entities with AI..."
+                placeholder="Search professional entities..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-corporate-500 focus:border-transparent bg-white shadow-sm"
@@ -453,12 +461,12 @@ const CompanySecretarial: React.FC = () => {
             </div>
             <div className="flex items-center space-x-2">
               <CorporateButton variant="ghost" size="sm" className="border-slate-200">
-                <Brain className="w-4 h-4 mr-2" />
-                AI Sort
+                <Activity className="w-4 h-4 mr-2" />
+                Smart Sort
               </CorporateButton>
               <CorporateButton variant="ghost" size="sm" className="border-slate-200">
-                <Zap className="w-4 h-4 mr-2" />
-                Quantum View
+                <Database className="w-4 h-4 mr-2" />
+                Advanced View
               </CorporateButton>
             </div>
           </div>
@@ -466,26 +474,26 @@ const CompanySecretarial: React.FC = () => {
 
         {/* Enhanced Entities Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {advancedEntities.map((entity) => (
+          {entities.map((entity) => (
             <EntityCard key={entity.id} entity={entity} />
           ))}
         </div>
 
-        {/* Neural Analytics Footer */}
+        {/* Business Analytics Footer */}
         <CorporateCard variant="elevated" padding="lg" className="shadow-lg border border-slate-200">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <Brain className="w-4 h-4 text-corporate-600" />
-                <span className="text-slate-700">Neural processing complete</span>
+                <Activity className="w-4 h-4 text-corporate-600" />
+                <span className="text-slate-700">Processing complete</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Zap className="w-4 h-4 text-yellow-600" />
-                <span className="text-slate-700">Quantum sync active</span>
+                <Database className="w-4 h-4 text-yellow-600" />
+                <span className="text-slate-700">Data sync active</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Target className="w-4 h-4 text-purple-600" />
-                <span className="text-slate-700">Plasma analytics enabled</span>
+                <span className="text-slate-700">Analytics enabled</span>
               </div>
             </div>
             <div className="text-slate-600">

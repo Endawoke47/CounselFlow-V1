@@ -1,5 +1,5 @@
 """
-Analytics Schemas for CounselFlow Legal Operating System
+Analytics Schemas for CounselFlow Legal Support
 Pydantic models for legal analytics and business intelligence
 """
 from pydantic import BaseModel, Field

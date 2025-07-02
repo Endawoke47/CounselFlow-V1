@@ -23,7 +23,6 @@ import {
   PieChart,
   Activity,
   Target,
-  Zap,
   BookOpen,
   Award,
   XCircle

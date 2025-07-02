@@ -6,7 +6,7 @@ from fastapi import FastAPI
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="CounselFlow Legal Operating System - Debug Mode",
+    title="CounselFlow Legal Support - Debug Mode",
     description="Debug version to isolate import issues",
     version="1.0.0-debug"
 )

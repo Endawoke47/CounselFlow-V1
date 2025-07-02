@@ -3,35 +3,35 @@ import { CorporateCard, CorporateCardHeader, CorporateCardContent } from "@/comp
 import { CorporateButton } from "@/components/corporate/CorporateButton";
 import { 
   Shield, AlertTriangle, CheckCircle, TrendingUp, TrendingDown, Search, Filter, Plus, BarChart3, Users,
-  Brain, Zap, Target, Cpu, Activity, Eye, ChevronRight, Star, Rocket, Timer, Lock, Unlock,
-  Layers, Globe, Settings, Database, Network, Bot, Calendar, Gauge, BookOpen, Scale, Briefcase, Monitor
+  Target, Activity, Eye, ChevronRight, Star, Timer, Lock, Unlock,
+  Layers, Globe, Settings, Database, Network, Calendar, Gauge, BookOpen, Scale, Briefcase, Monitor
 } from "lucide-react";
 
 const DataProtection = () => {
-  // Advanced AI-driven data protection analytics
-  const neuralMetrics = [
+  // Advanced data protection analytics
+  const complianceMetrics = [
     {
-      title: "Neural Privacy Index",
+      title: "Privacy Compliance Index",
       value: "98.6%",
       change: "+7.4%",
       trend: "up" as const,
-      icon: Brain,
+      icon: Shield,
       variant: "success" as const,
-      description: "AI-powered privacy compliance optimization",
+      description: "Privacy compliance optimization",
       prediction: "Perfect compliance approaching 99.8%",
     },
     {
-      title: "Quantum Data Velocity",
+      title: "Data Processing Efficiency",
       value: "91.2%",
       change: "+11.7%",
       trend: "up" as const,
-      icon: Zap,
+      icon: Activity,
       variant: "default" as const,
       description: "Advanced data processing efficiency",
       prediction: "Data flow optimization confirmed",
     },
     {
-      title: "Cyber Breach Threats",
+      title: "Security Threat Alerts",
       value: "3",
       change: "-67.8%",
       trend: "down" as const,
@@ -41,7 +41,7 @@ const DataProtection = () => {
       prediction: "Threat reduction trajectory active",
     },
     {
-      title: "Plasma Compliance Score",
+      title: "Overall Compliance Score",
       value: "96.8",
       change: "+14.2%",
       trend: "up" as const,
@@ -52,128 +52,128 @@ const DataProtection = () => {
     },
   ];
 
-  // Enhanced demo data with futuristic data protection elements
-  const quantumDataRequests = [
+  // Enhanced demo data with professional data protection elements
+  const dataRequests = [
     { 
       id: 1, 
-      type: "Neural Access Request", 
+      type: "Data Access Request", 
       subject: "Dr. Alexandra Neo", 
       email: "alex.neo@neuraldyne.com", 
-      status: "Cyber Processing", 
-      priority: "Plasma", 
-      submitted: "2 neural cycles ago",
-      aiComplexity: 92.4,
-      neuralActivity: 88.7,
-      quantumStage: "Phase 3",
+      status: "Processing", 
+      priority: "High", 
+      submitted: "2 days ago",
+      complexity: 92.4,
+      processingLevel: 88.7,
+      stage: "Phase 3",
       threatLevel: "Medium",
       complianceScore: 94.6,
       dataVolume: "2.3TB",
-      jurisdiction: "EU Neural Zone",
+      jurisdiction: "EU Region",
     },
     { 
       id: 2, 
-      type: "Quantum Deletion Protocol", 
+      type: "Data Deletion Request", 
       subject: "Commander Jane Vex", 
       email: "jane.vex@cyberops.com", 
-      status: "Neural Processing", 
-      priority: "Quantum", 
-      submitted: "1 plasma cycle ago",
-      aiComplexity: 96.1,
-      neuralActivity: 93.8,
-      quantumStage: "Phase 4",
+      status: "Processing", 
+      priority: "High", 
+      submitted: "1 day ago",
+      complexity: 96.1,
+      processingLevel: 93.8,
+      stage: "Phase 4",
       threatLevel: "High",
       complianceScore: 97.2,
       dataVolume: "5.7TB",
-      jurisdiction: "Global Cyber Network",
+      jurisdiction: "Global Network",
     },
     { 
       id: 3, 
-      type: "Plasma Rectification Matrix", 
+      type: "Data Rectification Request", 
       subject: "Agent Bob Quantum", 
       email: "bob.q@plasmatech.io", 
-      status: "Quantum Complete", 
-      priority: "Neural", 
-      submitted: "1 quantum week ago",
-      aiComplexity: 87.3,
-      neuralActivity: 91.5,
-      quantumStage: "Phase 4",
+      status: "Complete", 
+      priority: "Medium", 
+      submitted: "1 week ago",
+      complexity: 87.3,
+      processingLevel: 91.5,
+      stage: "Phase 4",
       threatLevel: "Low",
       complianceScore: 98.9,
       dataVolume: "1.1TB",
-      jurisdiction: "US Cyber Division",
+      jurisdiction: "US Division",
     },
     { 
       id: 4, 
-      type: "Neural Portability Protocol", 
+      type: "Data Portability Request", 
       subject: "Prof. Alice Cyber", 
       email: "alice.c@quantumlabs.net", 
-      status: "Cyber Pending", 
+      status: "Pending", 
       priority: "Standard", 
-      submitted: "3 neural cycles ago",
-      aiComplexity: 89.7,
-      neuralActivity: 86.2,
-      quantumStage: "Phase 2",
+      submitted: "3 days ago",
+      complexity: 89.7,
+      processingLevel: 86.2,
+      stage: "Phase 2",
       threatLevel: "Medium",
       complianceScore: 92.4,
       dataVolume: "3.8TB",
-      jurisdiction: "Asia-Pacific Neural",
+      jurisdiction: "Asia-Pacific",
     },
     { 
       id: 5, 
-      type: "Cyber Objection Analysis", 
+      type: "Data Subject Objection", 
       subject: "Director Charlie Plasma", 
       email: "charlie.p@neuralware.com", 
-      status: "Plasma Review", 
-      priority: "Quantum", 
-      submitted: "5 cyber hours ago",
-      aiComplexity: 94.8,
-      neuralActivity: 95.3,
-      quantumStage: "Phase 3",
+      status: "Review", 
+      priority: "High", 
+      submitted: "5 hours ago",
+      complexity: 94.8,
+      processingLevel: 95.3,
+      stage: "Phase 3",
       threatLevel: "Critical",
       complianceScore: 96.7,
       dataVolume: "8.2TB",
-      jurisdiction: "International Neural",
+      jurisdiction: "International",
     },
     { 
       id: 6, 
-      type: "Quantum Consent Framework", 
+      type: "Consent Management Request", 
       subject: "Agent Diana Neural", 
       email: "diana.n@cybersec.org", 
-      status: "Neural Active", 
-      priority: "Plasma", 
-      submitted: "12 quantum hours ago",
-      aiComplexity: 91.6,
-      neuralActivity: 89.4,
-      quantumStage: "Phase 3",
+      status: "Active", 
+      priority: "High", 
+      submitted: "12 hours ago",
+      complexity: 91.6,
+      processingLevel: 89.4,
+      stage: "Phase 3",
       threatLevel: "Medium",
       complianceScore: 95.1,
       dataVolume: "4.6TB",
-      jurisdiction: "EU Cyber Territory",
+      jurisdiction: "EU Territory",
     },
   ];
 
-  // AI Insights for Data Protection
-  const aiInsights = [
+  // Analytics Insights for Data Protection
+  const analyticsInsights = [
     {
-      title: "Neural Compliance Optimization",
-      description: "AI identified 6 process improvements that could boost compliance scores by 12% within one quantum cycle.",
+      title: "Compliance Process Optimization",
+      description: "Analytics identified 6 process improvements that could boost compliance scores by 12% within one month.",
       confidence: 95.7,
       category: "Optimization",
-      icon: Brain,
+      icon: Target,
     },
     {
-      title: "Quantum Threat Prediction",
-      description: "Advanced algorithms predict 89% reduction in data breach risks with new neural security protocols.",
+      title: "Security Threat Prediction",
+      description: "Advanced algorithms predict 89% reduction in data breach risks with new security protocols.",
       confidence: 92.3,
       category: "Security",
       icon: Shield,
     },
     {
-      title: "Plasma Data Efficiency",
+      title: "Data Processing Efficiency",
       description: "Machine learning suggests consolidating 4 data requests for 34% faster processing times.",
       confidence: 88.9,
       category: "Efficiency",
-      icon: Zap,
+      icon: Activity,
     },
   ];
 
@@ -234,18 +234,17 @@ const DataProtection = () => {
 
   const DataRequestCard = ({ request }: { request: any }) => {
     const statusStyles = {
-      'Cyber Processing': 'bg-green-100 text-green-800',
-      'Neural Processing': 'bg-blue-100 text-blue-800',
-      'Quantum Complete': 'bg-purple-100 text-purple-800',
-      'Cyber Pending': 'bg-amber-100 text-amber-800',
-      'Plasma Review': 'bg-indigo-100 text-indigo-800',
-      'Neural Active': 'bg-cyan-100 text-cyan-800'
+      'Processing': 'bg-blue-100 text-blue-800',
+      'Complete': 'bg-green-100 text-green-800',
+      'Pending': 'bg-amber-100 text-amber-800',
+      'Review': 'bg-purple-100 text-purple-800',
+      'Active': 'bg-cyan-100 text-cyan-800'
     };
 
     const priorityStyles = {
-      'Plasma': 'bg-purple-100 text-purple-800 border-purple-200',
-      'Quantum': 'bg-blue-100 text-blue-800 border-blue-200',
-      'Neural': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      'High': 'bg-red-100 text-red-800 border-red-200',
+      'Medium': 'bg-amber-100 text-amber-800 border-amber-200',
+      'Low': 'bg-green-100 text-green-800 border-green-200',
       'Standard': 'bg-gray-100 text-gray-800 border-gray-200'
     };
 
@@ -262,10 +261,10 @@ const DataProtection = () => {
           <div className="space-y-1">
             <p className="font-medium text-slate-900">{request.type}</p>
             <div className="flex items-center space-x-2 text-xs text-slate-500">
-              <Brain className="w-3 h-3" />
-              <span>AI Complexity: {request.aiComplexity}%</span>
+              <Activity className="w-3 h-3" />
+              <span>Complexity: {request.complexity}%</span>
               <span>•</span>
-              <span>Neural: {request.neuralActivity}%</span>
+              <span>Processing: {request.processingLevel}%</span>
             </div>
           </div>
         </td>
@@ -281,7 +280,7 @@ const DataProtection = () => {
             <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusStyles[request.status as keyof typeof statusStyles] || 'bg-gray-100 text-gray-800'}`}>
               {request.status}
             </span>
-            <p className="text-xs text-slate-500">{request.quantumStage}</p>
+            <p className="text-xs text-slate-500">{request.stage}</p>
           </div>
         </td>
         <td className="py-4">
@@ -310,7 +309,7 @@ const DataProtection = () => {
           <div className="flex space-x-1">
             <CorporateButton variant="ghost" size="sm" className="text-xs">
               <Eye className="w-3 h-3 mr-1" />
-              Neural View
+              View Details
             </CorporateButton>
           </div>
         </td>
@@ -377,9 +376,9 @@ const DataProtection = () => {
           </div>
         </div>
 
-        {/* Neural Metrics Grid */}
+        {/* Compliance Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {neuralMetrics.map((metric, index) => (
+          {complianceMetrics.map((metric, index) => (
             <StatCard key={index} {...metric} />
           ))}
         </div>
@@ -398,7 +397,7 @@ const DataProtection = () => {
           />
           <CorporateCardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {aiInsights.map((insight, index) => (
+              {analyticsInsights.map((insight, index) => (
                 <div key={index} className="bg-white rounded-xl p-4 border border-slate-200 hover:shadow-lg transition-shadow">
                   <div className="flex items-start space-x-3">
                     <div className="p-2 bg-corporate-100 rounded-lg">

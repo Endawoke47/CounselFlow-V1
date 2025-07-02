@@ -142,7 +142,7 @@ const PolicyManagement = () => {
   ];
 
   // AI Insights for Policy Management
-  const aiInsights = [
+  const businessInsights = [
     {
       title: "Neural Policy Optimization",
       description: "AI analysis suggests merging 4 overlapping cyber-policies for 23% efficiency gain.",
@@ -387,7 +387,7 @@ const PolicyManagement = () => {
           />
           <CorporateCardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {aiInsights.map((insight, index) => (
+              {businessInsights.map((insight, index) => (
                 <div key={index} className="bg-white rounded-xl p-4 border border-slate-200 hover:shadow-lg transition-shadow">
                   <div className="flex items-start space-x-3">
                     <div className="p-2 bg-corporate-100 rounded-lg">

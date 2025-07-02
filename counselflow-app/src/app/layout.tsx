@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CounselFlow - AI-Native Legal Operating System",
-  description: "Revolutionary AI-powered legal platform for elite law firms and corporate legal departments. Advanced analytics, contract management, and comprehensive legal workflow automation.",
-  keywords: ["legal AI", "law firm management", "legal compliance", "contract management", "legal analytics", "AI legal assistant"],
+  title: "CounselFlow - Professional Legal Support",
+  description: "Comprehensive legal platform for elite law firms and corporate legal departments. Advanced analytics, contract management, and professional legal workflow automation.",
+  keywords: ["legal technology", "law firm management", "legal compliance", "contract management", "legal analytics", "legal assistant"],
   authors: [{ name: "CounselFlow Team" }],
 };
 

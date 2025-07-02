@@ -68,7 +68,7 @@ export function Navigation({ onModuleSelect, activeModule }: NavigationProps) {
               CounselFlow
             </h1>
             <p style={{ color: '#64748B', fontSize: '0.8rem', margin: 0 }}>
-              Legal Operating System
+              Legal Support
             </p>
           </div>
         </div>

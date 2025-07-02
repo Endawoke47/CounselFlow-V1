@@ -52,7 +52,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'contracts',
     label: 'Contract Management',
-    href: '/contracts',
+    href: '/contracts-enhanced',
     icon: FileText,
     children: [
       { id: 'active-contracts', label: 'Active Contracts', href: '/contracts/active', icon: FileText },
@@ -63,7 +63,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'entity',
     label: 'Entity Management',
-    href: '/entity-management',
+    href: '/entity-management-enhanced',
     icon: Building,
     children: [
       { id: 'entities', label: 'Corporate Entities', href: '/entity-management/entities', icon: Building },
@@ -74,7 +74,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'tasks',
     label: 'Task Management',
-    href: '/task-management',
+    href: '/task-management-enhanced',
     icon: CheckSquare,
     children: [
       { id: 'my-tasks', label: 'My Tasks', href: '/task-management/my-tasks', icon: CheckSquare },
@@ -85,7 +85,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'knowledge',
     label: 'Knowledge Management',
-    href: '/knowledge-management',
+    href: '/knowledge-management-enhanced',
     icon: Book,
     children: [
       { id: 'documents', label: 'Document Library', href: '/knowledge-management/documents', icon: FileText },
@@ -96,7 +96,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'matters',
     label: 'Matter Management',
-    href: '/matters',
+    href: '/matter-management-enhanced',
     icon: Briefcase,
     children: [
       { id: 'active-matters', label: 'Active Matters', href: '/matters/active', icon: Briefcase },
@@ -118,7 +118,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'disputes',
     label: 'Dispute Resolution Management',
-    href: '/dispute-resolution',
+    href: '/dispute-resolution-enhanced',
     icon: Scale,
     children: [
       { id: 'active-disputes', label: 'Active Disputes', href: '/dispute-resolution/active', icon: Scale },
@@ -129,7 +129,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'outsourcing',
     label: 'Outsourcing and Spend Management',
-    href: '/outsourced-matters-spend',
+    href: '/outsourced-matters-spend-enhanced',
     icon: DollarSign,
     children: [
       { id: 'vendor-management', label: 'Vendor Management', href: '/outsourcing/vendors', icon: Users },
@@ -140,10 +140,10 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'compliance',
     label: 'Regulatory Compliance',
-    href: '/compliance',
+    href: '/regulatory-compliance-enhanced',
     icon: Shield,
     children: [
-      { id: 'compliance-dashboard', label: 'Compliance Dashboard', href: '/compliance', icon: Shield },
+      { id: 'compliance-dashboard', label: 'Compliance Dashboard', href: '/regulatory-compliance-enhanced', icon: Shield },
       { id: 'regulatory-tracking', label: 'Regulatory Tracking', href: '/compliance/regulatory', icon: FileText },
       { id: 'audit-management', label: 'Audit Management', href: '/compliance/audits', icon: Search }
     ]
@@ -151,7 +151,7 @@ const navigationItems: NavigationItem[] = [
   {
     id: 'policies',
     label: 'Policy Management',
-    href: '/policy-management',
+    href: '/policy-management-enhanced',
     icon: Book,
     children: [
       { id: 'policy-library', label: 'Policy Library', href: '/policy-management/library', icon: Book },
@@ -363,7 +363,7 @@ export const CorporateNavigation: React.FC = () => {
               isCollapsed ? 'w-0 opacity-0' : 'opacity-100'
             )}>
               <h1 className="text-lg font-semibold text-slate-900 whitespace-nowrap">CounselFlow</h1>
-              <p className="text-xs text-slate-500 whitespace-nowrap -mt-0.5">Legal OS</p>
+              <p className="text-xs text-slate-500 whitespace-nowrap -mt-0.5">Legal Support</p>
             </div>
           </div>
           

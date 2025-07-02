@@ -3,145 +3,155 @@ import { CorporateCard, CorporateCardHeader, CorporateCardContent } from "@/comp
 import { CorporateButton } from "@/components/corporate/CorporateButton";
 import { 
   TrendingUp, DollarSign, FileText, Clock, TrendingDown, Search, Filter, Plus, BarChart3, Briefcase,
-  Brain, Zap, Target, Cpu, Activity, Eye, ChevronRight, Star, Rocket, Timer, Database,
-  Users, Layers, Globe, Settings, Network, Bot, Calendar, Gauge, BookOpen, Scale, Monitor
+  Activity, Eye, ChevronRight, Users, Calendar, PieChart, LineChart, Database, Target
 } from "lucide-react";
 
 const Dealflow = () => {
-  // Advanced AI-driven dealflow analytics
-  const neuralMetrics = [
+  // Professional dealflow analytics
+  const dealMetrics = [
     {
-      title: "Neural Deal Velocity",
+      title: "Deal Velocity",
       value: "94.7%",
       change: "+28.4%",
       trend: "up" as const,
-      icon: Brain,
+      icon: TrendingUp,
       variant: "success" as const,
-      description: "AI-powered deal flow optimization",
-      prediction: "Deal acceleration approaching 97.2%",
+      description: "Deal flow processing efficiency",
+      prediction: "Velocity improvements through automation",
     },
     {
-      title: "Quantum Deal Value",
+      title: "Total Deal Value",
       value: "$47.8M",
       change: "+42.6%",
       trend: "up" as const,
-      icon: Zap,
+      icon: DollarSign,
       variant: "default" as const,
-      description: "Advanced deal value tracking",
-      prediction: "Value optimization trajectory confirmed",
+      description: "Aggregate deal portfolio value",
+      prediction: "Portfolio value expected to grow 15% this quarter",
     },
     {
-      title: "Cyber Deal Success",
+      title: "Success Rate",
       value: "89.3%",
       change: "+15.7%",
       trend: "up" as const,
-      icon: Target,
+      icon: BarChart3,
       variant: "success" as const,
-      description: "Real-time success rate monitoring",
-      prediction: "Success rate surge detected",
+      description: "Deal closure success rate",
+      prediction: "Success rate trending upward with improved processes",
     },
     {
-      title: "Plasma Closure Time",
+      title: "Average Duration",
       value: "67.2d",
       change: "-23.8%",
       trend: "down" as const,
-      icon: Timer,
+      icon: Clock,
       variant: "success" as const,
-      description: "Multi-dimensional closure optimization",
+      description: "Average deal closure time",
       prediction: "Closure time efficiency optimized",
     },
   ];
 
-  // Enhanced demo deal data with more sophisticated fields
-  const advancedDeals = [
+  // Enhanced demo deal data with professional fields
+  const deals = [
     { 
       id: 1, 
-      name: "Quantum TechCorp Acquisition", 
-      type: "Neural M&A", 
+      name: "TechCorp Acquisition", 
+      type: "M&A", 
       value: "$12.4M", 
-      stage: "AI Due Diligence", 
+      stage: "Due Diligence", 
       probability: "96.7%", 
       expectedClose: "2025-02-15", 
       lead: "Sarah Johnson",
-      aiConfidence: "98.9%",
-      dealScore: "S-Tier",
-      riskLevel: "Ultra-Low",
-      neuralInsights: "High-value acquisition with quantum synergies"
+      confidence: "98.9%",
+      dealScore: "A+",
+      riskLevel: "Low",
+      insights: "High-value acquisition with strong synergies"
     },
     { 
       id: 2, 
-      name: "Plasma StartupX Investment", 
-      type: "Cyber Investment", 
+      name: "StartupX Investment", 
+      type: "Investment", 
       value: "$8.7M", 
-      stage: "Neural Negotiation", 
+      stage: "Negotiation", 
       probability: "89.4%", 
       expectedClose: "2025-01-30", 
       lead: "Michael Chen",
-      aiConfidence: "94.2%",
-      dealScore: "A++",
+      confidence: "94.2%",
+      dealScore: "A",
       riskLevel: "Low",
-      neuralInsights: "High-growth potential with AI integration"
+      insights: "High-growth potential with strong fundamentals"
     },
     { 
       id: 3, 
-      name: "Quantum FinancePartners JV", 
-      type: "Neural Joint Venture", 
+      name: "FinancePartners JV", 
+      type: "Joint Venture", 
       value: "$15.8M", 
-      stage: "Plasma Legal Review", 
+      stage: "Legal Review", 
       probability: "97.1%", 
       expectedClose: "2025-02-28", 
       lead: "Emily Davis",
-      aiConfidence: "99.3%",
-      dealScore: "S-Tier",
-      riskLevel: "Minimal",
-      neuralInsights: "Strategic partnership with quantum advantages"
+      confidence: "99.3%",
+      dealScore: "A+",
+      riskLevel: "Very Low",
+      insights: "Strategic partnership with excellent prospects"
     },
     { 
       id: 4, 
-      name: "Cyber RetailCo Asset Deal", 
-      type: "AI Asset Purchase", 
+      name: "RetailCo Asset Deal", 
+      type: "Asset Purchase", 
       value: "$6.9M", 
-      stage: "Neural Documentation", 
+      stage: "Documentation", 
       probability: "82.8%", 
       expectedClose: "2025-03-15", 
       lead: "Robert Wilson",
-      aiConfidence: "91.7%",
-      dealScore: "A+",
-      riskLevel: "Low-Medium",
-      neuralInsights: "Asset optimization with cyber enhancements"
+      confidence: "91.7%",
+      dealScore: "B+",
+      riskLevel: "Medium",
+      insights: "Asset optimization with good return potential"
     },
     { 
       id: 5, 
-      name: "Neural CloudSoft Licensing", 
-      type: "Quantum Licensing", 
+      name: "CloudSoft Licensing", 
+      type: "Licensing", 
       value: "$3.4M", 
-      stage: "AI Initial Review", 
+      stage: "Initial Review", 
       probability: "73.6%", 
       expectedClose: "2025-04-01", 
       lead: "Lisa Anderson",
-      aiConfidence: "87.5%",
-      dealScore: "A",
+      confidence: "87.5%",
+      dealScore: "B",
       riskLevel: "Medium",
-      neuralInsights: "Licensing opportunity with neural acceleration"
+      insights: "Licensing opportunity with moderate risk"
     },
     {
       id: 6,
-      name: "Plasma BioTech Merger",
-      type: "Neural Merger",
+      name: "BioTech Merger",
+      type: "Merger",
       value: "$22.1M",
-      stage: "Quantum Analysis",
+      stage: "Analysis",
       probability: "94.8%",
       expectedClose: "2025-03-30",
       lead: "Dr. Amanda Foster",
-      aiConfidence: "97.6%",
-      dealScore: "S-Tier",
-      riskLevel: "Ultra-Low",
-      neuralInsights: "High-impact merger with quantum biotechnology"
+      confidence: "97.6%",
+      dealScore: "A+",
+      riskLevel: "Low",
+      insights: "High-impact merger with excellent synergies"
     }
   ];
 
-  // Enhanced StatCard component with neural analytics
-  const NeuralStatCard = ({ title, value, change, trend, icon: Icon, variant, description, prediction }: any) => {
+  // Professional StatCard component with analytics
+  interface StatCardProps {
+    title: string;
+    value: string;
+    change: string;
+    trend: 'up' | 'down';
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    variant: 'default' | 'success' | 'warning' | 'danger';
+    description: string;
+    prediction?: string;
+  }
+
+  const StatCard = ({ title, value, change, trend, icon: Icon, variant, description, prediction }: StatCardProps) => {
     const variantStyles = {
       default: 'border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100',
       success: 'border-emerald-200 bg-gradient-to-br from-emerald-50 to-emerald-100',
@@ -195,10 +205,10 @@ const Dealflow = () => {
             
             <div className="p-2 bg-white/40 rounded-lg border border-slate-200/50">
               <div className="flex items-center space-x-2">
-                <Cpu className="w-3 h-3 text-slate-400" />
-                <p className="text-xs text-slate-600 font-medium">AI Prediction:</p>
+                <Target className="w-3 h-3 text-slate-400" />
+                <p className="text-xs text-slate-600 font-medium">Prediction:</p>
               </div>
-              <p className="text-xs text-slate-500 mt-1">{prediction}</p>
+              <p className="text-xs text-slate-500 mt-1">{prediction || "Positive outlook based on current trends"}</p>
             </div>
           </div>
         </div>
@@ -209,9 +219,9 @@ const Dealflow = () => {
   return (
     <CorporateLayout>
       <div className="space-y-8">
-        {/* Enhanced Neural Header */}
+        {/* Professional Header */}
         <div className="relative bg-gradient-to-r from-corporate-600 via-corporate-700 to-corporate-800 rounded-2xl p-8 text-white overflow-hidden">
-          {/* Neural Background Effects */}
+          {/* Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-cyan-500/10"></div>
           <div className="absolute top-0 left-0 w-full h-full">
             <div className="absolute top-4 left-4 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
@@ -227,11 +237,11 @@ const Dealflow = () => {
                 </div>
                 <div>
                   <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
-                    Neural Dealflow Management
+                    Dealflow Management
                   </h1>
                   <p className="text-corporate-100 text-lg flex items-center space-x-2">
-                    <Brain className="w-5 h-5 text-cyan-300" />
-                    <span>AI-powered deal intelligence & quantum transaction optimization</span>
+                    <BarChart3 className="w-5 h-5 text-cyan-300" />
+                    <span>Advanced deal intelligence & transaction optimization</span>
                   </p>
                 </div>
               </div>
@@ -239,15 +249,15 @@ const Dealflow = () => {
               <div className="flex items-center space-x-6 text-sm">
                 <div className="flex items-center space-x-2">
                   <Activity className="w-4 h-4 text-green-400" />
-                  <span className="text-green-200">Neural Engine Active</span>
+                  <span className="text-green-200">System Active</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Zap className="w-4 h-4 text-yellow-400" />
-                  <span className="text-yellow-200">Quantum Processing</span>
+                  <LineChart className="w-4 h-4 text-yellow-400" />
+                  <span className="text-yellow-200">Real-time Processing</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Target className="w-4 h-4 text-purple-400" />
-                  <span className="text-purple-200">Plasma Analytics</span>
+                  <span className="text-purple-200">Advanced Analytics</span>
                 </div>
               </div>
             </div>
@@ -267,27 +277,27 @@ const Dealflow = () => {
           <div className="relative z-10 mt-8 flex flex-wrap gap-4">
             <CorporateButton variant="secondary" size="md" className="bg-white/10 border-white/20 hover:bg-white/20 backdrop-blur-sm">
               <Plus className="w-4 h-4 mr-2" />
-              Add Neural Deal
+              Add New Deal
             </CorporateButton>
             <CorporateButton variant="ghost" size="md" className="text-white border-white/20 hover:bg-white/10 backdrop-blur-sm">
               <BarChart3 className="w-4 h-4 mr-2" />
-              Quantum Analytics
+              Analytics Dashboard
             </CorporateButton>
             <CorporateButton variant="ghost" size="md" className="text-white border-white/20 hover:bg-white/10 backdrop-blur-sm">
-              <Brain className="w-4 h-4 mr-2" />
-              AI Predictions
+              <PieChart className="w-4 h-4 mr-2" />
+              Performance Reports
             </CorporateButton>
           </div>
         </div>
 
-        {/* Neural Analytics Grid */}
+        {/* Analytics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {neuralMetrics.map((metric, index) => (
-            <NeuralStatCard key={index} {...metric} />
+          {dealMetrics.map((metric, index) => (
+            <StatCard key={index} {...metric} />
           ))}
         </div>
 
-        {/* Advanced Neural Deal Pipeline */}
+        {/* Advanced Deal Pipeline */}
         <CorporateCard variant="elevated" padding="none" className="shadow-2xl border-slate-200">
           <div className="p-6 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
             <div className="flex items-center justify-between">
@@ -296,18 +306,18 @@ const Dealflow = () => {
                   <Database className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Neural Deal Pipeline</h3>
-                  <p className="text-sm text-slate-600">AI-powered deal intelligence & quantum transaction tracking</p>
+                  <h3 className="text-xl font-bold text-slate-900">Deal Pipeline</h3>
+                  <p className="text-sm text-slate-600">Advanced deal intelligence & transaction tracking</p>
                 </div>
               </div>
               <div className="flex space-x-2">
                 <CorporateButton variant="ghost" size="sm" className="border-slate-200 hover:bg-slate-50">
                   <Filter className="w-4 h-4 mr-2" />
-                  Neural Filter
+                  Filter
                 </CorporateButton>
                 <CorporateButton variant="ghost" size="sm" className="border-slate-200 hover:bg-slate-50">
                   <BarChart3 className="w-4 h-4 mr-2" />
-                  AI Analytics
+                  Analytics
                 </CorporateButton>
                 <CorporateButton variant="primary" size="sm" className="bg-gradient-to-r from-corporate-600 to-corporate-700 hover:from-corporate-700 hover:to-corporate-800">
                   <Plus className="w-4 h-4 mr-2" />
@@ -325,24 +335,24 @@ const Dealflow = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <input
                     type="text"
-                    placeholder="Search neural deals with AI..."
+                    placeholder="Search deals with advanced filtering..."
                     className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-corporate-500 focus:border-transparent bg-white shadow-sm"
                   />
                 </div>
                 <div className="flex items-center space-x-2">
                   <CorporateButton variant="ghost" size="sm" className="border-slate-200">
-                    <Brain className="w-4 h-4 mr-2" />
-                    AI Sort
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Sort
                   </CorporateButton>
                   <CorporateButton variant="ghost" size="sm" className="border-slate-200">
-                    <Zap className="w-4 h-4 mr-2" />
-                    Quantum View
+                    <PieChart className="w-4 h-4 mr-2" />
+                    View Options
                   </CorporateButton>
                 </div>
               </div>
               
               <div className="flex items-center justify-between text-sm text-slate-600">
-                <span>Showing {advancedDeals.length} neural deals with AI confidence scores</span>
+                <span>Showing {deals.length} active deals with confidence scores</span>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <Activity className="w-4 h-4 text-green-500" />
@@ -350,7 +360,7 @@ const Dealflow = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <Target className="w-4 h-4 text-blue-500" />
-                    <span>Plasma analytics enabled</span>
+                    <span>Advanced analytics enabled</span>
                   </div>
                 </div>
               </div>
@@ -365,7 +375,7 @@ const Dealflow = () => {
                     <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">Type</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">Value</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">Stage</th>
-                    <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">AI Confidence</th>
+                    <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">Confidence</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">Probability</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">Expected Close</th>
                     <th className="text-left p-4 text-sm font-semibold text-slate-700 border-b border-slate-200">Lead</th>
@@ -373,7 +383,7 @@ const Dealflow = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white">
-                  {advancedDeals.map((deal) => (
+                  {deals.map((deal) => (
                     <tr key={deal.id} className="border-b border-slate-100 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100/50 transition-all duration-200">
                       <td className="p-4">
                         <div className="flex items-center space-x-3">
@@ -404,10 +414,10 @@ const Dealflow = () => {
                           <div className="w-12 h-2 bg-slate-200 rounded-full overflow-hidden">
                             <div 
                               className="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full"
-                              style={{ width: deal.aiConfidence }}
+                              style={{ width: deal.confidence }}
                             ></div>
                           </div>
-                          <span className="text-sm font-medium text-slate-700">{deal.aiConfidence}</span>
+                          <span className="text-sm font-medium text-slate-700">{deal.confidence}</span>
                         </div>
                       </td>
                       <td className="p-4">
@@ -442,17 +452,17 @@ const Dealflow = () => {
               </table>
             </div>
             
-            {/* Neural Analytics Footer */}
+            {/* Analytics Footer */}
             <div className="mt-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
-                    <Brain className="w-4 h-4 text-corporate-600" />
-                    <span className="text-slate-700">Neural processing complete</span>
+                    <BarChart3 className="w-4 h-4 text-corporate-600" />
+                    <span className="text-slate-700">Processing complete</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Zap className="w-4 h-4 text-yellow-600" />
-                    <span className="text-slate-700">Quantum sync active</span>
+                    <LineChart className="w-4 h-4 text-yellow-600" />
+                    <span className="text-slate-700">Real-time sync active</span>
                   </div>
                 </div>
                 <div className="text-slate-600">

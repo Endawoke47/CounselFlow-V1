@@ -60,7 +60,7 @@ export interface Matter {
   clientId: string
   assignedLawyers: User[]
   documents: LegalDocument[]
-  aiInsights: AIInsight[]
+  businessInsights: BusinessInsight[]
   riskScore: number
   budget: number
   actualCost: number
@@ -95,7 +95,7 @@ export interface LegalDocument {
   clientId: string
   matterId?: string
   createdBy: string
-  aiAnalysis?: DocumentAIAnalysis
+  analyticsAnalysis?: DocumentAnalyticsAnalysis
   riskScore?: number
   privilegeProtected: boolean
   retentionPolicy: string
@@ -129,11 +129,11 @@ export interface DocumentMetadata {
   customFields: Record<string, unknown>
 }
 
-// AI Integration Types
-export interface AIAgent {
+// Analytics Integration Types
+export interface AnalyticsAgent {
   id: string
   name: string
-  type: AIAgentType
+  type: AnalyticsAgentType
   capabilities: string[]
   specializations: string[]
   model: string
@@ -141,7 +141,7 @@ export interface AIAgent {
   isActive: boolean
 }
 
-export type AIAgentType = 
+export type AnalyticsAgentType = 
   | 'legal_researcher'
   | 'contract_analyzer'
   | 'risk_assessor'
@@ -153,7 +153,7 @@ export type AIAgentType =
   | 'corporate_counsel'
   | 'privacy_officer'
 
-export interface AIInsight {
+export interface BusinessInsight {
   id: string
   type: InsightType
   title: string
@@ -161,10 +161,10 @@ export interface AIInsight {
   confidence: number
   severity: Severity
   recommendations: string[]
-  source: AIAgentType
+  source: AnalyticsAgentType
   createdAt: Date
   actionTaken?: string
-  feedback?: AIFeedback
+  feedback?: AnalyticsFeedback
 }
 
 export type InsightType = 
@@ -179,7 +179,7 @@ export type InsightType =
 
 export type Severity = 'info' | 'low' | 'medium' | 'high' | 'critical'
 
-export interface AIFeedback {
+export interface AnalyticsFeedback {
   rating: number // 1-5
   helpful: boolean
   comment?: string
@@ -197,7 +197,7 @@ export interface RiskAssessment {
   probability: number // 0-1
   impact: number // 0-1
   compositeScore: number
-  aiGenerated: boolean
+  analyticsGenerated: boolean
   humanValidated: boolean
   mitigationStrategy: MitigationStrategy
   status: RiskStatus
@@ -212,7 +212,7 @@ export type RiskType =
   | 'financial'
   | 'operational'
   | 'reputational'
-  | 'cyber_security'
+  | 'security_compliance'
   | 'compliance'
 
 export interface MitigationStrategy {
@@ -250,7 +250,7 @@ export interface Contract {
   renewalTerms?: RenewalTerms
   keyTerms: ContractTerm[]
   clauses: ContractClause[]
-  aiAnalysis: ContractAIAnalysis
+  analyticsAnalysis: ContractAnalyticsAnalysis
   riskScore: number
   complianceStatus: ComplianceStatus
   metadata: Record<string, unknown>
@@ -440,8 +440,8 @@ export interface SortInfo {
   direction: 'asc' | 'desc'
 }
 
-// AI Analysis Types
-export interface DocumentAIAnalysis {
+// Analytics Analysis Types
+export interface DocumentAnalyticsAnalysis {
   summary: string
   keyPoints: string[]
   riskFactors: RiskFactor[]
@@ -452,7 +452,7 @@ export interface DocumentAIAnalysis {
   version: string
 }
 
-export interface ContractAIAnalysis extends DocumentAIAnalysis {
+export interface ContractAnalyticsAnalysis extends DocumentAnalyticsAnalysis {
   unusualClauses: UnusualClause[]
   marketComparison: MarketComparison
   negotiationPoints: NegotiationPoint[]

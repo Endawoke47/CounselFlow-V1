@@ -6,7 +6,7 @@ export default function SimplePage() {
           🚀 CounselFlow
         </h1>
         <p className="text-gray-600 mb-4">
-          AI-Native Legal Operating System
+          Professional Legal Support
         </p>
         <div className="space-y-2">
           <p className="text-sm text-green-600">✅ Backend Running</p>
