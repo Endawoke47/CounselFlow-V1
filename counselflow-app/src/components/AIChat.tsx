@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Loader2, FileText, AlertTriangle, CheckCircle } from 'lucide-react';
-import { getAIService, AIQueryRequest } from '../services/aiService';
+import { getAIService, AnalyticsQueryRequest } from '../services/aiService';
 
 interface Message {
   id: string;
@@ -32,7 +32,7 @@ export const AIChat: React.FC<AIChatProps> = ({ matterId, clientId }) => {
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
-  const [selectedAgent, setSelectedAgent] = useState<AIQueryRequest['agent_type']>('legal_research');
+  const [selectedAgent, setSelectedAgent] = useState<AnalyticsQueryRequest['agent_type']>('legal_research');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const aiService = getAIService();
@@ -61,7 +61,7 @@ export const AIChat: React.FC<AIChatProps> = ({ matterId, clientId }) => {
 
     try {
       // Create AI query
-      const queryRequest: AIQueryRequest = {
+      const queryRequest: AnalyticsQueryRequest = {
         agent_type: selectedAgent,
         query: inputMessage,
         priority: 'medium',
@@ -149,7 +149,7 @@ export const AIChat: React.FC<AIChatProps> = ({ matterId, clientId }) => {
         <h3 className="text-lg font-semibold text-gray-900">AI Legal Assistant</h3>
         <select
           value={selectedAgent}
-          onChange={(e) => setSelectedAgent(e.target.value as AIQueryRequest['agent_type'])}
+          onChange={(e) => setSelectedAgent(e.target.value as AnalyticsQueryRequest['agent_type'])}
           className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="legal_research">Legal Research</option>

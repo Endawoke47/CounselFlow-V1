@@ -237,6 +237,22 @@ export type ActionStatus = 'pending' | 'in_progress' | 'completed' | 'overdue'
 export type RiskStatus = 'open' | 'monitoring' | 'mitigated' | 'accepted' | 'closed'
 
 // Contract Management Types
+export interface AIAnalysis {
+  summary: string
+  keyPoints: string[]
+  riskFactors: RiskFactor[]
+  recommendations: string[]
+  confidence: number
+  processingTime: number
+  model: string
+  version: string
+  lastUpdated: Date
+  unusualClauses: string[]
+  marketComparison: MarketComparison
+  negotiationPoints: NegotiationPoint[]
+  complianceIssues: string[]
+}
+
 export interface Contract {
   id: string
   title: string
@@ -250,7 +266,8 @@ export interface Contract {
   renewalTerms?: RenewalTerms
   keyTerms: ContractTerm[]
   clauses: ContractClause[]
-  analyticsAnalysis: ContractAnalyticsAnalysis
+  analyticsAnalysis?: ContractAnalyticsAnalysis
+  aiAnalysis?: AIAnalysis
   riskScore: number
   complianceStatus: ComplianceStatus
   metadata: Record<string, unknown>

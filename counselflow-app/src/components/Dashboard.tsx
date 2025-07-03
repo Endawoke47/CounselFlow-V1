@@ -14,7 +14,7 @@ import DisputeResolution from './modules/DisputeResolution'
 import OutsourcingSpendManagement from './modules/OutsourcingSpendManagement'
 import RegulatoryCompliance from './modules/RegulatoryCompliance'
 import PolicyManagement from './modules/PolicyManagement'
-import { AILegalAssistantHub } from './modules/AILegalAssistantHub'
+import { LegalAnalyticsAssistantHub } from './modules/AILegalAssistantHub'
 import { EnhancedDashboard } from './modules/EnhancedAIDashboard'
 import DocumentVersionControl from './modules/DocumentVersionControl'
 import MobileOptimization from './modules/MobileOptimization'
@@ -145,7 +145,7 @@ const modules: ModuleInfo[] = [
     description: 'Access AI-powered legal research, document analysis, and insights',
     icon: '🤖',
     color: 'bg-cyan-500',
-    component: AILegalAssistantHub,
+    component: LegalAnalyticsAssistantHub,
     category: 'ai',
     permissions: ['ai.access', 'ai.query']
   },
@@ -335,7 +335,7 @@ export default function Dashboard({ user = mockUser }: DashboardProps) {
                 </button>
               </div>
               <div className="p-4 h-full overflow-auto">
-                <AILegalAssistantHub userId={user.id} permissions={user.permissions} language={user.preferredLanguage} />
+                <LegalAnalyticsAssistantHub userId={user.id} permissions={user.permissions} language={user.preferredLanguage} />
               </div>
             </div>
           </div>
@@ -515,7 +515,7 @@ export default function Dashboard({ user = mockUser }: DashboardProps) {
               </button>
             </div>
             <div className="p-4 h-full overflow-auto">
-              <AILegalAssistantHub userId={user.id} permissions={user.permissions} language={user.preferredLanguage} />
+              <LegalAnalyticsAssistantHub userId={user.id} permissions={user.permissions} language={user.preferredLanguage} />
             </div>
           </div>
         </div>

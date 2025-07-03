@@ -142,6 +142,7 @@ export function ContractLifecycleManagement({
         processingTime: 1.2,
         model: 'CounselFlow-Legal-v2.1',
         version: '2.1.0',
+        lastUpdated: new Date('2024-12-01T10:30:00Z'),
         unusualClauses: [],
         marketComparison: {
           metric: 'Annual License Fee',

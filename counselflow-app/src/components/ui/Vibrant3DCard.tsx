@@ -4,10 +4,12 @@ import { useState } from 'react'
 
 interface Vibrant3DCardProps {
   children: React.ReactNode
-  variant?: 'professional' | 'elevated' | 'subtle' | 'outlined'
+  variant?: 'professional' | 'elevated' | 'subtle' | 'outlined' | 'glass' | 'gradient'
   size?: 'sm' | 'md' | 'lg' | 'xl'
   className?: string
   onClick?: () => void
+  hover3D?: boolean
+  glowEffect?: boolean
 }
 
 export function Vibrant3DCard({
@@ -15,7 +17,9 @@ export function Vibrant3DCard({
   variant = 'professional',
   size = 'md',
   className = '',
-  onClick
+  onClick,
+  hover3D = false,
+  glowEffect = false
 }: Vibrant3DCardProps) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -52,6 +56,23 @@ export function Vibrant3DCard({
           boxShadow: isHovered 
             ? '0 8px 20px rgba(30, 41, 59, 0.1)'
             : '0 2px 8px rgba(30, 41, 59, 0.05)',
+        }
+      case 'glass':
+        return {
+          background: 'rgba(255, 255, 255, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          backdropFilter: 'blur(10px)',
+          boxShadow: isHovered 
+            ? '0 8px 32px rgba(31, 38, 135, 0.37)'
+            : '0 4px 20px rgba(31, 38, 135, 0.2)',
+        }
+      case 'gradient':
+        return {
+          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%)',
+          border: '1px solid rgba(226, 232, 240, 0.6)',
+          boxShadow: isHovered 
+            ? '0 12px 30px rgba(30, 41, 59, 0.15)'
+            : '0 6px 18px rgba(30, 41, 59, 0.1)',
         }
       default:
         return {
@@ -106,9 +127,12 @@ export function Vibrant3DCard({
     overflow: 'hidden',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: onClick ? 'pointer' : 'default',
-    transform: isHovered 
+    transform: isHovered && hover3D
+      ? `translateY(-2px) rotateX(2deg) rotateY(2deg)`
+      : isHovered
       ? `translateY(-2px)`
       : 'translateY(0px)',
+    filter: glowEffect && isHovered ? 'drop-shadow(0 0 20px rgba(59, 130, 246, 0.3))' : 'none',
   }
 
   return (

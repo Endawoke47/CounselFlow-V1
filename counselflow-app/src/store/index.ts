@@ -541,6 +541,7 @@ export const useContractStore = create<ContractState>()(
                 processingTime: 2.5,
                 model: 'contract-analyzer-v2',
                 version: '2.1.0',
+                lastUpdated: new Date(),
                 unusualClauses: [],
                 marketComparison: {
                   metric: 'Total Contract Value',
